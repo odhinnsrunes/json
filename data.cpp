@@ -1,7 +1,7 @@
 #include "data.hpp"
 #include <iomanip>
-#include "tinyxml.h"
-#include "tinystr.h"
+#include "tinyxml/tinyxml.h"
+#include "tinyxml/tinystr.h"
 
 namespace data
 {
