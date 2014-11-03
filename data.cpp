@@ -475,9 +475,11 @@ void document::stripNameSpaces(json::atom & a, json::document jNameSpaces, bool 
 		for(json::iterator it = a.begin(); it != a.end(); ++it){
 			std::string sKey = it.key().string();
 			for(json::iterator nit = jNameSpaces.begin(); nit != jNameSpaces.end(); ++nit){
-				if(sKey.substr(0, (*nit).string().size()) == (*nit).string()){
-					sKey = sKey.substr((*nit).string().size());
-				}
+                if(sKey.size() > (*nit).string().size()){
+                    if(sKey.substr(0, (*nit).string().size()) == (*nit).string()){
+                        sKey = sKey.substr((*nit).string().size());
+                    }
+                }
 			}
 			temp[sKey] = (*it);
 			stripNameSpaces(temp[sKey], jNameSpaces);
@@ -500,9 +502,11 @@ void document::stripNameSpace(json::atom & a, std::string sNameSpace, bool begin
 		json::atom temp;
 		for(json::iterator it = a.begin(); it != a.end(); ++it){
 			std::string sKey = it.key().string();
-			if(sKey.substr(0, sNameSpace.size()) == sNameSpace){
-				sKey = sKey.substr(sNameSpace.size());
-			}
+            if(sKey.size() > sNameSpace.size()){
+                if(sKey.substr(0, sNameSpace.size()) == sNameSpace){
+                    sKey = sKey.substr(sNameSpace.size());
+                }
+            }
 			temp[sKey] = (*it);
 			stripNameSpace(temp[sKey], sNameSpace, false);
 		}
