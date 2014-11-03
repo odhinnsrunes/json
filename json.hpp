@@ -140,7 +140,7 @@ namespace json
 		friend void nullParse(atom& ret, instring& inputString, bool* bFailed);
 		friend void valueParse(atom& a, instring& inputString, bool* bFailed);
         friend void numberParse(atom& ret, instring& s, bool* bFailed);
-		friend void swap(atom& lhs, atom& rhs) {
+		static void swap(atom& lhs, atom& rhs) {
 			using std::swap;
 			swap(lhs.m_number, rhs.m_number);
 			swap(lhs.m_boolean, rhs.m_boolean);

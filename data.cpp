@@ -457,6 +457,61 @@ bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPrett
 		return true;
 	}
 	return false;
-}		
+}
+
+void document::stripNameSpaces(json::atom & a, json::document jNameSpaces, bool begin)
+{
+	if(begin){
+		for(json::iterator it = jNameSpaces.begin(); it != jNameSpaces.end(); ++it){
+			std::string sNS = (*it).string();
+			if(sNS[sNS.size() - 1] != ':'){
+				sNS.append(":");
+				(*it) = sNS;
+			}
+		}
+	}
+	if(a.isA(json::JSON_OBJECT)){
+		json::atom temp;
+		for(json::iterator it = a.begin(); it != a.end(); ++it){
+			std::string sKey = it.key().string();
+			for(json::iterator nit = jNameSpaces.begin(); nit != jNameSpaces.end(); ++nit){
+				if(sKey.substr(0, (*nit).string().size()) == (*nit).string()){
+					sKey = sKey.substr((*nit).string().size());
+				}
+			}
+			temp[sKey] = (*it);
+			stripNameSpaces(temp[sKey], jNameSpaces);
+		}
+		json::atom::swap(a, temp);
+	} else if(a.isA(json::JSON_ARRAY)){
+		for(json::iterator it = a.begin(); it != a.end(); ++it){
+			stripNameSpaces((*it), jNameSpaces);
+		}
+	}
+
+}
+
+void document::stripNameSpace(json::atom & a, std::string sNameSpace, bool begin)
+{
+	if(begin)
+		if(sNameSpace[sNameSpace.size() - 1] != ':')
+			sNameSpace.append(":");
+	if(a.isA(json::JSON_OBJECT)){
+		json::atom temp;
+		for(json::iterator it = a.begin(); it != a.end(); ++it){
+			std::string sKey = it.key().string();
+			if(sKey.substr(0, sNameSpace.size()) == sNameSpace){
+				sKey = sKey.substr(sNameSpace.size());
+			}
+			temp[sKey] = (*it);
+			stripNameSpace(temp[sKey], sNameSpace, false);
+		}
+		json::atom::swap(a, temp);
+	} else if(a.isA(json::JSON_ARRAY)){
+		for(json::iterator it = a.begin(); it != a.end(); ++it){
+			stripNameSpace((*it), sNameSpace, false);
+		}
+	}
+}
 
 }

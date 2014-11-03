@@ -33,6 +33,9 @@ namespace data
 		std::string rootTag() { return sRootTag; }
 		void rootTag(std::string rootElem) { sRootTag = rootElem; }
 
+		static void stripNameSpaces(json::atom & jDoc, json::document jNameSpaces, bool begin = true);
+		static void stripNameSpace(json::atom & jDoc, std::string sNameSpace, bool begin = true);
+
 	private:
 		void parseXMLElement(json::atom& ret, const TiXmlNode * elem);
 		void writeXML(std::string & str, json::atom & ret, int depth, bool bPretty = true, bool bTabs = true);
