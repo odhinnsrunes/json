@@ -692,12 +692,12 @@ namespace json
 		
 		bool writeFile(std::string inStr, bool bPretty = false, PREWRITEPTR = NULL) const;
 		
-		std::string ParseResult() const
+		std::string parseResult() const
 		{
 			return strParseResult;
 		}
 		
-		bool ParseSuccessful() const
+		bool parseSuccessful() const
 		{
 			return bParseSuccessful;
 		}
