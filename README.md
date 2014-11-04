@@ -1,6 +1,8 @@
 json::document
 ==============
 
+The official repository for this library is at https://github.com/odhinnsrunes/json
+
 The purpose of this library is to allow JSON to be used in C++ with a very simple interface similar to how you would use it in other languages that support it natively.  It is also designed to be fast.  It can parse and write megabytes in milliseconds.  It's been tested in Linux, Windows and MacOS using g++, clang++, Visual C++ and even Borland C++.
 
 More information regarding the JSON standard can be found here: <http://json.org/>
