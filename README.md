@@ -94,7 +94,7 @@ You can get other information with teh following functions:
     - json::JSON_STRING - value is a string.
     - json::JSON_ARRAY - value is an array.
     - json::JSON_OBJECT - value is an object.
-- isa(json type) - returns true if the value's type is the same as that passed in the argument.  The types are the same as those returned from the isA() function above.
+- isA(json type) - returns true if the value's type is the same as that passed in the argument.  The types are the same as those returned from the isA() function above.
 - empty() - returns false if an object or an array have items in them or if the value is a string, number or boolean.  Returns true if the value doesn't exist, if it's a NULL or if it is an empty object or array.
 
 Some other functions for working with JSON are:
@@ -104,6 +104,7 @@ Some other functions for working with JSON are:
 - push\_front(value) - pushes the value to the start of an array.  Creates the array if it doesn't exist.
 - pop\_back() - returns a json value (json::atom) that is the last item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
 - pop\_front() - returns a json value (json::atom) that is the first item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
+- insert(number, string or iterators and a value) - will insert a new value into an existing array or object at the point indicated.  This will invalidate any iterators referencing the array or object in question.  For an object, this is the same as just adding the value the normal way.
 
 Some Examples of these are:
 
@@ -113,4 +114,29 @@ Some Examples of these are:
     jDoc["array"].push_front("Test");
     int i = (int)jDoc["array"].pop_back().integer();
     std::string s = jDoc["array"].pop_front().string();
+    jDoc["array"].insert(0, "new value");
+
+There are three functions for removing data from a json::document:
+- clear() - this removes the contents of the value it is used on.
+- erase(index, iterator or 2 iterators) - this finds the specified value or range of values and removes it.  The arguments can be either a number for removing an item from an array, a string for removing an item from an object, an iterator that will remove an item from an array or an object or tow iterators, one for the range start and one for the range end that will remove all items from an array or object that fall between the iterators.  Any iterator for the array or object will be invalidated by erase.
+- destroy() - similar to erase, but removes the item it is called from.
+
+For example:
+
+    jDoc.clear(); // completely clears the json::document.
+    jDoc["array"].clear(); // empties the array "array" but leaves it in the document as [].
+    jDoc["array"].erase(6); // removes item 6 from "array".
+    jDoc.erase("array"); //removes "array" completely from the document.
+    jDoc["array"].destroy(); // the same as jDoc.erase("array");
+
+json::document also has a full set of operators:
+- +, - , *, /, %, +=, -=, *=, /=, %=  work on numbers, some work on booleans and + and += append strings like in std::string.
+- ==, !=, <, >, <=, >= work on all value types.
+- ++, -- and - work on numbers and booleans only.
+
+For example:
+
+    if(jDoc["number"] == 6){} // works, however this is invalid: if(6 == jDoc["number"]) {} use instead: if(6 == jDoc["number"].number()) {}
+    jDoc["string"] += ", world!";
+    jDoc["number"]++;
 
