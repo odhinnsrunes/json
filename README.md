@@ -24,5 +24,43 @@ Here is an example of reading and updating a simple JSON file with json::documen
         printf("Error reading JSON file: %s\n", jDoc.parseResult().c_str());
     }
     jDoc["bar"] = "baz";
-    jDoc.writeFile("sample.json", true); // true is optioal and tells the writer to output "pretty" JSON.
+    jDoc.writeFile("sample.json", true); // true is optional and tells the writer to output "pretty" JSON.
 
+You can access arrays using a number as the index in the square brackets:
+
+    for(size_t i = 0; i < jDoc.size(); i++){
+        jDoc[i] = i * 2;
+    }
+
+You can access objects using a string or char array as the index in teh square brackets:
+
+    jDoc["foo"] = 8;
+    
+Any numeric value, boolean, char array / string, object or array can be assigned to any JSON value:
+
+    jDoc["null"] = (char*)NULL;
+    jDoc["true"] = true;
+    jDoc["false"] = false;
+    jDoc["number"] = 1.234;
+    jDoc["string"] = "Hello, world!";
+    jDoc["object"] = jDoc["other_object"];
+    jDoc["array"] = jDoc["oterh_array"];
+    
+Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators:
+
+    json::iterator itObject= jDoc["some_object"].find("some_sub_value");
+    for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
+        std::string sKey = it.key().string();
+        std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
+    }
+    
+You can retrive values from a json::document with several conversion functions:
+
+- boolean() - returns a bool.
+- number() - returns a double. (Converts from strings as appropriate.)
+- integer() - returns a 64bit integer.
+- c_str() - returns a const char *.  Guaranteed to not be NULL.
+- string() - returns a std::string &
+- cString() - returns a char *.  NULL if it doesn't exist or the JSON value is null.
+
+    
