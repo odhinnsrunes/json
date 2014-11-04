@@ -16,13 +16,13 @@ Using json::document
 
 Here is an example of reading and updating a simple JSON file with json::document:
 
-  json::document jDoc;
-  if(jDoc.parseFile("sample.json")){
-    // read was successful
-    printf("foo = %s\n", jDoc["bar"].c_str());
-  } else {
-    printf("Error reading JSON file: %s\n", jDoc.parseResult().c_str());
-  }
-  jDoc["bar"] = "baz";
-  jDoc.writeFile("sample.json", true); // true is optioal and tells the writer to output "pretty" JSON.
+    json::document jDoc;
+    if(jDoc.parseFile("sample.json")){
+        // read was successful
+        printf("foo = %s\n", jDoc["bar"].c_str());
+    } else {
+        printf("Error reading JSON file: %s\n", jDoc.parseResult().c_str());
+    }
+    jDoc["bar"] = "baz";
+    jDoc.writeFile("sample.json", true); // true is optioal and tells the writer to output "pretty" JSON.
 
