@@ -48,13 +48,20 @@ Any numeric value, boolean, char array / string, object or array can be assigned
     jDoc["object"] = jDoc["other_object"];
     jDoc["array"] = jDoc["oterh_array"];
     
-Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators:
+Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators or reverse_iterators:
 
     json::iterator itObject= jDoc["some_object"].find("some_sub_value");
     for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
         std::string sKey = it.key().string(); // this will work for arrays as well, but the key will always return 0.
                                               // key() returns a JSON atom (value).
         std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
+    }
+    
+    json::reverse itObject= jDoc["some_object"].find("some_sub_value");
+    for(json::reverse_iterator rit = (*itObject).rbegin(); rit != (*itObject).rend(); ++rit){
+        std::string sKey = rit.key().string(); // this will work for arrays as well, but the key will always return 0.
+                                              // key() returns a JSON atom (value).
+        std::cout << "key = " << sKey << ", value = " << (*rit).number() << "\n";
     }
     
 You can retrive values from a json::document with several conversion functions:
@@ -65,6 +72,13 @@ You can retrive values from a json::document with several conversion functions:
 - c_str() - returns a const char *.  Guaranteed to not be NULL.  (Converts from numbers as appropriate)
 - string() - returns a std::string & (Converts from numbers as appropriate)
 - cString() - returns a char *.  NULL if it doesn't exist or the JSON value is null. (Converts from numbers as appropriate)
+
+Here are some examples:
+
+    int i = (int)jDoc["integer"].integer();
+    double d = jDoc["double"].number();
+    std::string str = jDoc["string"].string();
+    const char * szChar = jDoc["char"].c_str();
 
 You can get other information with teh following functions:
 
@@ -78,3 +92,6 @@ You can get other information with teh following functions:
     - json::JSON_STRING - value is a string.
     - json::JSON_ARRAY - value is an array.
     - json::JSON_OBJECT - value is an object.
+- isa(json type) - returns true if the value's type is the same as that passed in the argument.  The types are the same as those returned from the isA() function above.
+- empty() - returns false if an object or an array have items in them or if the value is a string, number or boolean.  Returns true if the value doesn't exist, if it's a NULL or if it is an empty object or array.
+
