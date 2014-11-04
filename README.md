@@ -17,8 +17,16 @@ data.?pp is an extension to json.?pp that allows a certain subset of XML to be p
 
 jsonquery.?pp is an experimental query language in JSON that is designed to get data from a JSON document much like an SQL statement would get it from a database.
 
+This document is incomplete, but gets most of the information across.
+
 Using json::document
 --------------------
+
+There are two ways to parse and two ways to write JSON documents:
+- parse(string) - pass a JSON string and it will parse it.  This returns true if parsing was successful.  parseResult() will contain error information if parsing failed.
+- parseFile(string) - will parse a file with the name given.  This returns true if parsing was successful.  parseResult() will contain error information if parsing failed.
+- write(pretty) - will return a std::string containing the JSON document.  Pass true for pretty if you want the JSON formatted with indentation and line feeds or omit pretty or pass false to have the JSON without tabs or line feeds.
+- writeFile(string, pretty) - will write the JSON document to the file passed as string.  Pretty works the same as above.  Will return true if the file could be opened and saved or false if the file could not be written.
 
 Here is an example of reading and updating a simple JSON file with json::document:
 
@@ -31,6 +39,13 @@ Here is an example of reading and updating a simple JSON file with json::documen
     }
     jDoc["bar"] = "baz";
     jDoc.writeFile("sample.json", true); // true is optional and tells the writer to output "pretty" JSON.
+
+You can also parse a string as follows using the constructor or the << operator:
+
+    json::document jDoc("[\"item1\",\"item2\"]");
+    json::document jDoc2(sJSONData);
+    json::document jDoc3;
+    jDoc3 << sJSONData;
 
 You can access arrays using a number as the index in the square brackets:
 
@@ -68,7 +83,7 @@ Here are some examples:
     std::string str = jDoc["string"].string();
     const char * szChar = jDoc["char"].c_str();
 
-You can get other information with teh following functions:
+You can get other information with the following functions:
 
 - size() - returns the number of elements in arrays or objects.  Numbers, strings and booleans return 1 and nulls and non-existant values return 0.
 - exists(string or number) - returns true if the object or array contains the index value.  False otherwise.
