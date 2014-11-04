@@ -105,6 +105,7 @@ Some other functions for working with JSON are:
 - pop\_back() - returns a json value (json::atom) that is the last item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
 - pop\_front() - returns a json value (json::atom) that is the first item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
 
+Some Examples of these are:
 
     jDoc["empty"].emptyArray();
     jDoc["empty"].emptyObject();
