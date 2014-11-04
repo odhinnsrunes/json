@@ -124,7 +124,7 @@ For example:
     jDoc["string"] += ", world!";
     jDoc["number"]++;
 
-Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators.  The functions for using them are the same as many of the standard container classes:
+Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators.  Iterators are extremely fast.  The functions for using them are the same as many of the standard container classes:
 - begin() - returns an iterator pointing to the beginning od an array or object.  If a value is not an array or object it will return end().
 - end() - returns an iterator pointint to the end of the array or object (technically it represents one past the end.)
 - rbegin() - returns a reverse iterator pointing to the last item in an array or object.  If a value is not an array or object it will return rend().
