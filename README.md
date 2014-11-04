@@ -1,9 +1,9 @@
 json::document
 ==============
 
-The purpose of this library is to allow JSON to be used in C++ with a very simple interface similar to how you would use it in other languages that support it natively.
+The purpose of this library is to allow JSON to be used in C++ with a very simple interface similar to how you would use it in other languages that support it natively.  It is also designed to be fast.  It can parse and write megabytes in milliseconds.  It's been tested in Linux, Windows and MacOS using g++, clang++, Visual C++ and even Borland C++.
 
-It is licensed under the MIT License.
+The json::document library is licensed under the MIT License.
 
 To use JSON in a c++ project, just include json.hpp and compile json.cpp with your own modules.
 
@@ -97,3 +97,12 @@ You can get other information with teh following functions:
 - isa(json type) - returns true if the value's type is the same as that passed in the argument.  The types are the same as those returned from the isA() function above.
 - empty() - returns false if an object or an array have items in them or if the value is a string, number or boolean.  Returns true if the value doesn't exist, if it's a NULL or if it is an empty object or array.
 
+Some other functions for working with JSON are:
+- emptyArray() - creates an empty array [] at the location specified.
+- emptyObject() - creates an empty object {} at the location specified.
+- push_back(value) - pushes the value to the end of an array.  Creates the array if it doesn't exist.
+- push_front(value) - pushes the value to the start of an array.  Creates the array if it doesn't exist.
+- pop_back() - returns a json value (json::atom) that is the last item in an array and removes it from the array.  Returns an atom with an isA type of json::JSON_VOID if the array is empty.
+
+    jDoc["empty"].emptyArray();
+    jDoc["empty"].emptyObject();
