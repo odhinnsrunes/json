@@ -148,3 +148,21 @@ For reverse_iterators:
                                               // key() returns a JSON atom (value).
         std::cout << "key = " << sKey << ", value = " << (*rit).number() << "\n";
     }
+
+Real World Example
+------------------
+
+    #include "json.hpp"
+    #include <iostream>
+    
+    int main(int argc, char ** argv) {
+        for(int i = 1; i < argc; i++){
+            json::document jDoc;
+            if(jDoc.parseFile(argv[i])){
+                jDoc.writeFile(argv[i], true);
+            } else {
+                std::cout << "Failed to open file " << argv[i] << ": " < jDoc.parseResult() << "\n";
+            }
+        }
+        return 0;
+    }
