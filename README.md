@@ -48,24 +48,6 @@ Any numeric value, boolean, char array / string, object or array can be assigned
     jDoc["object"] = jDoc["other_object"];
     jDoc["array"] = jDoc["oterh_array"];
     
-Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators:
-
-    json::iterator itObject= jDoc["some_object"].find("some_sub_value");
-    for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
-        std::string sKey = it.key().string(); // this will work for arrays as well, but the key will always return 0.
-                                              // key() returns a JSON atom (value).
-        std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
-    }
-
-or reverse_iterators:
-
-    json::iterator itObject= jDoc["some_object"].find("some_sub_value");
-    for(json::reverse_iterator rit = (*itObject).rbegin(); rit != (*itObject).rend(); ++rit){
-        std::string sKey = rit.key().string(); // this will work for arrays as well, but the key will always return 0.
-                                              // key() returns a JSON atom (value).
-        std::cout << "key = " << sKey << ", value = " << (*rit).number() << "\n";
-    }
-    
 You can retrive values from a json::document with several conversion functions:
 
 - boolean() - returns a bool.
@@ -136,7 +118,33 @@ json::document also has a full set of operators:
 
 For example:
 
-    if(jDoc["number"] == 6){} // works, however this is invalid: if(6 == jDoc["number"]) {} use instead: if(6 == jDoc["number"].number()) {}
+    if(jDoc["number"] == 6){} // works
+    if(6 == jDoc["number"]) {} // INVALID! Use this instead: 
+    if(6 == jDoc["number"].number()) {}
     jDoc["string"] += ", world!";
     jDoc["number"]++;
 
+Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators.  The functions for using them are the same as many of the standard container classes:
+- begin() - returns an iterator pointing to the beginning od an array or object.  If a value is not an array or object it will return end().
+- end() - returns an iterator pointint to the end of the array or object (technically it represents one past the end.)
+- rbegin() - returns a reverse iterator pointing to the last item in an array or object.  If a value is not an array or object it will return rend().
+- find(string or number index) - will return an iterator pointing to the given member of an array or object.  Will return end() if it isn't found or the value is not an array or object.
+- rfind(string or number index) - will return a reverse_iterator pointing to the given member of an array or object.  Will return rend() if it isn't found or the value is not an array or object.
+
+For normal iterators:
+
+    json::iterator itObject= jDoc["some_object"].find("some_sub_value");
+    for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
+        std::string sKey = it.key().string(); // this will work for arrays as well, but the key will always return 0.
+                                              // key() returns a JSON atom (value).
+        std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
+    }
+
+For reverse_iterators:
+
+    json::iterator itObject= jDoc["some_object"].find("some_sub_value");
+    for(json::reverse_iterator rit = (*itObject).rbegin(); rit != (*itObject).rend(); ++rit){
+        std::string sKey = rit.key().string(); // this will work for arrays as well, but the key will always return 0.
+                                              // key() returns a JSON atom (value).
+        std::cout << "key = " << sKey << ", value = " << (*rit).number() << "\n";
+    }
