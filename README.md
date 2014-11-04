@@ -152,6 +152,8 @@ For reverse_iterators:
 Real World Example
 ------------------
 
+The following program will open a JSON file and resave it in a "pretty" format with indentation and line feeds.
+
     #include "json.hpp"
     #include <iostream>
     
