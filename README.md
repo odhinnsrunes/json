@@ -48,7 +48,7 @@ Any numeric value, boolean, char array / string, object or array can be assigned
     jDoc["object"] = jDoc["other_object"];
     jDoc["array"] = jDoc["oterh_array"];
     
-Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators or reverse_iterators:
+Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators:
 
     json::iterator itObject= jDoc["some_object"].find("some_sub_value");
     for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
@@ -56,8 +56,10 @@ Although you can use size() and an index to ierate through a json::document arra
                                               // key() returns a JSON atom (value).
         std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
     }
-    
-    json::reverse itObject= jDoc["some_object"].find("some_sub_value");
+
+or reverse_iterators:
+
+    json::iterator itObject= jDoc["some_object"].find("some_sub_value");
     for(json::reverse_iterator rit = (*itObject).rbegin(); rit != (*itObject).rend(); ++rit){
         std::string sKey = rit.key().string(); // this will work for arrays as well, but the key will always return 0.
                                               // key() returns a JSON atom (value).
