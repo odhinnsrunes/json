@@ -3,6 +3,8 @@ json::document
 
 The purpose of this library is to allow JSON to be used in C++ with a very simple interface similar to how you would use it in other languages that support it natively.
 
+It is licensed under the MIT License.
+
 To use JSON in a c++ project, just include json.hpp and compile json.cpp with your own modules.
 
 Included along side the json library are some extras that aren't required for normal use.  These are the data.?pp and jsonquery.?pp files.
@@ -50,7 +52,8 @@ Although you can use size() and an index to ierate through a json::document arra
 
     json::iterator itObject= jDoc["some_object"].find("some_sub_value");
     for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
-        std::string sKey = it.key().string();
+        std::string sKey = it.key().string(); // this will work for arrays as well, but the key will always return 0.
+                                              // key() returns a JSON atom (value).
         std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
     }
     
@@ -58,9 +61,20 @@ You can retrive values from a json::document with several conversion functions:
 
 - boolean() - returns a bool.
 - number() - returns a double. (Converts from strings as appropriate.)
-- integer() - returns a 64bit integer.
-- c_str() - returns a const char *.  Guaranteed to not be NULL.
-- string() - returns a std::string &
-- cString() - returns a char *.  NULL if it doesn't exist or the JSON value is null.
+- integer() - returns a 64bit integer.  (Converts from strings as appropriate.)
+- c_str() - returns a const char *.  Guaranteed to not be NULL.  (Converts from numbers as appropriate)
+- string() - returns a std::string & (Converts from numbers as appropriate)
+- cString() - returns a char *.  NULL if it doesn't exist or the JSON value is null. (Converts from numbers as appropriate)
 
-    
+You can get other information with teh following functions:
+
+- size() - returns the number of elements in arrays or objects.  Numbers, strings and booleans return 1 and nulls and non-existant values return 0.
+- exists(string or number) - returns true if the object or array contains the index value.  False otherwise.
+- isA() - returns the type of value.  Can be:
+    - json::JSON_VOID - value does not exist.
+    - json::JSON_NULL - value is NULL.
+    - json::JSON_BOOLEAN - value is a boolean.
+    - json::JSON_NUMBER - value is a number.
+    - json::JSON_STRING - value is a string.
+    - json::JSON_ARRAY - value is an array.
+    - json::JSON_OBJECT - value is an object.
