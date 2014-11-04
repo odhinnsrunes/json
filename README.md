@@ -100,6 +100,10 @@ You can get other information with teh following functions:
 Some other functions for working with JSON are:
 - emptyArray() - creates an empty array [] at the location specified.
 - emptyObject() - creates an empty object {} at the location specified.
+- push\_back(value) - pushes the value to the end of an array.  Creates the array if it doesn't exist.
+- push\_front(value) - pushes the value to the start of an array.  Creates the array if it doesn't exist.
+- pop\_back() - returns a json value (json::atom) that is the last item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
+- pop\_front() - returns a json value (json::atom) that is the first item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
 
 
     jDoc["empty"].emptyArray();
@@ -108,3 +112,4 @@ Some other functions for working with JSON are:
     jDoc["array"].push_front("Test");
     int i = (int)jDoc["array"].pop_back().integer();
     std::string s = jDoc["array"].pop_front().string();
+
