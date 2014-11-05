@@ -670,9 +670,6 @@ namespace json
 			bParseSuccessful = false;
 		}
 		
-		document(const std::string& in);
-		document(const char*);
-		
 		document(const atom& V)
 		: atom(V) {
 			bParseSuccessful = true;
@@ -704,7 +701,10 @@ namespace json
 		{
 			return bParseSuccessful;
 		}
-		
+
+		template<typename T>
+		document(T V) : atom(V) {}
+
 		static int appendToArrayFile(std::string sFile, const document & atm, bool bPretty);
 
 	protected:

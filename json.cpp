@@ -3007,13 +3007,6 @@ namespace json
 		}
 		return S;
 	}
-	document::document(const std::string& in) {
-		parse(in);
-	}
-
-	document::document(const char* in) {
-		parse(in);
-	}
 
 	bool document::parse(const std::string& inStr, PREPARSEPTR preParser, std::string preParseFileName) {
 		return parse(inStr.c_str(), inStr.size(), preParser, preParseFileName);
@@ -3051,21 +3044,43 @@ namespace json
 			inStr = sOut.c_str();
 		}
 		instring in(inStr);
-		if (in.peek() == '{') {
-			myType = JSON_OBJECT;
-			objectParse(*this, in, &bFailed);
-			if (bFailed)
-				strParseResult = in.Str();
-		} else if (in.peek() == '[') {
-			myType = JSON_ARRAY;
-			arrayParse(*this, in, &bFailed);
-			if (bFailed)
-				strParseResult = in.Str();
-		} else {
-			bFailed = true;
-			strParseResult = "JSON Documents must begin with { or [.";
-		}
+		// if (in.peek() == '{') {
+		// 	myType = JSON_OBJECT;
+		// 	objectParse(*this, in, &bFailed);
+		// 	if (bFailed)
+		// 		strParseResult = in.Str();
+		// } else if (in.peek() == '[') {
+		// 	myType = JSON_ARRAY;
+		// 	arrayParse(*this, in, &bFailed);
+		// 	if (bFailed)
+		// 		strParseResult = in.Str();
+		// } else if (in.peek() == '"') {
+		// 	myType = JSON_ARRAY;
+		// 	stringParse(*this, in, &bFailed);
+		// 	if (bFailed)
+		// 		strParseResult = in.Str();
+		// } else if (in.peek() == 't') {
+		// 	myType = JSON_ARRAY;
+		// 	trueParse(*this, in, &bFailed);
+		// 	if (bFailed)
+		// 		strParseResult = in.Str();
+		// } else if (in.peek() == 'f') {
+		// 	myType = JSON_ARRAY;
+		// 	trueParse(*this, in, &bFailed);
+		// 	if (bFailed)
+		// 		strParseResult = in.Str();
+		// } else if (in.peek() == 'f') {
+		// 	myType = JSON_ARRAY;
+		// 	trueParse(*this, in, &bFailed);
+		// 	if (bFailed)
+		// 		strParseResult = in.Str();
+		// } else {
+		// 	bFailed = true;
+		// 	strParseResult = "JSON Documents must begin with { or [.";
+		// }
+		valueParse(*this, in, &bFailed);
 		if (bFailed) {
+			strParseResult = in.Str();
 			bParseSuccessful = false;
 			if (debug) {
 				debug("%s", strParseResult.c_str());
@@ -3140,12 +3155,11 @@ namespace json
 			atom::cprint(ptr, iDepth, bPretty);
 			std::string t(ptr.orig());
 			if (preWriter == NULL) {
-				return "[\n" + t + "\n]";
+				return t;
 			} else {
-				std::string sDat("[\n" + t + "\n]");
+				std::string sDat(t);
 				std::string sOut;
 				return preWriter(sDat, sOut);
-
 			}
 		}
 	}

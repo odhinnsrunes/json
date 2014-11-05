@@ -73,7 +73,7 @@ void document::parseXMLElement(json::atom & ret, const TiXmlNode * elem)
 			default:
 				break;
 
-			case TiXmlNode::DOCUMENT:
+			case TiXmlNode::TINYXML_DOCUMENT:
 				{				
 					TiXmlElement * rootElem = ((TiXmlDocument*)elem)->RootElement();
 					const TiXmlAttribute * att = rootElem->FirstAttribute();
@@ -87,7 +87,7 @@ void document::parseXMLElement(json::atom & ret, const TiXmlNode * elem)
 					for (TiXmlElement * child = rootElem->FirstChildElement(); child; child = child->NextSiblingElement() ) {
 						if (child != NULL) {
 							switch (child->Type()) {
-								case TiXmlNode::ELEMENT:
+								case TiXmlNode::TINYXML_ELEMENT:
 								{
 									std::string childName = child->Value();
 									if (childName[0] == '_' && strchr("1234567890", childName[1])) {
@@ -114,7 +114,7 @@ void document::parseXMLElement(json::atom & ret, const TiXmlNode * elem)
 					break;
 				}
 				
-			case TiXmlNode::ELEMENT:
+			case TiXmlNode::TINYXML_ELEMENT:
 				{
 					const TiXmlAttribute * att = elem->ToElement()->FirstAttribute();
 					while (att) {
@@ -129,7 +129,7 @@ void document::parseXMLElement(json::atom & ret, const TiXmlNode * elem)
 						while ((child = elem->IterateChildren(child))) {
                             bEmpty = false;
 							switch (child->Type()) {
-								case TiXmlNode::ELEMENT:
+								case TiXmlNode::TINYXML_ELEMENT:
 									{
 										std::string childName = child->Value();
 										if (childName[0] == '_' && strchr("1234567890", childName[1])) {
@@ -164,7 +164,7 @@ void document::parseXMLElement(json::atom & ret, const TiXmlNode * elem)
 					break;
 				}
 
-			case TiXmlNode::TEXT:
+			case TiXmlNode::TINYXML_TEXT:
 				if (elem->Value()) {
 					int iValType = isNumeric(elem->Value());
 					if (iValType != 0) {

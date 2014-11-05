@@ -40,13 +40,6 @@ Here is an example of reading and updating a simple JSON file with json::documen
     jDoc["bar"] = "baz";
     jDoc.writeFile("sample.json", true); // true is optional and tells the writer to output "pretty" JSON.
 
-You can also parse a string as follows using the constructor or the << operator:
-
-    json::document jDoc("[\"item1\",\"item2\"]");
-    json::document jDoc2(sJSONData);
-    json::document jDoc3;
-    jDoc3 << sJSONData;
-
 You can access arrays using a number as the index in the square brackets:
 
     for(size_t i = 0; i < jDoc.size(); i++){
