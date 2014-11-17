@@ -178,10 +178,23 @@ void document::parseXMLElement(json::atom & ret, const TiXmlNode * elem)
                         	json::numberParse(ret, in, &bFailed);
                         }
 					} else {
+						std::string val = elem->Value();
 						if (ret.isA(json::JSON_OBJECT)){
-							ret["#value"] = elem->Value();
+							if(val == "true" || val == "YES"){
+								ret["#value"] = true;
+							} else if(val == "false" || val == "NO"){
+								ret["#value"] = false;
+							} else {
+								ret["#value"] = elem->Value();
+							}
 						} else {
-							ret = elem->Value();
+							if(val == "true" || val == "YES"){
+								ret = true;
+							} else if(val == "false" || val == "NO"){
+								ret = false;
+							} else {
+								ret = elem->Value();
+							}
 						}
 					}
 				}
@@ -236,59 +249,59 @@ bool document::parseXML(std::string inStr, PREPARSEPTR preParser, std::string pr
 
 bool document::parseXMLFile(std::string inStr, PREPARSEPTR preParser, bool bReWriteFile)
 {
-		FILE* fd = fopen(inStr.c_str(), "rb");
-		if (fd) {
-			fseek(fd, 0, SEEK_END);
-			size_t l = ftell(fd);
-			fseek(fd, 0, SEEK_SET);
-			char* buffer = new char[l + 1];
+	FILE* fd = fopen(inStr.c_str(), "rb");
+	if (fd) {
+		fseek(fd, 0, SEEK_END);
+		size_t l = ftell(fd);
+		fseek(fd, 0, SEEK_SET);
+		char* buffer = new char[l + 1];
 
-			buffer[l] = 0;
-			fread(buffer, 1, l, fd);
+		buffer[l] = 0;
+		fread(buffer, 1, l, fd);
 
-			fclose(fd);
-			bool bRetVal;
-			std::string sDat(buffer, l);
-			if (bReWriteFile) {
-				bRetVal = parseXML(sDat, preParser, inStr);
-			} else {
-				bRetVal = parseXML(sDat, preParser);
-			}
-			bParseSuccessful = bRetVal;
-			delete[] buffer;
-			return bRetVal;
+		fclose(fd);
+		bool bRetVal;
+		std::string sDat(buffer, l);
+		if (bReWriteFile) {
+			bRetVal = parseXML(sDat, preParser, inStr);
+		} else {
+			bRetVal = parseXML(sDat, preParser);
 		}
-		strParseResult = "Couldn't open file " + inStr;
-		bParseSuccessful = false;
-		return false;
+		bParseSuccessful = bRetVal;
+		delete[] buffer;
+		return bRetVal;
+	}
+	strParseResult = "Couldn't open file " + inStr;
+	bParseSuccessful = false;
+	return false;
 }
 	
-	std::string XMLEscape(const std::string& in) {
-		std::string out;
-		for (std::string::const_iterator it = in.begin(); it != in.end(); ++it) {
-			switch (*it) {
-				default:
-					out.push_back(*it);
-					break;
-				case '&':
-					out.append("&amp;");
-					break;
-				case '\'':
-					out.append("&apos;");
-					break;
-				case '\"':
-					out.append("&quot;");
-					break;
-				case '>':
-					out.append("&gt;");
-					break;
-				case '<':
-					out.append("&lt;");
-					break;
-			}
+std::string XMLEscape(const std::string& in) {
+	std::string out;
+	for (std::string::const_iterator it = in.begin(); it != in.end(); ++it) {
+		switch (*it) {
+			default:
+				out.push_back(*it);
+				break;
+			case '&':
+				out.append("&amp;");
+				break;
+			case '\'':
+				out.append("&apos;");
+				break;
+			case '\"':
+				out.append("&quot;");
+				break;
+			case '>':
+				out.append("&gt;");
+				break;
+			case '<':
+				out.append("&lt;");
+				break;
 		}
-		return out;
 	}
+	return out;
+}
 
 void document::writeXML(std::string & str, json::atom & ret, int depth, bool bPretty, bool bTabs)
 {
