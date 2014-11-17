@@ -1785,6 +1785,7 @@ namespace json
 			delete obj;
 		if (arr)
 			delete arr;
+		printf("destructor\n");
 	}
 
 	atom& atom::at(size_t index)
@@ -2377,10 +2378,14 @@ namespace json
 	}
 
 	void atom::clear() {
-		if (arr)
-			arr->clear();
-		if (obj)
-			obj->clear();
+		if (arr){
+			delete arr;
+			arr = new array();
+		}
+		if (obj){
+			delete obj;
+			obj = new object();
+		}
 		if (!str.empty())
 			str.clear();
 
