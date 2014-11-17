@@ -1699,7 +1699,166 @@ namespace json
 		return *this;
 	}
 
-	atom::atom(bool V) {
+        atom& atom::operator=(const bool & V) {
+            if (debug) {
+                if(myType != JSON_BOOLEAN){
+                    switch(myType) {
+                        case JSON_NULL:
+                            debug("json operator= changed type from NULL to %s", typeName(JSON_BOOLEAN).c_str());
+                            break;
+                            
+                        case JSON_BOOLEAN:
+                            debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_BOOLEAN).c_str());
+                            break;
+                            
+                        case JSON_NUMBER:
+                            debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_BOOLEAN).c_str());
+                            break;
+                            
+                        case JSON_STRING:
+                            debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_BOOLEAN).c_str());
+                            break;
+                            
+                        case JSON_ARRAY:
+                            debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_BOOLEAN).c_str(), this->print(0, true).c_str());
+                            break;
+                            
+                        case JSON_OBJECT:
+                            debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_BOOLEAN).c_str(), this->print(0, true).c_str());
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                }
+            }
+            
+            m_number = (double)V;
+            m_boolean = V;
+            
+            // if (!V.str.empty()) {
+            //        str.assign("");
+            // } else {
+            str.clear();
+            // }
+            
+            myType = JSON_BOOLEAN;
+            if (obj)
+                delete obj;
+            obj = NULL;
+            
+            if (arr)
+                delete arr;
+            arr = NULL;
+            return *this;
+        }
+
+        atom& atom::operator=(const std::string & V) {
+            if (debug) {
+                if(myType != JSON_STRING){
+                    switch(myType) {
+                        case JSON_NULL:
+                            debug("json operator= changed type from NULL to %s", typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_BOOLEAN:
+                            debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_NUMBER:
+                            debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_STRING:
+                            debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_ARRAY:
+                            debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
+                            break;
+                            
+                        case JSON_OBJECT:
+                            debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                }
+            }
+            
+            m_number = 0;
+            m_boolean = false;
+            
+            str.assign(V);
+            
+            myType = JSON_STRING;
+            if (obj)
+                delete obj;
+            obj = NULL;
+            
+            if (arr)
+                delete arr;
+            arr = NULL;
+            return *this;
+        }
+        
+        atom& atom::operator=(const char * V) {
+            if (debug) {
+                if(myType != JSON_STRING){
+                    switch(myType) {
+                        case JSON_NULL:
+                            debug("json operator= changed type from NULL to %s", typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_BOOLEAN:
+                            debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_NUMBER:
+                            debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_STRING:
+                            debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_STRING).c_str());
+                            break;
+                            
+                        case JSON_ARRAY:
+                            debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
+                            break;
+                            
+                        case JSON_OBJECT:
+                            debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                }
+            }
+            
+            m_number = 0;
+            m_boolean = false;
+            
+            if(V == NULL){
+                str.clear();
+                myType = JSON_NULL;
+            } else {
+                str.assign(V);
+                myType = JSON_STRING;
+            }
+            
+            if (obj)
+                delete obj;
+            obj = NULL;
+            
+            if (arr)
+                delete arr;
+            arr = NULL;
+            return *this;
+        }
+        
+    atom::atom(bool V) {
 		m_number = (double)V;
 		m_boolean = !(V == 0);
 
@@ -1785,7 +1944,6 @@ namespace json
 			delete obj;
 		if (arr)
 			delete arr;
-		printf("destructor\n");
 	}
 
 	atom& atom::at(size_t index)
