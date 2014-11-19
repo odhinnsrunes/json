@@ -121,19 +121,19 @@ namespace json
 		}
 		if(bOk){
 			doc["_rev"] = generateUUID();
+            size_t lRevs = data["data"][doc["_id"].string()]["revs"].size();
 			data["data"][doc["_id"].string()]["revs"].push_front(doc["_rev"].string());
 			data["data"][doc["_id"].string()]["docs"][doc["_rev"].string()] = doc;
 			size_t lMax = (size_t)data["config"]["maxRevisions"].integer();
 			if(lMax > 0){
-				size_t l = data["data"][doc["_id"].string()]["revs"].size();
-				for(size_t lIndex = lMax; lIndex < l; lIndex++){
+				for(size_t lIndex = lMax; lIndex < lRevs; lIndex++){
 					data["data"][doc["_id"].string()]["docs"].erase(data["data"][doc["_id"].string()]["revs"].pop_back().string());
 				}
 			}
 			ret["_id"] = doc["_id"];
 			ret["_rev"] = doc["_rev"];
 			for(std::map<std::string, view>::iterator it = views.begin(); it != views.end(); ++it){
-				indexView(it->first, doc);
+				indexView(it->first, doc, (lRevs == 0));
 			}
 			if(data["config"]["autoSave"].boolean()){
 				ret["save"] = save();
@@ -175,14 +175,19 @@ namespace json
 		mtx.lock();
 		document ret;
 		if(!keys.empty()){
+//            ret["data"][data["indeces"][sName].size() - 1] = (char*)NULL;
+            atom at;
+            at.emptyObject();
+            ret["data"].resize(data["indeces"][sName].size(), at);
 			size_t lRows = 0;
 			for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
 				if((*it)["key"] == keys){
-					ret["data"].push_back((*it));
+					ret["data"][lRows] = (*it);
 					lRows++;
 				}
 			}
 			ret["rows"] = lRows;
+            ret["data"].resize(lRows);
 		} else {
 			ret["rows"] = data["indeces"][sName].size();
 			ret["data"] = data["indeces"][sName];
@@ -192,14 +197,18 @@ namespace json
 		return ret;
 	}
 
-	void database::indexView(std::string sName, document& jDoc)
+	void database::indexView(std::string sName, document& jDoc, bool bNew)
 	{
 		mtx.lock();
 		if(views.find(sName) != views.end()){
 			if(views[sName].map){
+                
 				if(jDoc.empty()){
 					data["indeces"][sName].clear();
-					for(iterator it = data["data"].begin(); it != data["data"].end(); ++it){
+                    iterator itIndex = data["indeces"].find(sName);
+                    data["data"];
+                    iterator itData = data.find("data");
+					for(iterator it = (*itData).begin(); it != (*itData).end(); ++it){
 						document ret = views[sName].map((*it)["docs"][(*it)["revs"][0].string()]);
 						if(!ret.empty()){
 							if(!ret["key"].isA(JSON_OBJECT)){
@@ -208,44 +217,54 @@ namespace json
 								
 								index["key"] = ret["key"];
 								index["value"] = ret["value"];
-								data["indeces"][sName].push_back(index);
+								(*itIndex).push_back(index);
 //								bNeedsSort = true;
 							}
 						}
 					}
-                    data["indeces"][sName].sort(&viewSort);
+                    (*itIndex).sort(&viewSort);
 				} else {
+                    std::string id = jDoc["_id"].string();
 					document ret = views[sName].map(jDoc);
+                    data["indeces"][sName];
+                    iterator itIndex = data["indeces"].find(sName);
+//                    printf("%s:\n%s\n\n", sName.c_str(), ret.write(true).c_str());
 					if(!ret.empty()){
 //						document ret = views[sName].map(jDoc);
 						if(!ret["key"].isA(JSON_OBJECT)){
-							for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
-								if((*it)["_id"] == jDoc["_id"]){
-                                    data["indeces"][sName].erase(it);
-                                    break;
-								}
-							}
-                            document index;
-                            index["_id"] = jDoc["_id"];
-                            
-                            index["key"] = ret["key"];
-                            index["value"] = ret["value"];
-                            if(!data["indeces"][sName].empty()){
-                                for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
-                                    if((*it)["key"] < ret["key"]){
-                                        data["indeces"][sName].insert(it, index);
+                            if(!bNew){
+                                for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
+                                    if((*it)["_id"] == id){
+                                        (*itIndex).erase(it);
                                         break;
                                     }
                                 }
-                            } else {
-                                data["indeces"][sName].push_back(index);
+                            }
+                            document index;
+                            index["_id"] = id;
+                            
+                            index["key"] = ret["key"];
+                            iterator itRet = ret.find("key");
+                            index["value"] = ret["value"];
+                            bool bDoIt = true;
+                            if(!(*itIndex).empty()){
+                                for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
+                                    if((*it)["key"] < (*itRet)){
+                                        (*itIndex).insert(it, index);
+                                        bDoIt = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(bDoIt){
+                                (*itIndex).push_back(index);
                             }
  //                            data["indeces"][sName].push_back(index);
 						}
 					} else {
-						for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
-							if((*it)["_id"] == jDoc["_id"]){
-								data["indeces"][sName].erase(it);
+						for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
+							if((*it)["_id"] == id){
+								(*itIndex).erase(it);
 								break;
 							}
 						}
