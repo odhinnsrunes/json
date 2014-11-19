@@ -2700,9 +2700,6 @@ namespace json
 	
 	bool atom::operator==(json::atom V) const
 	{
-		if ((myType == JSON_ARRAY && V.myType != JSON_ARRAY) || (myType == JSON_OBJECT && V.myType != JSON_OBJECT)) {
-			return false;
-		}
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
@@ -2718,12 +2715,18 @@ namespace json
 			case JSON_STRING:
 				return str == V.string();
 				
-			case JSON_ARRAY:
+            case JSON_ARRAY:
+            {
+                if(V.myType != JSON_ARRAY)
+                    return false;
 				return *arr == *(V.arr);
-				
+            }
 			case JSON_OBJECT:
+            {
+                if(V.myType != JSON_OBJECT)
+                    return false;
 				return *obj == *(V.obj);
-				
+            }
 		}
 	}
 	

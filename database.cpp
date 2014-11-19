@@ -178,13 +178,15 @@ namespace json
 			size_t lRows = 0;
 			data["indeces"][sName];
 			iterator itIndex = data["indeces"].find(sName);
-			for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
+            ret["data"];
+            iterator itRet = ret.find("data");
+            for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
 				if((*it)["key"] == keys){
-					ret["data"][lRows] = (*it);
+					(*itRet)[lRows] = (*it);
 					lRows++;
 				}
 			}
-			ret["rows"] = lRows;
+            ret["rows"] = lRows;
 		} else {
 			ret["rows"] = data["indeces"][sName].size();
 			ret["data"] = data["indeces"][sName];
