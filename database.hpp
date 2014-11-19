@@ -8,7 +8,7 @@ namespace json
 	class database{
 		public:
 			database(std::string sSetPath);
-
+            ~database();
 			document getConfig();
 			document setConfig(document jSetConfig);
 

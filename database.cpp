@@ -20,6 +20,10 @@ namespace json
 		mtx.unlock();
 	}
 
+    database::~database()
+    {
+        save();
+    }
 	document database::save()
 	{
 		mtx.lock();
@@ -31,7 +35,9 @@ namespace json
 
 	std::string database::generateUUID()
 	{
-		boost::uuids::uuid u = boost::uuids::random_generator()(); // initialize uuid
+        static boost::uuids::basic_random_generator<boost::mt19937> gen;
+        boost::uuids::uuid u = gen();
+//		boost::uuids::uuid u = boost::uuids::random_generator()(); // initialize uuid
 
 		return to_string(u);
 	}
@@ -191,7 +197,6 @@ namespace json
 		mtx.lock();
 		if(views.find(sName) != views.end()){
 			if(views[sName].map){
-				bool bNeedsSort = false;
 				if(jDoc.empty()){
 					data["indeces"][sName].clear();
 					for(iterator it = data["data"].begin(); it != data["data"].end(); ++it){
@@ -204,33 +209,38 @@ namespace json
 								index["key"] = ret["key"];
 								index["value"] = ret["value"];
 								data["indeces"][sName].push_back(index);
-								bNeedsSort = true;
+//								bNeedsSort = true;
 							}
 						}
 					}
+                    data["indeces"][sName].sort(&viewSort);
 				} else {
 					document ret = views[sName].map(jDoc);
 					if(!ret.empty()){
-						bool bFound = false;
-						document ret = views[sName].map(jDoc);
+//						document ret = views[sName].map(jDoc);
 						if(!ret["key"].isA(JSON_OBJECT)){
 							for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
 								if((*it)["_id"] == jDoc["_id"]){
-									bFound = true;								
-									(*it)["key"] = ret["key"];
-									(*it)["value"] = ret["value"];
-									bNeedsSort = true;
+                                    data["indeces"][sName].erase(it);
+                                    break;
 								}
 							}
-							if(!bFound){
-								document index;
-								index["_id"] = jDoc["_id"];
-								
-								index["key"] = ret["key"];
-								index["value"] = ret["value"];
-								data["indeces"][sName].push_back(index);
-								bNeedsSort = true;
-							}
+                            document index;
+                            index["_id"] = jDoc["_id"];
+                            
+                            index["key"] = ret["key"];
+                            index["value"] = ret["value"];
+                            if(!data["indeces"][sName].empty()){
+                                for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
+                                    if((*it)["key"] < ret["key"]){
+                                        data["indeces"][sName].insert(it, index);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                data["indeces"][sName].push_back(index);
+                            }
+ //                            data["indeces"][sName].push_back(index);
 						}
 					} else {
 						for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
@@ -240,9 +250,6 @@ namespace json
 							}
 						}
 					}
-				}
-				if(bNeedsSort){
-					data["indeces"][sName].sort(&viewSort);
 				}
 			}
 		}
