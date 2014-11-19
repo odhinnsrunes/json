@@ -194,11 +194,11 @@ namespace json
 		~atom();
 		
         atom& operator=(const atom& V);
-        atom& operator=(const bool &V);
-        atom& operator=(const std::string& V);
-        atom& operator=(const char* V);
-        template <typename T>
-        atom& operator=(T V);
+        // atom& operator=(const bool &V);
+        // atom& operator=(const std::string& V);
+        // atom& operator=(const char* V);
+        // template <typename T>
+        // atom& operator=(T V);
         
 		int isA() const;
 		bool isA(int i) const
@@ -719,60 +719,60 @@ namespace json
 		
 	std::ostream& operator<<(std::ostream& S, document& doc);
 	std::ostream& operator<<(std::ostream& S, atom& doc);
-    template <typename T>
-    atom& atom::operator=(T V) {
-        if (debug) {
-            if(myType != JSON_NUMBER){
-                switch(myType) {
-                    case JSON_NULL:
-                        debug("json operator= changed type from NULL to %s", typeName(JSON_NUMBER).c_str());
-                        break;
+    // template <typename T>
+    // atom& atom::operator=(T V) {
+    //     if (debug) {
+    //         if(myType != JSON_NUMBER){
+    //             switch(myType) {
+    //                 case JSON_NULL:
+    //                     debug("json operator= changed type from NULL to %s", typeName(JSON_NUMBER).c_str());
+    //                     break;
                         
-                    case JSON_BOOLEAN:
-                        debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_NUMBER).c_str());
-                        break;
+    //                 case JSON_BOOLEAN:
+    //                     debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_NUMBER).c_str());
+    //                     break;
                         
-                    case JSON_NUMBER:
-                        debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_NUMBER).c_str());
-                        break;
+    //                 case JSON_NUMBER:
+    //                     debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_NUMBER).c_str());
+    //                     break;
                         
-                    case JSON_STRING:
-                        debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_NUMBER).c_str());
-                        break;
+    //                 case JSON_STRING:
+    //                     debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_NUMBER).c_str());
+    //                     break;
                         
-                    case JSON_ARRAY:
-                        debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_NUMBER).c_str(), this->print(0, true).c_str());
-                        break;
+    //                 case JSON_ARRAY:
+    //                     debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_NUMBER).c_str(), this->print(0, true).c_str());
+    //                     break;
                         
-                    case JSON_OBJECT:
-                        debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_NUMBER).c_str(), this->print(0, true).c_str());
-                        break;
+    //                 case JSON_OBJECT:
+    //                     debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_NUMBER).c_str(), this->print(0, true).c_str());
+    //                     break;
                         
-                    default:
-                        break;
-                }
-            }
-        }
+    //                 default:
+    //                     break;
+    //             }
+    //         }
+    //     }
         
-        m_number = V;
-        m_boolean = V != 0;
+    //     m_number = V;
+    //     m_boolean = V != 0;
         
-        // if (!V.str.empty()) {
-        //        str.assign("");
-        // } else {
-        str.clear();
-        // }
+    //     // if (!V.str.empty()) {
+    //     //        str.assign("");
+    //     // } else {
+    //     str.clear();
+    //     // }
         
-        myType = JSON_NUMBER;
-        if (obj)
-            delete obj;
-        obj = NULL;
+    //     myType = JSON_NUMBER;
+    //     if (obj)
+    //         delete obj;
+    //     obj = NULL;
         
-        if (arr)
-            delete arr;
-        arr = NULL;
-        return *this;
-    }
+    //     if (arr)
+    //         delete arr;
+    //     arr = NULL;
+    //     return *this;
+    // }
     
 }
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
