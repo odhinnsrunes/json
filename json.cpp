@@ -1691,7 +1691,7 @@ namespace json
         }
 		if (V.obj && obj == NULL) {
 			obj = new object(V.obj);
-        } else {
+        } else if(V.obj) {
             *obj = *V.obj;
         }
         
@@ -1701,7 +1701,7 @@ namespace json
         }
 		if (V.arr && arr == NULL) {
 			arr = new array(V.arr);
-        } else {
+        } else if(V.arr){
             *arr = *V.arr;
         }
 		return *this;
