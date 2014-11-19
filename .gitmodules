@@ -1,3 +1,6 @@
 [submodule "tinyxml"]
 	path = tinyxml
 	url = https://github.com/odhinnsrunes/tinyxml.git
+[submodule "boost"]
+	path = boost
+	url = https://github.com/boostorg/boost.git
