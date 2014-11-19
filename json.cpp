@@ -575,30 +575,31 @@ namespace json
 	size_t esize(const std::string& in) {
 		size_t ret = 0;
 		static const char escape[256] = {
-#define Z16 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define Z16 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 			//0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
-			'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'b', 't', 'n', 'u', 'f', 'r', 'u', 'u', // 00
-			'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', // 10
-			0, 0, '"', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,								// 20
+			6, 6, 6, 6, 6, 6, 6, 6, 2, 2, 2, 6, 2, 2, 6, 6, // 00
+			6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, // 10
+			1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,								// 20
 			Z16, Z16,																		// 30~4F
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '\\', 0, 0, 0,								// 50
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1,								// 50
 			Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16								// 60~FF
 #undef Z16
 		};
 		size_t l = in.size();
 		const char* str = in.c_str();
 		for (size_t i = 0; i < l; i++) {
-			switch (escape[(unsigned char)*(str++)]) {
-			case 0:
-				ret++;
-				break;
-			case 'u':
-				ret += 6;
-				break;
-			default:
-				ret += 2;
-				break;
-			}
+            ret += escape[(unsigned char)*(str++)];
+//			switch (escape[(unsigned char)*(str++)]) {
+//			case 0:
+//				ret++;
+//				break;
+//			case 'u':
+//				ret += 6;
+//				break;
+//			default:
+//				ret += 2;
+//				break;
+//			}
 		}
 		return ret;
 	}
@@ -1683,19 +1684,26 @@ namespace json
 		// }
 
 		myType = V.myType;
-		if (obj)
+        
+        if (obj && V.obj == NULL){
 			delete obj;
-		obj = NULL;
-		if (V.obj) {
+            obj = NULL;
+        }
+		if (V.obj && obj == NULL) {
 			obj = new object(V.obj);
-		}
-
-		if (arr)
-			delete arr;
-		arr = NULL;
-		if (V.arr) {
+        } else {
+            *obj = *V.obj;
+        }
+        
+        if (arr && V.arr == NULL){
+            delete arr;
+            arr = NULL;
+        }
+		if (V.arr && arr == NULL) {
 			arr = new array(V.arr);
-		}
+        } else {
+            *arr = *V.arr;
+        }
 		return *this;
 	}
 
@@ -2281,6 +2289,24 @@ namespace json
 		return ret;
 	}
 	
+    void atom::resize(size_t iCount){
+        if(myType == JSON_VOID){
+            arr = new array();
+        }
+        if(arr){
+            arr->resize(iCount);
+        }
+    }
+    
+    void atom::resize(size_t iCount, atom val){
+        if(myType == JSON_VOID){
+            arr = new array();
+        }
+        if(arr){
+            arr->resize(iCount, val);
+        }
+    }
+        
 	bool atom::empty() const
 	{
 		switch (isA()) {
@@ -3332,7 +3358,9 @@ namespace json
 		FILE* fd = fopen(inStr.c_str(), "wb");
 		if (fd) {
 			std::string w = write(bPretty, preWriter);
-			fwrite(w.data(), 1, w.size(), fd);
+            if(fwrite(w.data(), 1, w.size(), fd) != w.size()){
+                printf("Failed Writing %lu bytes to %s.", w.size(), inStr.c_str());
+            }
 			fclose(fd);
 			return true;
 		}

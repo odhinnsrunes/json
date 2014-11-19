@@ -240,6 +240,9 @@ namespace json
 		void insert(iterator position, iterator first, iterator last);  // Array / Object (position ignored)
 		void insert(iterator first, iterator last);					 // Array (append) / Object
 		
+        void resize(size_t iCount);
+        void resize(size_t iCount, atom val);
+        
 		bool empty() const; // Is array empty or object empty or string empty.  Number and booleans return false, NULL and VOID return true.
 		
 		std::string getKey(size_t index); // VERY slow for objects.  Don't use inside a for loop.  Use iterators instead.
