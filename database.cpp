@@ -175,19 +175,16 @@ namespace json
 		mtx.lock();
 		document ret;
 		if(!keys.empty()){
-//            ret["data"][data["indeces"][sName].size() - 1] = (char*)NULL;
-            atom at;
-            at.emptyObject();
-            ret["data"].resize(data["indeces"][sName].size(), at);
 			size_t lRows = 0;
-			for(iterator it = data["indeces"][sName].begin(); it != data["indeces"][sName].end(); ++it){
+			data["indeces"][sName];
+			iterator itIndex = data["indeces"].find(sName);
+			for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
 				if((*it)["key"] == keys){
 					ret["data"][lRows] = (*it);
 					lRows++;
 				}
 			}
 			ret["rows"] = lRows;
-            ret["data"].resize(lRows);
 		} else {
 			ret["rows"] = data["indeces"][sName].size();
 			ret["data"] = data["indeces"][sName];
