@@ -17,13 +17,16 @@ namespace json
 			data["config"]["maxRevisions"] = 0;
 
 		}
+		if(!data.exists("sequence")){
+			data["sequence"] = 0;
+		}
 		mtx.unlock();
 	}
 
-    database::~database()
-    {
-        save();
-    }
+	database::~database()
+	{
+		save();
+	}
 	document database::save()
 	{
 		mtx.lock();
@@ -35,8 +38,8 @@ namespace json
 
 	std::string database::generateUUID()
 	{
-        static boost::uuids::basic_random_generator<boost::mt19937> gen;
-        boost::uuids::uuid u = gen();
+		static boost::uuids::basic_random_generator<boost::mt19937> gen;
+		boost::uuids::uuid u = gen();
 //		boost::uuids::uuid u = boost::uuids::random_generator()(); // initialize uuid
 
 		return to_string(u);
@@ -121,9 +124,13 @@ namespace json
 		}
 		if(bOk){
 			doc["_rev"] = generateUUID();
-            size_t lRevs = data["data"][doc["_id"].string()]["revs"].size();
+			size_t lRevs = data["data"][doc["_id"].string()]["revs"].size();
 			data["data"][doc["_id"].string()]["revs"].push_front(doc["_rev"].string());
 			data["data"][doc["_id"].string()]["docs"][doc["_rev"].string()] = doc;
+			data["data"][doc["_id"].string()]["sequence"] = data["sequence"];
+			data["sequenceIndex"][data["sequence"].integer()]["_id"] = doc["_id"].string();
+			data["sequenceIndex"][data["sequence"].integer()]["_rev"] = doc["_rev"].string();
+			data["sequence"] = data["sequence"] + 1;
 			size_t lMax = (size_t)data["config"]["maxRevisions"].integer();
 			if(lMax > 0){
 				for(size_t lIndex = lMax; lIndex < lRevs; lIndex++){
@@ -132,9 +139,6 @@ namespace json
 			}
 			ret["_id"] = doc["_id"];
 			ret["_rev"] = doc["_rev"];
-			for(std::map<std::string, view>::iterator it = views.begin(); it != views.end(); ++it){
-				indexView(it->first, doc, (lRevs == 0));
-			}
 			if(data["config"]["autoSave"].boolean()){
 				ret["save"] = save();
 			}
@@ -155,8 +159,7 @@ namespace json
 		data["views"][sSetName]["version"] = sSetVersion;
 		document ret;
 		if(bReIndex){
-			document temp;
-			indexView(sSetName, temp);
+			data["indeces"].erase(sSetName);
 			if(data["config"]["autoSave"].boolean()){
 				ret["save"] = save();
 			}
@@ -174,101 +177,109 @@ namespace json
 	{
 		mtx.lock();
 		document ret;
+		indexView(sName);
 		if(!keys.empty()){
 			size_t lRows = 0;
-			data["indeces"][sName];
-			iterator itIndex = data["indeces"].find(sName);
-            ret["data"];
-            iterator itRet = ret.find("data");
-            for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
+			data["indeces"][sName]["data"];
+			iterator itIndex = data["indeces"][sName].find("data");
+			ret["data"];
+			iterator itRet = ret.find("data");
+			for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
 				if((*it)["key"] == keys){
 					(*itRet)[lRows] = (*it);
 					lRows++;
 				}
 			}
-            ret["rows"] = lRows;
+			ret["rows"] = lRows;
 		} else {
-			ret["rows"] = data["indeces"][sName].size();
-			ret["data"] = data["indeces"][sName];
+			ret["rows"] = data["indeces"][sName]["data"].size();
+			ret["data"] = data["indeces"][sName]["data"];
 		}
 		ret["name"] = sName;
 		mtx.unlock();
 		return ret;
 	}
 
-	void database::indexView(std::string sName, document& jDoc, bool bNew)
+	void database::indexView(std::string sName)
 	{
 		mtx.lock();
 		if(views.find(sName) != views.end()){
 			if(views[sName].map){
-                
-				if(jDoc.empty()){
-					data["indeces"][sName].clear();
-                    iterator itIndex = data["indeces"].find(sName);
-                    data["data"];
-                    iterator itData = data.find("data");
-					for(iterator it = (*itData).begin(); it != (*itData).end(); ++it){
-						document ret = views[sName].map((*it)["docs"][(*it)["revs"][0].string()]);
+				data["indeces"]["sname"]["data"];
+				iterator itIndex = data["indeces"][sName].find("data");
+				size_t sequence = data["indeces"][sName]["sequence"].integer();
+				size_t latest = data["sequence"].integer();
+				data["indeces"][sName]["sequence"] = latest;
+				document newChanges;
+				for(size_t i = sequence + 1; i < latest; i++){
+					std::string id = data["sequenceIndex"][i]["_id"].string();
+					std::string rev = data["sequenceIndex"][i]["_rev"].string();
+					if(data["data"][id]["sequence"] == i){ // skip out of date documents
+						document ret = views[sName].map(data["data"][id]["docs"][rev]);
 						if(!ret.empty()){
 							if(!ret["key"].isA(JSON_OBJECT)){
 								document index;
-								index["_id"] = it.key().string();
+								index["_id"] = id;
 								
 								index["key"] = ret["key"];
 								index["value"] = ret["value"];
-								(*itIndex).push_back(index);
-//								bNeedsSort = true;
-							}
-						}
-					}
-                    (*itIndex).sort(&viewSort);
-				} else {
-                    std::string id = jDoc["_id"].string();
-					document ret = views[sName].map(jDoc);
-                    data["indeces"][sName];
-                    iterator itIndex = data["indeces"].find(sName);
-//                    printf("%s:\n%s\n\n", sName.c_str(), ret.write(true).c_str());
-					if(!ret.empty()){
-//						document ret = views[sName].map(jDoc);
-						if(!ret["key"].isA(JSON_OBJECT)){
-                            if(!bNew){
-                                for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
-                                    if((*it)["_id"] == id){
-                                        (*itIndex).erase(it);
-                                        break;
-                                    }
-                                }
-                            }
-                            document index;
-                            index["_id"] = id;
-                            
-                            index["key"] = ret["key"];
-                            iterator itRet = ret.find("key");
-                            index["value"] = ret["value"];
-                            bool bDoIt = true;
-                            if(!(*itIndex).empty()){
-                                for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
-                                    if((*it)["key"] < (*itRet)){
-                                        (*itIndex).insert(it, index);
-                                        bDoIt = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if(bDoIt){
-                                (*itIndex).push_back(index);
-                            }
- //                            data["indeces"][sName].push_back(index);
-						}
-					} else {
-						for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
-							if((*it)["_id"] == id){
-								(*itIndex).erase(it);
-								break;
+								newChanges.push_back(index);
 							}
 						}
 					}
 				}
+				if(newChanges.empty()){
+					printf("No New Changes %s\n", sName.c_str());
+					mtx.unlock();
+					return;
+				}
+
+				if((*itIndex).empty()){
+					printf("Empty index %s\n", sName.c_str());
+					(*itIndex) = newChanges;
+					if(data["config"]["autoSave"].boolean()){
+						save();
+					}
+					mtx.unlock();
+					return;
+				}
+
+				newChanges.sort(&viewSort);
+				iterator itNew = newChanges.begin();
+				if(itNew != newChanges.end()){
+					size_t l = (*itIndex).size();
+					printf("index size for %s is %lu\n", sName.c_str(), l);
+					for(size_t i = 0; i < l; i++){
+						if((*itIndex)[i]["_id"] == (*itNew)["_id"]){
+							printf("erasing %s - %s\n", sName.c_str(), (*itNew)["_id"].c_str());
+							(*itIndex).erase(i);
+							l--;
+							++itNew;
+							if(itNew == newChanges.end()){
+								break;
+							}
+						}
+					}
+					itNew = newChanges.begin();
+					printf("index size for %s is %lu take 2\n", sName.c_str(), l);
+					for(size_t i = 0; i < l; i++){
+						if((*itIndex)[i]["key"] > (*itNew)["key"]){
+							printf("inserting %s - %s\n", sName.c_str(), (*itNew)["_id"].c_str());
+							(*itIndex).insert(i, (*itNew));
+							l++;
+							++itNew;
+							if(itNew == newChanges.end()){
+								break;
+							}
+						}
+					}
+					for(;itNew != newChanges.end(); ++itNew){
+						(*itIndex).push_back((*itNew));
+					}
+					if(data["config"]["autoSave"].boolean()){
+						save();
+					}
+				}				
 			}
 		}
 		mtx.unlock();

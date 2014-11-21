@@ -30,7 +30,7 @@ namespace json
 
 		private:
 			static bool viewSort(json::atom a, json::atom b);
-			void indexView(std::string sName, document& jDoc, bool bNew = false);
+			void indexView(std::string sName);
 
 			struct view{
 				MAPPTR map;
