@@ -204,8 +204,9 @@ namespace json
 			for(iterator it = ret["rows"].begin(); it != ret["rows"].end(); ++it){
 				values.push_back((*it)["value"]);
 			}
-			ret["rows"]["value"] = views[sName].reduce(keys, values, false);
-			ret["rows"]["key"] = (char*)NULL;
+			ret["rows"].clear();
+			ret["rows"][0]["value"] = views[sName].reduce(keys, values, false);
+			ret["rows"][0]["key"] = (char*)NULL;
 			ret["total_rows"] = ret["rows"].size();
 		}
 		ret["name"] = sName;
@@ -213,9 +214,10 @@ namespace json
 		return ret;
 	}
 
-	void database::indexView(std::string sName)
+	document database::indexView(std::string sName)
 	{
 		mtx.lock();
+		document ret;
 		if(views.find(sName) != views.end()){
 			if(views[sName].map){
 				data["indeces"]["sname"]["data"];
@@ -242,29 +244,25 @@ namespace json
 					}
 				}
 				if(newChanges.empty()){
-					printf("No New Changes %s\n", sName.c_str());
 					mtx.unlock();
-					return;
+					return ret;
 				}
 
 				if((*itIndex).empty()){
-					printf("Empty index %s\n", sName.c_str());
 					(*itIndex) = newChanges;
 					if(data["config"]["autoSave"].boolean()){
-						save();
+						ret["save"] = save();
 					}
 					mtx.unlock();
-					return;
+					return ret;
 				}
 
 				newChanges.sort(&viewSort);
 				iterator itNew = newChanges.begin();
 				if(itNew != newChanges.end()){
 					size_t l = (*itIndex).size();
-					printf("index size for %s is %lu\n", sName.c_str(), l);
 					for(size_t i = 0; i < l; i++){
 						if((*itIndex)[i]["id"] == (*itNew)["id"]){
-							printf("erasing %s - %s\n", sName.c_str(), (*itNew)["id"].c_str());
 							(*itIndex).erase(i);
 							l--;
 							++itNew;
@@ -274,10 +272,8 @@ namespace json
 						}
 					}
 					itNew = newChanges.begin();
-					printf("index size for %s is %lu take 2\n", sName.c_str(), l);
 					for(size_t i = 0; i < l; i++){
 						if((*itIndex)[i]["key"] > (*itNew)["key"]){
-							printf("inserting %s - %s\n", sName.c_str(), (*itNew)["id"].c_str());
 							(*itIndex).insert(i, (*itNew));
 							l++;
 							++itNew;
@@ -290,12 +286,25 @@ namespace json
 						(*itIndex).push_back((*itNew));
 					}
 					if(data["config"]["autoSave"].boolean()){
-						save();
+						ret["save"] = save();
 					}
 				}				
 			}
 		}
 		mtx.unlock();
+		return ret;
+	}
+	
+	document database::cleanUpViews()
+	{
+		mtx.lock();
+		data["indeces"].clear();
+		document ret;
+		if(data["config"]["autoSave"].boolean()){
+			ret["save"] = save();
+		}
+		mtx.unlock();
+		return ret;
 	}
 }
 

@@ -28,9 +28,11 @@ namespace json
 			document addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce = NULL);
 			document getView(std::string sName, document keys = document(), bool bReduce = true);
 
+			document cleanUpViews();
+
 		private:
 			static bool viewSort(json::atom a, json::atom b);
-			void indexView(std::string sName);
+			document indexView(std::string sName);
 
 			struct view{
 				MAPPTR map;
