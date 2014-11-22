@@ -180,24 +180,28 @@ namespace json
 		}
 		mtx.lock();
 		document ret;
-		indexView(sName);
-		if(!keys.empty()){
-			size_t lRows = 0;
-			data["indeces"][sName]["data"];
-			iterator itIndex = data["indeces"][sName].find("data");
-			ret["rows"];
-			iterator itRet = ret.find("rows");
-			for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
-				if((*it)["key"] == keys){
-					(*itRet)[lRows] = (*it);
-					lRows++;
-				}
-			}
-			ret["total_rows"] = lRows;
-		} else {
-			ret["total_rows"] = data["indeces"][sName]["data"].size();
-			ret["rows"] = data["indeces"][sName]["data"];
-		}
+		
+		std::string sKeys = keys.write();
+
+		indexView(sName, sKeys, keys);
+		
+		// if(!keys.empty()){
+		// 	size_t lRows = 0;
+		// 	data["indeces"][sName]["data"];
+		// 	iterator itIndex = data["indeces"][sName].find("data");
+		// 	ret["rows"];
+		// 	iterator itRet = ret.find("rows");
+		// 	for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
+		// 		if((*it)["key"] == keys){
+		// 			(*itRet)[lRows] = (*it);
+		// 			lRows++;
+		// 		}
+		// 	}
+		// 	ret["total_rows"] = lRows;
+		// } else {
+			ret["total_rows"] = data["indeces"][sName][sKeys]["data"].size();
+			ret["rows"] = data["indeces"][sName][sKeys]["data"];
+		// }
 		if(bReduce && views[sName].reduce){
 			document values;
 			values.emptyArray();
@@ -214,17 +218,17 @@ namespace json
 		return ret;
 	}
 
-	document database::indexView(std::string sName)
+	document database::indexView(std::string &sName, std::string &sKeys, json::document keys)
 	{
 		mtx.lock();
 		document ret;
 		if(views.find(sName) != views.end()){
 			if(views[sName].map){
-				data["indeces"]["sname"]["data"];
-				iterator itIndex = data["indeces"][sName].find("data");
-				size_t sequence = data["indeces"][sName]["sequence"].integer();
+				data["indeces"][sName][sKeys]["data"];
+				iterator itIndex = data["indeces"][sName][sKeys].find("data");
+				size_t sequence = data["indeces"][sName][sKeys]["sequence"].integer();
 				size_t latest = data["sequence"].integer();
-				data["indeces"][sName]["sequence"] = latest;
+				data["indeces"][sName][sKeys]["sequence"] = latest;
 				document newChanges;
 				for(size_t i = sequence + 1; i < latest; i++){
 					std::string id = data["sequenceIndex"][i]["_id"].string();
@@ -233,12 +237,14 @@ namespace json
 						document ret = views[sName].map(data["data"][id]["docs"][rev]);
 						if(!ret.empty()){
 							if(!ret["key"].isA(JSON_OBJECT)){
-								document index;
-								index["id"] = id;
-								
-								index["key"] = ret["key"];
-								index["value"] = ret["value"];
-								newChanges.push_back(index);
+								if(ret["key"] == keys){
+									document index;
+									index["id"] = id;
+									
+									index["key"] = ret["key"];
+									index["value"] = ret["value"];
+									newChanges.push_back(index);
+								}
 							}
 						}
 					}
