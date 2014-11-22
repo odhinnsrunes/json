@@ -175,6 +175,9 @@ namespace json
 
 	document database::getView(std::string sName, document keys, bool bReduce)
 	{
+		if(views.find(sName) == views.end()){
+			return document();
+		}
 		mtx.lock();
 		document ret;
 		indexView(sName);
@@ -182,18 +185,28 @@ namespace json
 			size_t lRows = 0;
 			data["indeces"][sName]["data"];
 			iterator itIndex = data["indeces"][sName].find("data");
-			ret["data"];
-			iterator itRet = ret.find("data");
+			ret["rows"];
+			iterator itRet = ret.find("rows");
 			for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
 				if((*it)["key"] == keys){
 					(*itRet)[lRows] = (*it);
 					lRows++;
 				}
 			}
-			ret["rows"] = lRows;
+			ret["total_rows"] = lRows;
 		} else {
-			ret["rows"] = data["indeces"][sName]["data"].size();
-			ret["data"] = data["indeces"][sName]["data"];
+			ret["total_rows"] = data["indeces"][sName]["data"].size();
+			ret["rows"] = data["indeces"][sName]["data"];
+		}
+		if(bReduce && views[sName].reduce){
+			document values;
+			values.emptyArray();
+			for(iterator it = ret["rows"].begin(); it != ret["rows"].end(); ++it){
+				values.push_back((*it)["value"]);
+			}
+			ret["rows"]["value"] = views[sName].reduce(keys, values, false);
+			ret["rows"]["key"] = (char*)NULL;
+			ret["total_rows"] = ret["rows"].size();
 		}
 		ret["name"] = sName;
 		mtx.unlock();
@@ -219,7 +232,7 @@ namespace json
 						if(!ret.empty()){
 							if(!ret["key"].isA(JSON_OBJECT)){
 								document index;
-								index["_id"] = id;
+								index["id"] = id;
 								
 								index["key"] = ret["key"];
 								index["value"] = ret["value"];
@@ -250,8 +263,8 @@ namespace json
 					size_t l = (*itIndex).size();
 					printf("index size for %s is %lu\n", sName.c_str(), l);
 					for(size_t i = 0; i < l; i++){
-						if((*itIndex)[i]["_id"] == (*itNew)["_id"]){
-							printf("erasing %s - %s\n", sName.c_str(), (*itNew)["_id"].c_str());
+						if((*itIndex)[i]["id"] == (*itNew)["id"]){
+							printf("erasing %s - %s\n", sName.c_str(), (*itNew)["id"].c_str());
 							(*itIndex).erase(i);
 							l--;
 							++itNew;
@@ -264,7 +277,7 @@ namespace json
 					printf("index size for %s is %lu take 2\n", sName.c_str(), l);
 					for(size_t i = 0; i < l; i++){
 						if((*itIndex)[i]["key"] > (*itNew)["key"]){
-							printf("inserting %s - %s\n", sName.c_str(), (*itNew)["_id"].c_str());
+							printf("inserting %s - %s\n", sName.c_str(), (*itNew)["id"].c_str());
 							(*itIndex).insert(i, (*itNew));
 							l++;
 							++itNew;
