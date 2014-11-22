@@ -2147,23 +2147,23 @@ namespace json
 			if (debug) {
 				switch(myType) {
 					case JSON_NULL:
-						debug("json operator(size_t) changed type from NULL to Object.");
+						debug("json operator(std::string) changed type from NULL to Object.");
 						break;
 
 					case JSON_BOOLEAN:
-						debug("json operator(size_t) changed type from Boolean to Object.", m_boolean);
+						debug("json operator(std::string) changed type from Boolean to Object.", m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json operator(size_t) changed type from Number %f to Object.", m_number);
+						debug("json operator(std::string) changed type from Number %f to Object.", m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json operator(size_t) changed type from String %s to Object.", str.c_str());
+						debug("json operator(std::string) changed type from String %s to Object.", str.c_str());
 						break;
 
 					case JSON_ARRAY:
-						debug("json operator(size_t) changed type from Array to Object, orphanning:\n%s\n", this->print(0, true).c_str());
+						debug("json operator(std::string) changed type from Array to Object, orphanning:\n%s\n", this->print(0, true).c_str());
 						break;
 
 					default:
