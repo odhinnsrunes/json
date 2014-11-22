@@ -237,7 +237,7 @@ namespace json
 						document ret = views[sName].map(data["data"][id]["docs"][rev]);
 						if(!ret.empty()){
 							if(!ret["key"].isA(JSON_OBJECT)){
-								if(ret["key"] == keys){
+								if(ret["key"] == keys || keys.empty()){
 									document index;
 									index["id"] = id;
 									
