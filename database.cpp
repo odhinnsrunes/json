@@ -203,8 +203,25 @@ namespace json
 			getViewWorker(ret, sName, keys["key"], bReduce);
 		} else if(keys.exists("keys")){
 			size_t i = 0;
+			document temp;
+			ret["total_rows"] = 0;
 			for(iterator it = keys["keys"].begin(); it != keys["keys"].end(); ++it){
-				getViewWorker(ret[i++], sName, (*it), bReduce);
+				getViewWorker(temp[i++], sName, (*it), bReduce);
+			}
+			for(iterator it = temp.begin(); it != temp.end(); ++it){
+				ret["total_rows"] += (*it)["total_rows"];
+				ret["rows"] += (*it)["rows"];
+			}
+			if(bReduce && views[sName].reduce){
+				atom rere;
+				for(iterator it = ret["rows"].begin(); it != ret["rows"].end(); ++it){
+					rere.push_back((*it)["value"]);
+				}
+				ret["rows"].clear();
+				atom n = atom((char*)NULL);
+				ret["rows"][0]["value"] = views[sName].reduce(n, rere, true);
+				ret["rows"][0]["key"] = (char*)NULL;
+				ret["total_rows"] = 1;
 			}
 		} else {
 			getViewWorker(ret, sName, keys, bReduce);
@@ -230,7 +247,7 @@ namespace json
 			ret["rows"].clear();
 			ret["rows"][0]["value"] = views[sName].reduce(keys, values, false);
 			ret["rows"][0]["key"] = (char*)NULL;
-			ret["total_rows"] = ret["rows"].size();
+			ret["total_rows"] = 1;
 		}
 		ret["name"] = sName;
 		mtx.unlock();
