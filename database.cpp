@@ -173,35 +173,54 @@ namespace json
 		return (a["key"] > b["key"]);
 	}
 
+	size_t database::matchLevel(atom& keys, atom& mappedResult)
+	{
+		if(keys.isA(JSON_ARRAY) && mappedResult["key"].isA(JSON_ARRAY)){
+			size_t l = keys.size();
+			size_t ret = 0;
+			for(; ret < l; ret++){
+				if(keys[ret] != mappedResult["key"][ret]){
+					break;
+				}
+			}
+			return ret;
+		} else if(keys == mappedResult["key"]){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
 	document database::getView(std::string sName, document keys, bool bReduce)
 	{
+		mtx.lock();
 		if(views.find(sName) == views.end()){
+			mtx.unlock();
 			return document();
 		}
-		mtx.lock();
 		document ret;
-		
-		std::string sKeys = keys.write();
+		if(keys.exists("key")){
+			getViewWorker(ret, sName, keys["key"], bReduce);
+		} else if(keys.exists("keys")){
+			size_t i = 0;
+			for(iterator it = keys["keys"].begin(); it != keys["keys"].end(); ++it){
+				getViewWorker(ret[i++], sName, (*it), bReduce);
+			}
+		} else {
+			getViewWorker(ret, sName, keys, bReduce);
+		}
+		return ret;
 
+	}
+
+	atom & database::getViewWorker(atom & ret, std::string & sName, atom & keys, bool bReduce)
+	{
+		std::string sKeys = document(keys).write();
 		indexView(sName, sKeys, keys);
 		
-		// if(!keys.empty()){
-		// 	size_t lRows = 0;
-		// 	data["indeces"][sName]["data"];
-		// 	iterator itIndex = data["indeces"][sName].find("data");
-		// 	ret["rows"];
-		// 	iterator itRet = ret.find("rows");
-		// 	for(iterator it = (*itIndex).begin(); it != (*itIndex).end(); ++it){
-		// 		if((*it)["key"] == keys){
-		// 			(*itRet)[lRows] = (*it);
-		// 			lRows++;
-		// 		}
-		// 	}
-		// 	ret["total_rows"] = lRows;
-		// } else {
-			ret["total_rows"] = data["indeces"][sName][sKeys]["data"].size();
-			ret["rows"] = data["indeces"][sName][sKeys]["data"];
-		// }
+		ret["total_rows"] = data["indeces"][sName][sKeys]["data"].size();
+		ret["rows"] = data["indeces"][sName][sKeys]["data"];
+
 		if(bReduce && views[sName].reduce){
 			document values;
 			values.emptyArray();
@@ -218,6 +237,7 @@ namespace json
 		return ret;
 	}
 
+
 	document database::indexView(std::string &sName, std::string &sKeys, json::document keys)
 	{
 		mtx.lock();
@@ -230,6 +250,7 @@ namespace json
 				size_t latest = data["sequence"].integer();
 				data["indeces"][sName][sKeys]["sequence"] = latest;
 				document newChanges;
+				size_t keysSize = keys.size();
 				for(size_t i = sequence + 1; i < latest; i++){
 					std::string id = data["sequenceIndex"][i]["_id"].string();
 					std::string rev = data["sequenceIndex"][i]["_rev"].string();
@@ -237,7 +258,7 @@ namespace json
 						document ret = views[sName].map(data["data"][id]["docs"][rev]);
 						if(!ret.empty()){
 							if(!ret["key"].isA(JSON_OBJECT)){
-								if(ret["key"] == keys || keys.empty()){
+								if(matchLevel(keys, ret) >= keysSize){
 									document index;
 									index["id"] = id;
 									

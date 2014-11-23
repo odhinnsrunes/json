@@ -23,7 +23,7 @@ namespace json
 			document save();
 
 			typedef document (*MAPPTR)(atom & doc);
-			typedef document (*REDUCEPTR)(document & keys, document & values, bool bReReduce);
+			typedef document (*REDUCEPTR)(atom & keys, atom & values, bool bReReduce);
 
 			document addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce = NULL);
 			document getView(std::string sName, document keys = document(), bool bReduce = true);
@@ -33,6 +33,8 @@ namespace json
 		private:
 			static bool viewSort(json::atom a, json::atom b);
 			document indexView(std::string &sName, std::string &sKeys, json::document keys);
+			size_t matchLevel(atom& keys, atom& mappedResult);
+			atom&  getViewWorker(atom & ret, std::string & sName, atom & keys, bool bReduce);
 
 			struct view{
 				MAPPTR map;
