@@ -1661,11 +1661,11 @@ namespace json
 						break;
 
 					case JSON_ARRAY:
-						debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
+						debug("json operator= changed type from Array to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
 						break;
 
 					case JSON_OBJECT:
-						debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
+						debug("json operator= changed type from Object to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
 						break;
 
 					default:
@@ -2094,23 +2094,23 @@ namespace json
 			if (debug) {
 				switch(myType) {
 					case JSON_NULL:
-						debug("json operator(size_t) changed type from NULL to Array.");
+						debug("json operator[](size_t) changed type from NULL to Array.");
 						break;
 
 					case JSON_BOOLEAN:
-						debug("json operator(size_t) changed type from Boolean to Array.", m_boolean);
+						debug("json operator[](size_t) changed type from Boolean to Array.", m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json operator(size_t) changed type from Number %f to Array.", m_number);
+						debug("json operator[](size_t) changed type from Number %f to Array.", m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json operator(size_t) changed type from String %s to Array.", str.c_str());
+						debug("json operator[](size_t) changed type from String %s to Array.", str.c_str());
 						break;
 
 					case JSON_OBJECT:
-						debug("json operator(size_t) changed type from Object to Array, orphanning:\n%s\n", this->print(0, true).c_str());
+						debug("json operator[](size_t) changed type from Object to Array, orphanning:\n%s\n", this->print(0, true).c_str());
 						break;
 
 					default:
@@ -2147,23 +2147,23 @@ namespace json
 			if (debug) {
 				switch(myType) {
 					case JSON_NULL:
-						debug("json operator(std::string) changed type from NULL to Object.");
+						debug("json operator[](std::string) changed type from NULL to Object.");
 						break;
 
 					case JSON_BOOLEAN:
-						debug("json operator(std::string) changed type from Boolean to Object.", m_boolean);
+						debug("json operator[](std::string) changed type from Boolean to Object.", m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json operator(std::string) changed type from Number %f to Object.", m_number);
+						debug("json operator[](std::string) changed type from Number %f to Object.", m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json operator(std::string) changed type from String %s to Object.", str.c_str());
+						debug("json operator[](std::string) changed type from String %s to Object.", str.c_str());
 						break;
 
 					case JSON_ARRAY:
-						debug("json operator(std::string) changed type from Array to Object, orphanning:\n%s\n", this->print(0, true).c_str());
+						debug("json operator[](std::string) changed type from Array to Object(%s), orphanning:\n%s\n", index.c_str(), this->print(0, true).c_str());
 						break;
 
 					default:
