@@ -233,14 +233,14 @@ namespace json
 			for(value & at : keys["keys"]){
 				getViewWorker(temp[i++], sName, at, bReduce);
 			}
-			for(iterator it = temp.begin(); it != temp.end(); ++it){
-				ret["total_rows"] += (*it)["total_rows"];
-				ret["rows"] += (*it)["rows"];
+			for(value & val : temp){
+				ret["total_rows"] += val["total_rows"];
+				ret["rows"] += val["rows"];
 			}
 			if(bReduce && views[sName].reduce){
 				value rere; // this is where grouping needs to happen.
-				for(iterator it = ret["rows"].begin(); it != ret["rows"].end(); ++it){
-					rere.push_back((*it)["value"]);
+				for(value & val : ret["rows"]){
+					rere.push_back(val["value"]);
 				}
 				ret["rows"].clear();
 				value n = value((char*)NULL);
@@ -266,8 +266,8 @@ namespace json
 		if(bReduce && views[sName].reduce){
 			document values;
 			values.emptyArray();
-			for(iterator it = ret["rows"].begin(); it != ret["rows"].end(); ++it){
-				values.push_back((*it)["value"]);
+			for(value & val : ret["rows"]){
+				values.push_back(val["value"]);
 			}
 			ret["rows"].clear();
 			ret["rows"][0]["value"] = views[sName].reduce(keys, values, false);
