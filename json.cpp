@@ -182,7 +182,7 @@ namespace json
 		// inputString.set(s.str().c_str());
 	}
 
-	void nullParse(atom& ret, instring& inputString, bool* bFailed) {
+	void nullParse(value& ret, instring& inputString, bool* bFailed) {
 		if (inputString.take() != 'n' || inputString.take() != 'u' || inputString.take() != 'l' || inputString.take() != 'l') {
 			generateError(inputString, "Error Parsing null.");
 			*bFailed = true;
@@ -202,7 +202,7 @@ namespace json
 		ret.m_boolean = false;
 	}
 
-	void trueParse(atom& ret, instring& inputString, bool* bFailed) {
+	void trueParse(value& ret, instring& inputString, bool* bFailed) {
 		if (inputString.take() != 't' || inputString.take() != 'r' || inputString.take() != 'u' || inputString.take() != 'e') {
 			generateError(inputString, "Error Parsing true.");
 			*bFailed = true;
@@ -210,7 +210,7 @@ namespace json
 		ret = true;
 	}
 
-	void falseParse(atom& ret, instring& inputString, bool* bFailed) {
+	void falseParse(value& ret, instring& inputString, bool* bFailed) {
 		if (inputString.take() != 'f' || inputString.take() != 'a' || inputString.take() != 'l' || inputString.take() != 's' || inputString.take() != 'e') {
 			generateError(inputString, "Error Parsing false.");
 			*bFailed = true;
@@ -314,7 +314,7 @@ namespace json
 		}
 	}
 
-	void numberParse(atom& ret, instring& s, bool* bFailed) { 
+	void numberParse(value& ret, instring& s, bool* bFailed) { 
 		// Parse minus
         char * pStart = s.getPos();
 		bool minus = false;
@@ -336,16 +336,16 @@ namespace json
 				if (d >= 1E307) {
 					generateError(s, "Number too big to store in double");
 					*bFailed = true;
-					ret = atom();
-					return; // atom();
+					ret = value();
+					return; // value();
 				}
 				d = d * 10 + (s.take() - '0');
 			}
 		} else if (s.peek() != '.') {
 			generateError(s, "Expect a value here.");
 			*bFailed = true;
-			ret = atom();
-			return; // atom();
+			ret = value();
+			return; // value();
 		}
 
 		// Parse frac = decimal-point 1*DIGIT
@@ -359,8 +359,8 @@ namespace json
 			} else {
 				generateError(s, "At least one digit in fraction part");
 				*bFailed = true;
-				ret = atom();
-				return; // atom();
+				ret = value();
+				return; // value();
 			}
 
 			while (s.peek() >= '0' && s.peek() <= '9') {
@@ -392,15 +392,15 @@ namespace json
 					if (exp > 308) {
 						generateError(s, "Number too big to store in double");
 						*bFailed = true;
-						ret = atom();
-						return; // atom();
+						ret = value();
+						return; // value();
 					}
 				}
 			} else {
 				generateError(s, "At least one digit in exponent");
 				*bFailed = true;
-				ret = atom();
-				return; // atom();
+				ret = value();
+				return; // value();
 			}
 
 			if (expMinus)
@@ -415,7 +415,7 @@ namespace json
 		return;
 	}
 
-	void objectParse(atom& ret, instring& inputString, bool* bFailed) { 
+	void objectParse(value& ret, instring& inputString, bool* bFailed) { 
 		if (inputString.peek() != '{') {
 			generateError(inputString, "Invalid character for start of object.");
 			*bFailed = true;
@@ -440,14 +440,14 @@ namespace json
 			if (inputString.peek() != '"') {
 				generateError(inputString, "Name of an object member must be a string");
 				*bFailed = true;
-				ret = atom();
+				ret = value();
 				return;
 			}
 
 			std::string key;
 			stringParse(key, inputString, bFailed);
 			if (*bFailed) {
-				ret = atom();
+				ret = value();
 				return;
 			}
 
@@ -456,14 +456,14 @@ namespace json
 			if (inputString.take() != ':') {
 				generateError(inputString, "There must be a colon after the name of object member");
 				*bFailed = true;
-				ret = atom();
+				ret = value();
 				return;
 			}
 			SkipWhitespace(inputString);
 
 			valueParse((*ret.obj)[key], inputString, bFailed);
 			if (*bFailed) {
-				ret = atom();
+				ret = value();
 				return;
 			}
 
@@ -479,17 +479,17 @@ namespace json
 			default:
 				generateError(inputString, "Must be a comma or '}' after an object member");
 				*bFailed = true;
-				ret = atom();
+				ret = value();
 				return;
 			}
 		}
 	}
 
-	void arrayParse(atom& arr, instring& inputString, bool* bFailed) { 
+	void arrayParse(value& arr, instring& inputString, bool* bFailed) { 
 		if (inputString.peek() != '[') {
 			generateError(inputString, "Invalid character for start of object.");
 			*bFailed = true;
-			arr = atom();
+			arr = value();
 			return;
 		}
 		inputString.take(); // Skip '['
@@ -514,7 +514,7 @@ namespace json
 			arr.arr->resize(l + 1);
 			valueParse(arr.arr->at(l), inputString, bFailed);
 			if (*bFailed) {
-				arr = atom();
+				arr = value();
 				return;
 			}
 
@@ -530,13 +530,13 @@ namespace json
 			default:
 				generateError(inputString, "Must be a comma or ']' after an array element.");
 				*bFailed = true;
-				arr = atom();
+				arr = value();
 				return;
 			}
 		}
 	}
 
-	void valueParse(atom& a, instring& inputString, bool* bFailed) 
+	void valueParse(value& a, instring& inputString, bool* bFailed) 
 	{
 		switch (inputString.peek()) {
 		case 'n':
@@ -827,7 +827,7 @@ namespace json
 		return std::string(str, pos);
 	}
 
-	iterator atom::begin() const
+	iterator value::begin() const
 	{
 		switch (myType) {
 			case JSON_ARRAY:
@@ -841,7 +841,7 @@ namespace json
 		}
 	}
 
-	iterator atom::end() const
+	iterator value::end() const
 	{
 		switch (myType) {
 			case JSON_ARRAY:
@@ -861,7 +861,7 @@ namespace json
 		}
 	}
 
-	reverse_iterator atom::rbegin() const
+	reverse_iterator value::rbegin() const
 	{
 		switch (myType) {
 			case JSON_ARRAY:
@@ -875,7 +875,7 @@ namespace json
 		}
 	}
 
-	reverse_iterator atom::rend() const
+	reverse_iterator value::rend() const
 	{
 		switch (myType) {
 			case JSON_ARRAY:
@@ -895,73 +895,28 @@ namespace json
 		}
 	}
 
-	iterator atom::find(size_t index)
+	iterator value::find(size_t index)
 	{
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json find: index %lu out of bounds", index);
 			return iterator();
 		}
 		if (arr) {
-			if (index > arr->size())
-				arr->resize(index);
-			size_t i = 0;
-			for (myVec::iterator it = arr->begin(); it != arr->end(); ++it) {
-				if (i++ == index) {
-					return iterator(it);
-				}
-			}			
-		}
-		if (myType != JSON_VOID && myType) {
-			m_number = 0;
-			m_boolean = false;
-			if (!str.empty())
-				str.clear();
-			if (obj)
-				delete obj;
-			obj = NULL;
-		}
-		myType = JSON_ARRAY;
-			arr = new array();
-		arr->resize(index);
-		size_t i = 0;
-		for (myVec::iterator it = arr->begin(); it != arr->end(); ++it) {
-			if (i++ == index) {
-				return iterator(it);
-			}
+			if (index < arr->size())
+				return arr->begin() + index;
 		}
 		return iterator();
 	}
 	
-	iterator atom::find(std::string index)
+	iterator value::find(std::string index)
 	{
 		if (obj) {
-			myMap::iterator it = obj->find(index);
-			if (it == obj->end()) {
-				return iterator(obj->insert(obj->end(), std::pair<std::string, atom>(index, atom())));
-			}
-			return iterator(it);
+			return obj->find(index);
 		}
-		
-		if (myType != JSON_VOID) {
-			m_number = 0;
-			m_boolean = false;
-			if (!str.empty())
-				str.clear();
-			if (arr)
-				delete arr;
-			arr = NULL;
-		}
-		myType = JSON_OBJECT;
-		obj = new object();
-
-		myMap::iterator it = obj->find(index);
-		if (it == obj->end()) {
-			return iterator(obj->insert(obj->end(), std::pair<std::string, atom>(index, atom())));
-		}
-		return iterator(it);
+		return iterator();
 	}
     
-    reverse_iterator atom::rfind(size_t index) {
+    reverse_iterator value::rfind(size_t index) {
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json rfind: index %lu out of bounds", index);
 			return reverse_iterator();
@@ -969,11 +924,11 @@ namespace json
         return reverse_iterator(find(index));
     }
 	
-    reverse_iterator atom::rfind(std::string index) {
+    reverse_iterator value::rfind(std::string index) {
         return reverse_iterator(find(index));
     }
     
-	bool atom::boolean() {
+	bool value::boolean() {
 		switch (myType) {
 		case JSON_VOID:
 		case JSON_NULL:
@@ -998,7 +953,7 @@ namespace json
 		}
 	}
 
-	size_t atom::psize(int depth, bool bPretty) const
+	size_t value::psize(int depth, bool bPretty) const
 	{
 		switch (isA()) {
 		default:
@@ -1036,7 +991,7 @@ namespace json
 		}
 	}
 
-	void atom::cprint(MovingCharPointer& ptr, int depth, bool bPretty) const 
+	void value::cprint(MovingCharPointer& ptr, int depth, bool bPretty) const 
 	{
 		switch (isA()) {
 		default:
@@ -1088,8 +1043,6 @@ namespace json
 		}
 	}
 
-//	static atom nullAtom((char*)NULL);
-
 	size_t array::psize(int depth, bool bPretty) const
 	{
 		int ret = 0;
@@ -1111,7 +1064,6 @@ namespace json
 			if (bPretty)
 				ret += depth;
 			if ((*it).isA() == JSON_VOID) {
-				//nullAtom = (char*)NULL;
 				ret += 4;
 			} else {
 				ret += it->psize(depth, bPretty);
@@ -1231,8 +1183,8 @@ namespace json
 		ptr.set('}');
 	}
 
-	atom atom::merge(atom& V) {
-		atom retVal;
+	value value::merge(value& V) {
+		value retVal;
 
 		if (isA(JSON_OBJECT) && V.isA(JSON_OBJECT)) {
 			retVal = *this;
@@ -1257,7 +1209,7 @@ namespace json
 		return retVal;
 	}
 
-	void atom::erase(size_t index) {
+	void value::erase(size_t index) {
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json erase: index %lu out of bounds", index);
 			return;
@@ -1269,7 +1221,7 @@ namespace json
 		}
 	}
 
-	void atom::erase(std::string index) {
+	void value::erase(std::string index) {
 		if (obj) {
 			myMap::iterator it;
 			it = obj->find(index);
@@ -1278,7 +1230,7 @@ namespace json
 		}
 	}
 	
-	void atom::erase(iterator it) {
+	void value::erase(iterator it) {
 		if (it.IsArray() && arr) {
 			arr->erase(it.arr());
 		} else if (!it.None() && obj) {
@@ -1286,7 +1238,7 @@ namespace json
 		}
 	}
 
-	void atom::erase(iterator first, iterator last)
+	void value::erase(iterator first, iterator last)
 	{
 		if (first.IsArray()  && last.IsArray() && arr) {
 			arr->erase(first.arr(), last.arr());
@@ -1295,7 +1247,7 @@ namespace json
 		}
 	}
 
-	bool atom::exists(size_t index) {
+	bool value::exists(size_t index) {
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json exists: index %lu out of bounds", index);
 			return false;
@@ -1308,7 +1260,7 @@ namespace json
 		return false;
 	}
 	
-	bool atom::exists(std::string index) {
+	bool value::exists(std::string index) {
 		if (isA(JSON_OBJECT) && obj != NULL) {
 			if (obj->find(index) != obj->end()) {
 				return true;
@@ -1323,7 +1275,7 @@ namespace json
 		return false;
 	}
 
-	iterator atom::insert(size_t index, atom V)
+	iterator value::insert(size_t index, value V)
 	{
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json insert: index %lu out of bounds", index);
@@ -1346,7 +1298,7 @@ namespace json
 		return iterator();
 	}
 	
-	iterator atom::insert(std::string index, atom V)
+	iterator value::insert(std::string index, value V)
 	{
 		if (myType != JSON_OBJECT) {
 			m_number = 0;
@@ -1359,17 +1311,17 @@ namespace json
 				delete arr;
 			arr = NULL;
 		}
-		return iterator(obj->insert(obj->end(), std::pair<std::string, atom>(index, V)));
+		return iterator(obj->insert(obj->end(), std::pair<std::string, value>(index, V)));
 	}
 	
-	iterator atom::insert(iterator position, atom V) {
+	iterator value::insert(iterator position, value V) {
 		if (!position.IsArray() || myType != JSON_ARRAY)
 			return iterator();
 		
 		return iterator(arr->insert(position.arr(), V));
 	}
 	
-	void atom::insert(iterator position, iterator first, iterator last) {
+	void value::insert(iterator position, iterator first, iterator last) {
 		if (position.IsArray() && first.IsArray() && last.IsArray()) {
 			if (myType != JSON_ARRAY || arr == NULL) {
 				m_number = 0;
@@ -1399,7 +1351,7 @@ namespace json
 		}
 	}
 	
-	void atom::insert(iterator first, iterator last) {
+	void value::insert(iterator first, iterator last) {
 		if (first.IsArray() && last.IsArray()) {
 			if (myType != JSON_ARRAY) {
 				m_number = 0;
@@ -1429,13 +1381,13 @@ namespace json
 		}
 	}
 	
-	const atom parse(instring& inputString, bool* bFailed) {
-		atom ret;
+	const value parse(instring& inputString, bool* bFailed) {
+		value ret;
 		objectParse(ret, inputString, bFailed);
 		return ret;
 	}
 
-	// atom& atom::get(std::string index, atom V) {
+	// value& value::get(std::string index, value V) {
 	// 	if (obj == NULL) {
 	// 		obj = new object();
 	// 		if (arr)
@@ -1447,20 +1399,20 @@ namespace json
 	// 		m_number = 0.0;
 	// 		m_boolean = false;
 	// 		str.clear();
-	// 		obj->insert(std::pair<std::string, atom>(index, atom(V)));
+	// 		obj->insert(std::pair<std::string, value>(index, value(V)));
 	// 		return obj->find(index)->second;
 	// 	} else if (isA() == JSON_OBJECT) {
 	// 		if (obj->find(index) == obj->end()) {
-	// 			obj->insert(std::pair<std::string, atom>(index, atom(V)));
+	// 			obj->insert(std::pair<std::string, value>(index, value(V)));
 	// 		}
 	// 		return obj->find(index)->second;
 	// 	} else {
-	// 		static atom a;
+	// 		static value a;
 	// 		return a;
 	// 	}
 	// }
 
-	// inline void atom::set(std::string index, atom V) {
+	// inline void value::set(std::string index, value V) {
 	// 	if (obj == NULL) {
 	// 		obj = new object();
 	// 		if (arr)
@@ -1472,17 +1424,17 @@ namespace json
 	// 		m_number = 0.0;
 	// 		m_boolean = false;
 	// 		str.clear();
-	// 		obj->insert(std::pair<std::string, atom>(index, V));
+	// 		obj->insert(std::pair<std::string, value>(index, V));
 	// 	} else if (isA() == JSON_OBJECT) {
 	// 		if (obj->find(index) == obj->end()) {
-	// 			obj->insert(std::pair<std::string, atom>(index, V));
+	// 			obj->insert(std::pair<std::string, value>(index, V));
 	// 		} else {
 	// 			obj->find(index)->second = V;
 	// 		}
 	// 	}
 	// }
 
-	// atom& atom::get(size_t index, atom V) {
+	// value& value::get(size_t index, value V) {
 	// 	if (arr == NULL) {
 	// 		arr = new array();
 	// 		if (obj)
@@ -1504,12 +1456,12 @@ namespace json
 	// 		}
 	// 		return arr->at(index);
 	// 	} else {
-	// 		static atom a;
+	// 		static value a;
 	// 		return a;
 	// 	}
 	// }
 
-	// inline void atom::set(int index, atom V) {
+	// inline void value::set(int index, value V) {
 	// 	if (arr == NULL) {
 	// 		arr = new array();
 	// 		if (obj)
@@ -1532,7 +1484,7 @@ namespace json
 	// 	}
 	// }
 
-	std::string atom::getKey(size_t index) {
+	std::string value::getKey(size_t index) {
 		if (isA() == JSON_OBJECT) {
 			if (obj == NULL) {
 				obj = new object();
@@ -1553,9 +1505,9 @@ namespace json
 		}
 	}
 
-	atom::DEBUGPTR atom::debug = NULL;
+	value::DEBUGPTR value::debug = NULL;
 
-	atom::atom() {
+	value::value() {
 		m_number = 0;
 		m_boolean = false;
 
@@ -1564,7 +1516,7 @@ namespace json
 		arr = NULL;
 	}
 
-	atom::atom(const atom& V) {
+	value::value(const value& V) {
 
 		m_number = V.m_number;
 		m_boolean = V.m_boolean;
@@ -1586,9 +1538,9 @@ namespace json
 		}
 	}
 #ifdef __BORLANDC__
-	atom::atom(document& V) {
+	value::value(document& V) {
 #else
-	atom::atom(const document& V) {
+	value::value(const document& V) {
 #endif
 		m_number = V.m_number;
 		m_boolean = V.m_boolean;
@@ -1610,7 +1562,7 @@ namespace json
 		}
 	}
 
-	std::string atom::typeName(JSONTypes type)
+	std::string value::typeName(JSONTypes type)
 	{
 		switch(type) {
 			default:
@@ -1637,7 +1589,7 @@ namespace json
 		}
 	}
 
-	atom& atom::operator=(const atom& V) {
+	value& value::operator=(const value& V) {
 		if (this == &V)
 			return *this;
 
@@ -1707,7 +1659,7 @@ namespace json
 		return *this;
 	}
 
-        // atom& atom::operator=(const bool & V) {
+        // value& value::operator=(const bool & V) {
         //     if (debug) {
         //         if(myType != JSON_BOOLEAN){
         //             switch(myType) {
@@ -1761,7 +1713,7 @@ namespace json
         //     return *this;
         // }
 
-        // atom& atom::operator=(const std::string & V) {
+        // value& value::operator=(const std::string & V) {
         //     if (debug) {
         //         if(myType != JSON_STRING){
         //             switch(myType) {
@@ -1811,7 +1763,7 @@ namespace json
         //     return *this;
         // }
         
-        // atom& atom::operator=(const char * V) {
+        // value& value::operator=(const char * V) {
         //     if (debug) {
         //         if(myType != JSON_STRING){
         //             switch(myType) {
@@ -1866,7 +1818,7 @@ namespace json
         //     return *this;
         // }
         
-    atom::atom(bool V) {
+    value::value(bool V) {
 		m_number = (double)V;
 		m_boolean = !(V == 0);
 
@@ -1875,7 +1827,7 @@ namespace json
 		arr = NULL;
 	}
 
-	atom::atom(const char* V) { // could this be by ref instead of by val?
+	value::value(const char* V) { // could this be by ref instead of by val?
 		m_number = 0;
 		m_boolean = false;
 
@@ -1889,7 +1841,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	atom::atom(char* V) { // could this be by ref instead of by val?
+	value::value(char* V) { // could this be by ref instead of by val?
 		m_number = 0;
 		m_boolean = false;
 
@@ -1903,7 +1855,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	atom::atom(std::string V) { // could this be by ref instead of by val?
+	value::value(std::string V) { // could this be by ref instead of by val?
 		m_number = 0;
 		m_boolean = false;
 		str.assign(V);
@@ -1911,7 +1863,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	atom::atom(object& V) { // could this be by ref instead of by val?
+	value::value(object& V) { // could this be by ref instead of by val?
 		m_number = 0;
 		m_boolean = false;
 
@@ -1919,7 +1871,7 @@ namespace json
 		obj = new object(V);
 		arr = NULL;
 	}
-	atom::atom(array& V) {
+	value::value(array& V) {
 		m_number = 0;
 		m_boolean = false;
 
@@ -1928,7 +1880,7 @@ namespace json
 		arr = new array(V);
 	}
 
-	int atom::isA() const
+	int value::isA() const
 	{
 		switch(myType) {
 			case JSON_ARRAY:
@@ -1947,14 +1899,14 @@ namespace json
 		return myType;
 	}
 
-	atom::~atom() {
+	value::~value() {
 		if (obj)
 			delete obj;
 		if (arr)
 			delete arr;
 	}
 
-	atom& atom::at(size_t index)
+	value& value::at(size_t index)
 	{
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json at: index %lu out of bounds", index);
@@ -1975,7 +1927,7 @@ namespace json
 		return *this;
 	}
 
-	atom& atom::emptyArray()
+	value& value::emptyArray()
 	{
 		if (myType != JSON_VOID) {
 			if (debug) {
@@ -2024,7 +1976,7 @@ namespace json
 		return *this;
 	}
 
-	atom& atom::emptyObject()
+	value& value::emptyObject()
 	{
 		if (myType != JSON_VOID) {
 			if (debug) {
@@ -2073,7 +2025,7 @@ namespace json
 		return *this;
 	}
 
-	atom& atom::operator[](size_t index) {
+	value& value::operator[](size_t index) {
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json find: index %lu out of bounds", index);
 			return *this;
@@ -2132,7 +2084,7 @@ namespace json
 		return arr->at(index);
 	}
 
-	atom& atom::operator[](std::string index) {
+	value& value::operator[](std::string index) {
 		if (obj) {
 			return obj->operator[](index);
 		}
@@ -2183,28 +2135,28 @@ namespace json
 		return obj->operator[](index);
 	}
 
-	void atom::push_back(atom val) {
+	void value::push_back(value val) {
 		if (myType != JSON_ARRAY) {
 			if (debug) {
 				switch(myType) {
 					case JSON_NULL:
-						debug("json push_back(atom val) changed type from NULL to Array.");
+						debug("json push_back(value val) changed type from NULL to Array.");
 						break;
 
 					case JSON_BOOLEAN:
-						debug("json push_back(atom val) changed type from Boolean to Array.", m_boolean);
+						debug("json push_back(value val) changed type from Boolean to Array.", m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json push_back(atom val) changed type from Number %f to Array.", m_number);
+						debug("json push_back(value val) changed type from Number %f to Array.", m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json push_back(atom val) changed type from String %s to Array.", str.c_str());
+						debug("json push_back(value val) changed type from String %s to Array.", str.c_str());
 						break;
 
 					case JSON_OBJECT:
-						debug("json push_back(atom val) changed type from Object to Array, orphanning:\n%s\n", this->print(0, true).c_str());
+						debug("json push_back(value val) changed type from Object to Array, orphanning:\n%s\n", this->print(0, true).c_str());
 						break;
 
 					default:
@@ -2224,28 +2176,28 @@ namespace json
 		arr->push_back(val);
 	}
 	
-	void atom::push_front(atom val) {
+	void value::push_front(value val) {
 		if (myType != JSON_ARRAY) {
 			if (debug) {
 				switch(myType) {
 					case JSON_NULL:
-						debug("json push_front(atom val) changed type from NULL to Array.");
+						debug("json push_front(value val) changed type from NULL to Array.");
 						break;
 
 					case JSON_BOOLEAN:
-						debug("json push_front(atom val) changed type from Boolean to Array.", m_boolean);
+						debug("json push_front(value val) changed type from Boolean to Array.", m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json push_front(atom val) changed type from Number %f to Array.", m_number);
+						debug("json push_front(value val) changed type from Number %f to Array.", m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json push_front(atom val) changed type from String %s to Array.", str.c_str());
+						debug("json push_front(value val) changed type from String %s to Array.", str.c_str());
 						break;
 
 					case JSON_OBJECT:
-						debug("json push_front(atom val) changed type from Object to Array, orphanning:\n%s\n", this->print(0, true).c_str());
+						debug("json push_front(value val) changed type from Object to Array, orphanning:\n%s\n", this->print(0, true).c_str());
 						break;
 
 					default:
@@ -2265,9 +2217,9 @@ namespace json
 		arr->push_front(val);
 	}
 	
-	atom atom::pop_back()
+	value value::pop_back()
 	{
-		atom ret;
+		value ret;
 		if (myType == JSON_ARRAY) {
 			if (!arr->empty()) {
 				ret = *(arr->rbegin());
@@ -2277,9 +2229,9 @@ namespace json
 		return ret;
 	}
 	
-	atom atom::pop_front()
+	value value::pop_front()
 	{
-		atom ret;
+		value ret;
 		if (myType == JSON_ARRAY) {
 			if (!arr->empty()) {
 				ret = *(arr->begin());
@@ -2289,7 +2241,7 @@ namespace json
 		return ret;
 	}
 	
-    void atom::resize(size_t iCount){
+    void value::resize(size_t iCount){
         if(myType == JSON_VOID){
             arr = new array();
         }
@@ -2298,7 +2250,7 @@ namespace json
         }
     }
     
-    void atom::resize(size_t iCount, atom val){
+    void value::resize(size_t iCount, value val){
         if(myType == JSON_VOID){
             arr = new array();
         }
@@ -2307,7 +2259,7 @@ namespace json
         }
     }
         
-	bool atom::empty() const
+	bool value::empty() const
 	{
 		switch (isA()) {
 			case JSON_OBJECT:
@@ -2350,7 +2302,7 @@ namespace json
 		return true;
 	}
 	
-	size_t atom::size() const
+	size_t value::size() const
 	{
 		switch (myType) {
 		// case JSON_STRING:
@@ -2389,13 +2341,13 @@ namespace json
 		}
 	}
 
-	atom atom::simpleSearch(atom& searchFor, bool bSubStr) {
-		atom retVal;
+	value value::simpleSearch(value& searchFor, bool bSubStr) {
+		value retVal;
 
 		if (myType == JSON_ARRAY) {
 			array::iterator it;
 			const char* getKey = searchFor.begin().key().c_str();
-			const atom getVal = searchFor[getKey];
+			const value getVal = searchFor[getKey];
 			int iGetType = searchFor[getKey].myType;
 			int iIndex = 0;
 			for (it = arr->begin(); it != arr->end(); ++it) {
@@ -2428,7 +2380,7 @@ namespace json
 		} else if (myType == JSON_OBJECT) {
 			object::iterator it;
 			const char* getKey = searchFor.begin().key().c_str();
-			const atom getVal = searchFor[getKey];
+			const value getVal = searchFor[getKey];
 			int iGetType = searchFor[getKey].myType;
 			for (it = obj->begin(); it != obj->end(); ++it) {
 				if (searchFor.myType == JSON_OBJECT && it->second.myType == JSON_OBJECT) {
@@ -2460,7 +2412,7 @@ namespace json
 		} //else if (myType == JSON_STRING) {
 //			object::iterator it;
 //			const char* getKey = searchFor.getKey(0).c_str();
-//			const atom getVal = searchFor[getKey];
+//			const value getVal = searchFor[getKey];
 //			int iGetType = searchFor[getKey].myType;
 //			int iIndex = 0;
 //			for (it = obj->begin(); it != obj->end(); ++it) {
@@ -2494,7 +2446,7 @@ namespace json
 		return retVal;
 	}
 
-	size_t atom::simpleCount(atom& searchFor, bool bSubStr) {
+	size_t value::simpleCount(value& searchFor, bool bSubStr) {
 		size_t retVal = 0;
 
 		if (myType == JSON_ARRAY) {
@@ -2561,7 +2513,7 @@ namespace json
 		return retVal;
 	}
 
-	void atom::clear() {
+	void value::clear() {
 		if (arr){
 			delete arr;
 			arr = new array();
@@ -2578,7 +2530,7 @@ namespace json
 //		myType = JSON_VOID;
 	}
 
-    void atom::destroy() {
+    void value::destroy() {
         m_number = 0;
         m_boolean = false;
         str.clear();
@@ -2591,12 +2543,12 @@ namespace json
         arr = NULL;
     }
         
-	void atom::sort(bool (*compareFunc)(atom, atom)) {
+	void value::sort(bool (*compareFunc)(value, value)) {
 		if (arr)
 			std::sort(arr->begin(), arr->end(), compareFunc);
 	}
 
-	double atom::number() {
+	double value::number() {
 		switch (myType) {
 		case JSON_NUMBER:
 			return m_number;
@@ -2626,11 +2578,11 @@ namespace json
 		}
 	}
 
-	i64 atom::integer() {
+	i64 value::integer() {
 		return (i64)number();
 	}
 
-	std::string& atom::string() {
+	std::string& value::string() {
 		switch (myType) {
 		case JSON_STRING:
 			break;
@@ -2669,15 +2621,15 @@ namespace json
 		return str;
 	}
 
-	const char* atom::safeCString() {
+	const char* value::safeCString() {
 		return string().c_str();
 	}
 
-	const char* atom::c_str() {
+	const char* value::c_str() {
 		return string().c_str();
 	}
 
-	const char* atom::cString() {
+	const char* value::cString() {
 		switch (myType) {
 		case JSON_VOID:
 		case JSON_NULL:
@@ -2687,7 +2639,7 @@ namespace json
 		}
 	}
 
-	std::string atom::print(int depth, bool bPretty) const
+	std::string value::print(int depth, bool bPretty) const
 	{
 		if (myType == JSON_ARRAY) {
 			arr->resize(size());
@@ -2698,7 +2650,7 @@ namespace json
 		return std::string(ptr.orig());
 	}
 	
-	bool atom::operator==(json::atom V) const
+	bool value::operator==(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -2730,12 +2682,12 @@ namespace json
 		}
 	}
 	
-	bool atom::operator!=(atom V) const
+	bool value::operator!=(value V) const
 	{
 		return !(*this == V);
 	}
 	
-	bool atom::operator>(json::atom V) const
+	bool value::operator>(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -2766,7 +2718,7 @@ namespace json
 		}
 	}
 	
-	bool atom::operator<(json::atom V) const
+	bool value::operator<(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -2797,7 +2749,7 @@ namespace json
 		}
 	}
 	
-	bool atom::operator<=(json::atom V) const
+	bool value::operator<=(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -2828,7 +2780,7 @@ namespace json
 		}
 	}
 	
-	bool atom::operator>=(json::atom V) const
+	bool value::operator>=(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -2859,54 +2811,54 @@ namespace json
 		}
 	}
 	
-	atom atom::operator+(json::atom V) const
+	value value::operator+(json::value V) const
 	{
 		switch (myType) {
 			default:
-				return atom(0);
+				return value(0);
 
 			case JSON_VOID:
 			case JSON_NULL:
-				return atom(V.number());
+				return value(V.number());
 				
 			case JSON_BOOLEAN:
-				return atom(m_boolean + V.boolean());
+				return value(m_boolean + V.boolean());
 				
 			case JSON_NUMBER:
-				return atom(m_number + V.number());
+				return value(m_number + V.number());
 				
 			case JSON_STRING:
-				return atom(str + V.string());
+				return value(str + V.string());
 				
 			case JSON_ARRAY:
 			case JSON_OBJECT:
 			{
-				atom ret = *this;
+				value ret = *this;
 				ret.insert(ret.end(), V.begin(), V.end());
 				return ret;
 			}
 		}
 	}
 	
-	atom atom::operator-(json::atom V) const
+	value value::operator-(json::value V) const
 	{
 		switch (myType) {
 			default:
-				return atom(0);
+				return value(0);
 
 			case JSON_VOID:
 			case JSON_NULL:
-				return atom(V.number());
+				return value(V.number());
 				
 			case JSON_BOOLEAN:
-				return atom(m_boolean - V.boolean());
+				return value(m_boolean - V.boolean());
 				
 			case JSON_NUMBER:
-				return atom(m_number - V.number());
+				return value(m_number - V.number());
 				
 			case JSON_OBJECT:
 			{
-				atom ret(*this);
+				value ret(*this);
 				for (iterator it = V.begin(); it != V.end(); ++it) {
 					ret.erase(it.key().string());
 				}
@@ -2915,49 +2867,49 @@ namespace json
 		}
 	}
 	
-	atom atom::operator*(json::atom V) const
+	value value::operator*(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return atom(0);
+				return value(0);
 				
 			case JSON_BOOLEAN:
-				return atom(m_boolean * V.boolean());
+				return value(m_boolean * V.boolean());
 				
 			case JSON_NUMBER:
-				return atom(m_number * V.number());
+				return value(m_number * V.number());
 		}
 	}
 	
-	atom atom::operator/(json::atom V) const
+	value value::operator/(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return atom(0);
+				return value(0);
 
 			case JSON_NUMBER:
-				return atom(m_number / V.number());
+				return value(m_number / V.number());
 		}
 	}
 	
-	atom atom::operator%(json::atom V) const
+	value value::operator%(json::value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return atom(0);
+				return value(0);
 
 			case JSON_NUMBER:
-				return atom((i64)m_number % V.integer());
+				return value((i64)m_number % V.integer());
 		}
 	}
 	
-	atom& atom::operator+=(json::atom V)
+	value& value::operator+=(json::value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -2985,7 +2937,7 @@ namespace json
 		return *this;
 	}
 	
-	atom& atom::operator-=(json::atom V)
+	value& value::operator-=(json::value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3011,7 +2963,7 @@ namespace json
 	}
 	
 	
-	atom &atom::operator*=(json::atom V)
+	value &value::operator*=(json::value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3030,7 +2982,7 @@ namespace json
 		return *this;
 	}
 	
-	atom &atom::operator/=(json::atom V)
+	value &value::operator/=(json::value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3049,7 +3001,7 @@ namespace json
 		return *this;
 	}
 	
-	atom &atom::operator%=(json::atom V)
+	value &value::operator%=(json::value V)
 	{
 		switch (myType) {
 			case JSON_NUMBER:
@@ -3063,7 +3015,7 @@ namespace json
 		return *this;
 	}
 	
-	atom &atom::operator++()
+	value &value::operator++()
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3086,7 +3038,7 @@ namespace json
 		return *this;
 	}
 	
-	atom &atom::operator--()
+	value &value::operator--()
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3109,9 +3061,9 @@ namespace json
 		return *this;
 	}
 	
-	atom atom::operator++(int)
+	value value::operator++(int)
 	{
-		atom ret = *this;
+		value ret = *this;
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
@@ -3134,9 +3086,9 @@ namespace json
 		return ret;
 	}
 	
-	atom atom::operator--(int)
+	value value::operator--(int)
 	{
-		atom ret = *this;
+		value ret = *this;
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
@@ -3159,10 +3111,10 @@ namespace json
 		return ret;
 	}
 	
-	atom atom::operator-()
+	value value::operator-()
 	{
 		if (myType == JSON_NUMBER) {
-			return atom(-m_number);
+			return value(-m_number);
 		}
 		return *this;
 	}
@@ -3172,7 +3124,7 @@ namespace json
 		return S;
 	}
 
-	std::ostream& operator<<(std::ostream& S, atom& doc) {
+	std::ostream& operator<<(std::ostream& S, value& doc) {
 		switch (doc.isA()) {
 		case JSON_VOID:
 		case JSON_NULL:
@@ -3342,9 +3294,9 @@ namespace json
 				return preWriter(std::string(ptr.orig()), sOut);
 			}
 		} else {
-			size_t l = atom::psize(iDepth, bPretty);
+			size_t l = value::psize(iDepth, bPretty);
 			MovingCharPointer ptr(l);
-			atom::cprint(ptr, iDepth, bPretty);
+			value::cprint(ptr, iDepth, bPretty);
 			std::string t(ptr.orig());
 			if (preWriter == NULL) {
 				return t;

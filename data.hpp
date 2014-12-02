@@ -42,7 +42,7 @@ namespace data
 		document(const char* in) {
 			parseXML(in);
 		}
-		document(const json::atom& V) : json::document(V) { }
+		document(const json::value& V) : json::document(V) { }
 
 		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
 		typedef std::string& (*PREWRITEPTR)(const std::string& in, std::string& out);
@@ -57,12 +57,12 @@ namespace data
 		std::string rootTag() { return sRootTag; }
 		void rootTag(std::string rootElem) { sRootTag = rootElem; }
 
-		static void stripNameSpaces(json::atom & jDoc, json::document jNameSpaces, bool begin = true);
-		static void stripNameSpace(json::atom & jDoc, std::string sNameSpace, bool begin = true);
+		static void stripNameSpaces(json::value & jDoc, json::document jNameSpaces, bool begin = true);
+		static void stripNameSpace(json::value & jDoc, std::string sNameSpace, bool begin = true);
 
 	private:
-		void parseXMLElement(json::atom& ret, const TiXmlNode * elem);
-		void writeXML(std::string & str, json::atom & ret, int depth, bool bPretty = true, bool bTabs = true);
+		void parseXMLElement(json::value& ret, const TiXmlNode * elem);
+		void writeXML(std::string & str, json::value & ret, int depth, bool bPretty = true, bool bTabs = true);
 
 		std::string sRootTag;
 		

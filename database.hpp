@@ -38,7 +38,7 @@ namespace json
 			document setConfig(document jSetConfig);
 
 			document getConfigValue(std::string sKey);
-			document setConfigValue(std::string sKey, atom aValue);
+			document setConfigValue(std::string sKey, value aValue);
 
 			document getDocument(std::string id, std::string rev = "");
 			document setDocument(document doc);
@@ -47,8 +47,8 @@ namespace json
 
 			document save();
 
-			typedef document (*MAPPTR)(atom & doc);
-			typedef document (*REDUCEPTR)(atom & keys, atom & values, bool bReReduce);
+			typedef document (*MAPPTR)(value & doc);
+			typedef document (*REDUCEPTR)(value & keys, value & values, bool bReReduce);
 
 			document addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce = NULL);
 			document getView(std::string sName, document keys = document(), bool bReduce = true);
@@ -56,10 +56,10 @@ namespace json
 			document cleanUpViews();
 
 		private:
-			static bool viewSort(json::atom a, json::atom b);
+			static bool viewSort(json::value a, json::value b);
 			document indexView(std::string &sName, std::string &sKeys, json::document keys);
-			size_t matchLevel(atom& keys, atom& mappedResult);
-			atom&  getViewWorker(atom & ret, std::string & sName, atom & keys, bool bReduce);
+			size_t matchLevel(value& keys, value& mappedResult);
+			value&  getViewWorker(value & ret, std::string & sName, value & keys, bool bReduce);
 
 			struct view{
 				MAPPTR map;

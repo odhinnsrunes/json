@@ -26,7 +26,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 namespace json
 {
-		void query::setTarget(atom* insearch) {
+		void query::setTarget(value* insearch) {
 		m_to_search = insearch;
 		result.clear();
 		switch (m_to_search->myType) {
@@ -40,7 +40,7 @@ namespace json
 		}
 	}
 
-	bool query::logic(atom& working, atom& params) {
+	bool query::logic(value& working, value& params) {
 		bool bRetVal = false;
 		if (params.isA(JSON_ARRAY)) {
 			for (array::iterator it = params.arr->begin(); it != params.arr->end(); ++it) {
@@ -168,8 +168,8 @@ namespace json
 		return bRetVal;
 	}
 
-	atom query::doresult(atom& working, eOperators op, atom value) {
-		atom retVal;
+	value query::doresult(value& working, eOperators op, value val) {
+		value retVal;
 		size_t myDepth = depth++;
 		if (myDepth == (*this)["from"].size()) {
 			// do where and select here
@@ -187,7 +187,7 @@ namespace json
 							iterator w = working.find((size_t)(*it).integer());
 							switch (op) {
 								case eAssign:
-									(*w) = value;
+									(*w) = val;
 									(*r) = (*w);
 									break;
 								case eIncrement:
@@ -203,19 +203,19 @@ namespace json
 									(*r) = --(*w);
 									break;
 								case eAddTo:
-									(*w) += value;
+									(*w) += val;
 									(*r) = (*w);
 									break;
 								case eSubtractFrom:
-									(*w) -= value;
+									(*w) -= val;
 									(*r) = (*w);
 									break;
 								case eMultiplyBy:
-									(*w) *= value;
+									(*w) *= val;
 									(*r) = (*w);
 									break;
 								case eDivideBy:
-									(*w) /= value;
+									(*w) /= val;
 									(*r) = (*w);
 									break;
 								case eRemove:
@@ -234,7 +234,7 @@ namespace json
 							iterator r = retVal.find((*it).string());
 							switch (op) {
 								case eAssign:
-									(*w) = value;
+									(*w) = val;
 									(*r) = (*w);
 									break;
 								case eIncrement:
@@ -250,19 +250,19 @@ namespace json
 									(*r) = --(*w);
 									break;
 								case eAddTo:
-									(*w) += value;
+									(*w) += val;
 									(*r) = (*w);
 									break;
 								case eSubtractFrom:
-									(*w) -= value;
+									(*w) -= val;
 									(*r) = (*w);
 									break;
 								case eMultiplyBy:
-									(*w) *= value;
+									(*w) *= val;
 									(*r) = (*w);
 									break;
 								case eDivideBy:
-									(*w) /= value;
+									(*w) /= val;
 									(*r) = (*w);
 									break;
 								case eRemove:
@@ -278,7 +278,7 @@ namespace json
 				} else {
 					switch (op) {
 						case eAssign:
-							working = value;
+							working = val;
 							retVal = working;
 							break;
 						case eIncrement:
@@ -294,19 +294,19 @@ namespace json
 							retVal = --working;
 							break;
 						case eAddTo:
-							working += value;
+							working += val;
 							retVal = working;
 							break;
 						case eSubtractFrom:
-							working -= value;
+							working -= val;
 							retVal = working;
 							break;
 						case eMultiplyBy:
-							working *= value;
+							working *= val;
 							retVal = working;
 							break;
 						case eDivideBy:
-							working /= value;
+							working /= val;
 							retVal = working;
 							break;
 						case eRemove:
@@ -325,13 +325,13 @@ namespace json
 					if (working.isA(JSON_ARRAY) && working.size()) {
 						int i = 0;
 						for (array::iterator it = working.arr->begin(); it != working.arr->end(); ++it) {
-							atom r = doresult(*it, op, value);
+							value r = doresult(*it, op, val);
 							if (r.size() || r.myType == JSON_STRING || myDepth < (*this)["from"].size() - 1)
 								retVal[i++] = r;
 						}
 					} else if (working.isA(JSON_OBJECT) && working.size()) {
 						for (object::iterator it = working.obj->begin(); it != working.obj->end(); ++it) {
-							atom r = doresult(it->second, op, value);
+							value r = doresult(it->second, op, val);
 							if (r.size() || r.myType == JSON_STRING)
 								retVal[it->first] = r;
 						}
@@ -339,12 +339,12 @@ namespace json
 				} else {
 					if ((*this)["from"][myDepth].isA(JSON_STRING) && working.isA(JSON_OBJECT)) {
 						if (working[(*this)["from"][myDepth].safeCString()].myType != JSON_VOID) {
-							atom r = doresult(working[(*this)["from"][myDepth].safeCString()], op, value);
+							value r = doresult(working[(*this)["from"][myDepth].safeCString()], op, val);
 							retVal[(*this)["from"][myDepth].safeCString()] = r;
 						}
 					} else if ((*this)["from"][myDepth].isA(JSON_NUMBER) && working.isA(JSON_ARRAY)) {
 						if (working[(int)(*this)["from"][myDepth].number()].myType != JSON_VOID) {
-							atom r = doresult(working[(int)(*this)["from"][myDepth].number()], op, value);
+							value r = doresult(working[(int)(*this)["from"][myDepth].number()], op, val);
 							retVal[0] = r;
 						}
 					}

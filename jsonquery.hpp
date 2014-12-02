@@ -45,19 +45,19 @@ namespace json
 			m_to_search = NULL;
 		}
 		
-		query(atom& V)
+		query(value& V)
 		: document(V) {
 			depth = 0;
 			m_to_search = NULL;
 		}
 		
-		query(const char* V, atom* insearch)
+		query(const char* V, value* insearch)
 		: document(V) {
 			depth = 0;
 			m_to_search = NULL;
 			setTarget(insearch);
 		}
-		query(char* V, atom* insearch)
+		query(char* V, value* insearch)
 		: document(V) {
 			depth = 0;
 			m_to_search = NULL;
@@ -65,37 +65,37 @@ namespace json
 		}
 		
 		template <typename T>
-		query(T V, atom* insearch)
+		query(T V, value* insearch)
 		: document(V) {
 			depth = 0;
 			m_to_search = NULL;
 			setTarget(insearch);
 		}
 		
-		query(atom& V, atom* insearch)
+		query(value& V, value* insearch)
 		: document(V) {
 			depth = 0;
 			m_to_search = NULL;
 			setTarget(insearch);
 		}
 		
-		void setTarget(atom* insearch);
+		void setTarget(value* insearch);
 		
 		document& getResult() {
 			depth = 0;
-			*(atom*)(&result) = doresult(*m_to_search);
+			*(value*)(&result) = doresult(*m_to_search);
 			return result;
 		}
 		
-		document& operator=(atom& value) {
+		document& operator=(value& val) {
 			depth = 0;
-			*(atom*)(&result) = doresult(*m_to_search, eAssign, value);
+			*(value*)(&result) = doresult(*m_to_search, eAssign, val);
 			return result;
 		}
 		
 		document& remove() {
 			depth = 0;
-			*(atom*)(&result) = doresult(*m_to_search, eRemove);
+			*(value*)(&result) = doresult(*m_to_search, eRemove);
 			return result;
 		}
 		
@@ -114,11 +114,11 @@ namespace json
 			eRemove
 		};
 		
-		bool logic(atom& working, atom& params);
+		bool logic(value& working, value& params);
 		
-		atom doresult(atom& working, eOperators op = eNoOp, atom value = atom());
+		value doresult(value& working, eOperators op = eNoOp, value val = value());
 		
-		atom* m_to_search;
+		value* m_to_search;
 		array::iterator aIt;
 		object::iterator oIt;
 		

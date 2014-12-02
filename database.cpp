@@ -98,7 +98,7 @@ namespace json
 		return ret;
 	}
 
-	document database::setConfigValue(std::string sKey, atom aValue)
+	document database::setConfigValue(std::string sKey, value aValue)
 	{
 		mtx.lock();
 		document ret;
@@ -193,12 +193,12 @@ namespace json
 		return ret;
 	}
 
-	bool database::viewSort(json::atom a, json::atom b)
+	bool database::viewSort(json::value a, json::value b)
 	{
 		return (a["key"] > b["key"]);
 	}
 
-	size_t database::matchLevel(atom& keys, atom& mappedResult)
+	size_t database::matchLevel(value& keys, value& mappedResult)
 	{
 		if(keys.isA(JSON_ARRAY) && mappedResult["key"].isA(JSON_ARRAY)){
 			size_t l = keys.size();
@@ -230,20 +230,20 @@ namespace json
 			size_t i = 0;
 			document temp;
 			ret["total_rows"] = 0;
-			for(iterator it = keys["keys"].begin(); it != keys["keys"].end(); ++it){
-				getViewWorker(temp[i++], sName, (*it), bReduce);
+			for(value & at : keys["keys"]){
+				getViewWorker(temp[i++], sName, at, bReduce);
 			}
 			for(iterator it = temp.begin(); it != temp.end(); ++it){
 				ret["total_rows"] += (*it)["total_rows"];
 				ret["rows"] += (*it)["rows"];
 			}
 			if(bReduce && views[sName].reduce){
-				atom rere;
+				value rere; // this is where grouping needs to happen.
 				for(iterator it = ret["rows"].begin(); it != ret["rows"].end(); ++it){
 					rere.push_back((*it)["value"]);
 				}
 				ret["rows"].clear();
-				atom n = atom((char*)NULL);
+				value n = value((char*)NULL);
 				ret["rows"][0]["value"] = views[sName].reduce(n, rere, true);
 				ret["rows"][0]["key"] = (char*)NULL;
 				ret["total_rows"] = 1;
@@ -255,7 +255,7 @@ namespace json
 
 	}
 
-	atom & database::getViewWorker(atom & ret, std::string & sName, atom & keys, bool bReduce)
+	value & database::getViewWorker(value & ret, std::string & sName, value & keys, bool bReduce)
 	{
 		std::string sKeys = document(keys).write();
 		indexView(sName, sKeys, keys);

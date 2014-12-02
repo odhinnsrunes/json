@@ -140,7 +140,7 @@ namespace json
 	 *			However, don't instaitiate this class direcly.  Instead use the
 	 *			json::document class.
 	 */
-	class atom
+	class value
 	{
 	public:
 		
@@ -150,14 +150,14 @@ namespace json
 		friend class query;
 		friend class iterator;
 		
-		friend void objectParse(atom& ret, instring& inputString, bool* bFailed);
+		friend void objectParse(value& ret, instring& inputString, bool* bFailed);
 		
-		friend void arrayParse(atom& arr, instring& inputString, bool* bFailed);
+		friend void arrayParse(value& arr, instring& inputString, bool* bFailed);
 		
-		friend void nullParse(atom& ret, instring& inputString, bool* bFailed);
-		friend void valueParse(atom& a, instring& inputString, bool* bFailed);
-        friend void numberParse(atom& ret, instring& s, bool* bFailed);
-		static void swap(atom& lhs, atom& rhs) {
+		friend void nullParse(value& ret, instring& inputString, bool* bFailed);
+		friend void valueParse(value& a, instring& inputString, bool* bFailed);
+        friend void numberParse(value& ret, instring& s, bool* bFailed);
+		static void swap(value& lhs, value& rhs) {
 			using std::swap;
 			swap(lhs.m_number, rhs.m_number);
 			swap(lhs.m_boolean, rhs.m_boolean);
@@ -167,22 +167,22 @@ namespace json
 			swap(lhs.arr, rhs.arr);
 		}
 		
-		atom();
-		atom(const atom& V);
+		value();
+		value(const value& V);
 #ifdef __BORLANDC__
-		atom(document& V);
+		value(document& V);
 #else
-		atom(const document& V);
+		value(const document& V);
 #endif
-		atom(bool V);
-		atom(const char* V);
-		atom(char* V);
-		atom(std::string V);
-		atom(object& V);
-		atom(array& V);
+		value(bool V);
+		value(const char* V);
+		value(char* V);
+		value(std::string V);
+		value(object& V);
+		value(array& V);
 		
 		template <typename T>
-		atom(T V) {
+		value(T V) {
 			m_number = (double)V;
 			m_boolean = !(V == 0.0);
 			
@@ -191,14 +191,14 @@ namespace json
 			arr = NULL;
 		}
 		
-		~atom();
+		~value();
 		
-        atom& operator=(const atom& V);
-        // atom& operator=(const bool &V);
-        // atom& operator=(const std::string& V);
-        // atom& operator=(const char* V);
+        value& operator=(const value& V);
+        // value& operator=(const bool &V);
+        // value& operator=(const std::string& V);
+        // value& operator=(const char* V);
         // template <typename T>
-        // atom& operator=(T V);
+        // value& operator=(T V);
         
 		int isA() const;
 		bool isA(int i) const
@@ -206,8 +206,8 @@ namespace json
 			return (isA() == i);
 		}
 
-		atom& emptyArray();
-		atom& emptyObject();
+		value& emptyArray();
+		value& emptyObject();
 		
 		double number();
 		i64 integer();
@@ -217,14 +217,14 @@ namespace json
 		const char* c_str();
 		const char* cString();
 		
-		atom& operator[](size_t index);
-		atom& operator[](std::string index);
+		value& operator[](size_t index);
+		value& operator[](std::string index);
 		
-		void push_back(atom val);									   // Array
-		void push_front(atom val);									  // Array
+		void push_back(value val);									   // Array
+		void push_front(value val);									  // Array
 		
-		atom pop_back();												// Array
-		atom pop_front();											   // Array
+		value pop_back();												// Array
+		value pop_front();											   // Array
 		
 		void erase(size_t index);									   // Array
 		void erase(std::string index);								  // Object
@@ -234,62 +234,62 @@ namespace json
 		bool exists(size_t index);
 		bool exists(std::string index);
 		
-		iterator insert(size_t index, atom V);							  // Array
-		iterator insert(std::string index, atom V);						 // Object
-		iterator insert(iterator position, atom V);						 // Array / Object
+		iterator insert(size_t index, value V);							  // Array
+		iterator insert(std::string index, value V);						 // Object
+		iterator insert(iterator position, value V);						 // Array / Object
 		void insert(iterator position, iterator first, iterator last);  // Array / Object (position ignored)
 		void insert(iterator first, iterator last);					 // Array (append) / Object
 		
         void resize(size_t iCount);
-        void resize(size_t iCount, atom val);
+        void resize(size_t iCount, value val);
         
 		bool empty() const; // Is array empty or object empty or string empty.  Number and booleans return false, NULL and VOID return true.
 		
 		std::string getKey(size_t index); // VERY slow for objects.  Don't use inside a for loop.  Use iterators instead.
 		
-		// atom& get(std::string index, atom V);
-		// atom& get(size_t index, atom V);
+		// value& get(std::string index, value V);
+		// value& get(size_t index, value V);
 		
-		atom& at(size_t index);
+		value& at(size_t index);
 		
-		// void set(std::string index, atom V);
-		// void set(int index, atom V);
+		// void set(std::string index, value V);
+		// void set(int index, value V);
 		
-		bool operator==(atom V) const;
-		bool operator!=(atom V) const;
-		bool operator>(atom V) const;
-		bool operator<(atom V) const;
-		bool operator>=(atom V) const;
-		bool operator<=(atom V) const;
+		bool operator==(value V) const;
+		bool operator!=(value V) const;
+		bool operator>(value V) const;
+		bool operator<(value V) const;
+		bool operator>=(value V) const;
+		bool operator<=(value V) const;
 		
-		atom operator+(atom V) const;
-		atom operator-(atom V) const;
-		atom operator*(atom V) const;
-		atom operator/(atom V) const;
-		atom operator%(atom V) const;
+		value operator+(value V) const;
+		value operator-(value V) const;
+		value operator*(value V) const;
+		value operator/(value V) const;
+		value operator%(value V) const;
 		
-		atom &operator+=(atom V);
-		atom &operator-=(atom V);
-		atom &operator*=(atom V);
-		atom &operator/=(atom V);
-		atom &operator%=(atom V);
+		value &operator+=(value V);
+		value &operator-=(value V);
+		value &operator*=(value V);
+		value &operator/=(value V);
+		value &operator%=(value V);
 		
-		atom operator++(int);
-		atom &operator++();
-		atom operator--(int);
-		atom &operator--();
+		value operator++(int);
+		value &operator++();
+		value operator--(int);
+		value &operator--();
 		
-		atom operator-();
+		value operator-();
 		
 		size_t size() const;
         void clear();
         void destroy();
 		
-		void sort(bool (*compareFunc)(atom, atom));
+		void sort(bool (*compareFunc)(value, value));
 		
-		atom simpleSearch(atom& searchFor, bool bSubStr = false);
-		size_t simpleCount(atom& searchFor, bool bSubStr = false);
-		virtual atom merge(atom& V);
+		value simpleSearch(value& searchFor, bool bSubStr = false);
+		size_t simpleCount(value& searchFor, bool bSubStr = false);
+		virtual value merge(value& V);
 		
 		iterator begin() const;
 		iterator end() const;
@@ -322,7 +322,7 @@ namespace json
 		static DEBUGPTR debug;
 	};
 
-    void numberParse(atom& ret, instring& s, bool* bFailed);
+    void numberParse(value& ret, instring& s, bool* bFailed);
     
 	class instring
 	{
@@ -366,9 +366,9 @@ namespace json
 		size_t size;
 	};
 
-	typedef std::map<std::string, json::atom> myMap;
+	typedef std::map<std::string, json::value> myMap;
 	
-	typedef std::deque<json::atom> myVec;
+	typedef std::deque<json::value> myVec;
 
 	class object : public myMap
 	{
@@ -414,7 +414,7 @@ namespace json
 		size_t psize(int depth, bool bPretty) const;
 	};
 	
-	class iterator : public std::iterator<std::input_iterator_tag, atom>{
+	class iterator : public std::iterator<std::input_iterator_tag, value>{
 	public:
         friend class json::reverse_iterator;
 		iterator() {
@@ -495,7 +495,7 @@ namespace json
 			}
 		}
 		
-		atom& operator*() {
+		value& operator*() {
 			if (!bNone) {
 				if (bIsArray) {
 					return *arr_it;
@@ -503,18 +503,18 @@ namespace json
 					return obj_it->second;
 				}
 			} else {
-				dumbRet = atom();
+				dumbRet = value();
 				return dumbRet;
 			}
 		}
-		atom key() {
+		value key() {
 			if (!bNone) {
 				if (bIsArray)
-					return atom();
+					return value();
 				else
-					return atom(obj_it->first);
+					return value(obj_it->first);
 			} else {
-				return atom();
+				return value();
 			}
 		}
 		
@@ -525,14 +525,14 @@ namespace json
 		myMap::iterator & obj() { return obj_it; }
 		
 	private:
-		atom dumbRet;
+		value dumbRet;
 		bool bNone;
 		myVec::iterator arr_it;
 		myMap::iterator obj_it;
 		bool bIsArray;
 	};
 	
-	class reverse_iterator : public std::iterator<std::input_iterator_tag, atom>{
+	class reverse_iterator : public std::iterator<std::input_iterator_tag, value>{
 	public:
 		reverse_iterator() {
 			bNone = true;
@@ -631,7 +631,7 @@ namespace json
 			}
 		}
 		
-		atom& operator*() {
+		value& operator*() {
 			if (!bNone) {
 				if (bIsArray) {
 					return *arr_it;
@@ -639,18 +639,18 @@ namespace json
 					return obj_it->second;
 				}
 			} else {
-				dumbRet = atom();
+				dumbRet = value();
 				return dumbRet;
 			}
 		}
-		atom key() {
+		value key() {
 			if (!bNone) {
 				if (bIsArray)
-					return atom();
+					return value();
 				else
-					return atom(obj_it->first);
+					return value(obj_it->first);
 			} else {
-				return atom();
+				return value();
 			}
 		}
 		
@@ -661,7 +661,7 @@ namespace json
 		myMap::reverse_iterator & obj() { return obj_it; }
 		
 	private:
-		atom dumbRet;
+		value dumbRet;
 		bool bNone;
 		myVec::reverse_iterator arr_it;
 		myMap::reverse_iterator obj_it;
@@ -669,17 +669,17 @@ namespace json
 	};
 	
 	
-	class document : public atom
+	class document : public value
 	{
 	public:
-		friend class atom;
+		friend class value;
 		document()
-		: atom() {
+		: value() {
 			bParseSuccessful = false;
 		}
 		
-		document(const atom& V)
-		: atom(V) {
+		document(const value& V)
+		: value(V) {
 			bParseSuccessful = true;
 		}
 		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
@@ -711,7 +711,7 @@ namespace json
 		}
 
 		template<typename T>
-		document(T V) : atom(V) {}
+		document(T V) : value(V) {}
 
 		static int appendToArrayFile(std::string sFile, const document & atm, bool bPretty);
 
@@ -721,9 +721,9 @@ namespace json
 	};
 		
 	std::ostream& operator<<(std::ostream& S, document& doc);
-	std::ostream& operator<<(std::ostream& S, atom& doc);
+	std::ostream& operator<<(std::ostream& S, value& doc);
     // template <typename T>
-    // atom& atom::operator=(T V) {
+    // value& value::operator=(T V) {
     //     if (debug) {
     //         if(myType != JSON_NUMBER){
     //             switch(myType) {
