@@ -1886,8 +1886,9 @@ namespace json
 			case JSON_ARRAY:
 			case JSON_OBJECT:
 			{
-				for (iterator it = begin(); it != end(); ++it) {
-					if (!(*it).isA(JSON_VOID)) {
+                for (value & val : *this){
+//				for (iterator it = begin(); it != end(); ++it) {
+					if (!val.isA(JSON_VOID)) {
 						return myType;
 					}
 				}
@@ -2265,8 +2266,9 @@ namespace json
 			case JSON_OBJECT:
 			case JSON_ARRAY:
 			{
-				for (iterator it = begin(); it != end(); ++it){
-					if (!(*it).empty()){
+                for (const value & val : *this){
+//				for (iterator it = begin(); it != end(); ++it){
+					if (!val.empty()){
 						return false;
 					}
 				}
@@ -2284,8 +2286,9 @@ namespace json
 	
 	bool array::empty() const
 	{
-		for (myVec::const_iterator it = this->begin(); it != this->end(); ++it) {
-			if (!(*it).empty()) {
+        for(const value & val : *this){
+//		for (myVec::const_iterator it = this->begin(); it != this->end(); ++it) {
+			if (!val.empty()) {
 				return false;
 			}
 		}
@@ -2294,8 +2297,9 @@ namespace json
 	
 	bool object::empty() const
 	{
-		for (myMap::const_iterator it = this->begin(); it != this->end(); ++it) {
-			if (!it->second.empty()) {
+        for (const std::pair<std::string, value> &pair: *this) {
+//		for (myMap::const_iterator it = this->begin(); it != this->end(); ++it) {
+			if (!pair.second.empty()) {
 				return false;
 			}
 		}
@@ -2324,8 +2328,9 @@ namespace json
 		case JSON_OBJECT:
 		{
 			size_t ret = 0;
-			for (iterator it = begin(); it != end(); ++it) {
-				if ((*it).isA() != JSON_VOID) {
+            for (const value & val : *this) {
+//			for (iterator it = begin(); it != end(); ++it) {
+				if (val.isA() != JSON_VOID) {
 					ret++;
 				}
 			}
@@ -2543,7 +2548,7 @@ namespace json
         arr = NULL;
     }
         
-	void value::sort(bool (*compareFunc)(value, value)) {
+	void value::sort(bool (*compareFunc)(value&, value&)) {
 		if (arr)
 			std::sort(arr->begin(), arr->end(), compareFunc);
 	}

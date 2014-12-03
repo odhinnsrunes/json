@@ -193,7 +193,7 @@ namespace json
 		return ret;
 	}
 
-	bool database::viewSort(json::value a, json::value b)
+	bool database::viewSort(json::value &a, json::value &b)
 	{
 		return (a["key"] > b["key"]);
 	}
@@ -216,14 +216,14 @@ namespace json
 		}
 	}
 
-	document database::getView(std::string sName, document keys, bool bReduce)
+	document database::getView(document & ret, std::string sName, document keys, bool bReduce)
 	{
 		mtx.lock();
 		if(views.find(sName) == views.end()){
 			mtx.unlock();
 			return document();
 		}
-		document ret;
+        ret.clear();
 		if(keys.exists("key")){
 			getViewWorker(ret, sName, keys["key"], bReduce);
 		} else if(keys.exists("keys")){
@@ -280,7 +280,7 @@ namespace json
 	}
 
 
-	document database::indexView(std::string &sName, std::string &sKeys, json::document keys)
+	document database::indexView(std::string &sName, std::string &sKeys, value &keys)
 	{
 		mtx.lock();
 		document ret;

@@ -51,13 +51,13 @@ namespace json
 			typedef document (*REDUCEPTR)(value & keys, value & values, bool bReReduce);
 
 			document addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce = NULL);
-			document getView(std::string sName, document keys = document(), bool bReduce = true);
+			document getView(document & ret, std::string sName, document keys = document(), bool bReduce = true);
 
 			document cleanUpViews();
 
 		private:
-			static bool viewSort(json::value a, json::value b);
-			document indexView(std::string &sName, std::string &sKeys, json::document keys);
+			static bool viewSort(json::value &a, json::value &b);
+			document indexView(std::string &sName, std::string &sKeys, value &keys);
 			size_t matchLevel(value& keys, value& mappedResult);
 			value&  getViewWorker(value & ret, std::string & sName, value & keys, bool bReduce);
 
