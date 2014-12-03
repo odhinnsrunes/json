@@ -417,9 +417,9 @@ namespace json
 			if(c != '0'){
 				if(pos > 0){
 					ret.str = ret.str.substr(pos);
-					if(ret.str[0] == '.'){
-						ret.str.insert(0, 0, '0');
-					}
+				}
+				if(ret.str[0] == '.'){
+					ret.str.insert(0, 1, '0');
 				}
 				break;
 			}
