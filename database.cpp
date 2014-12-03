@@ -132,20 +132,23 @@ namespace json
 	{
 		mtx.lock();
 		document ret;
-		bool bOk = true;;
+		bool bOk = true;
+		std::string id;
 		if(doc.exists("_id")){
-			if(!doc.exists("_rev")){
+			id.assign(doc["_id"].string());
+			if(!doc.exists("_rev") && data["data"].exists(id)){
 				ret["error"] = "Document already exists and no _rev was given.";
 				bOk = false;
 			} else {
-				document oldDoc = getDocument(doc["_id"].string()); // TODO, do this without getDocument to make it faster
+				document oldDoc = getDocument(id);
 				if(doc["_rev"] != oldDoc["_rev"]){
 					ret["error"] = "Document already exists and _rev given is not up to date.";
 					bOk = false;
 				}
 			}
 		} else {
-			doc["_id"] = generateUUID();
+			id.assign(generateUUID());
+			doc["_id"] = id;
 		}
 		if(bOk){
 			doc["_rev"] = generateUUID();
