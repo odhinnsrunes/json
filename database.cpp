@@ -182,6 +182,25 @@ namespace json
 		return ret;
 	}
 
+	document database::deleteDocument(std::string id, std::string rev)
+	{
+		mtx.lock();
+		document ret;
+		if(data["data"].exists(id)){
+			document doc = setDocument(getDocument(id));
+			data["data"][id]["deleted"][doc["_rev"].string()] = true;
+			ret["_id"] = id;
+			ret["_rev"] = doc["_rev"];
+			ret["deleted"] = true;
+			if(data["config"]["autoSave"].boolean()){
+				ret["save"] = save();
+			}
+		}
+		
+		mtx.unlock();
+		return ret;
+	}
+
 	document database::addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce)
 	{
 		mtx.lock();
@@ -319,6 +338,7 @@ namespace json
 			if(views[sName].map){
 				data["indeces"][sName][sKeys]["data"];
 				iterator itIndex = data["indeces"][sName][sKeys].find("data");
+				bool bEmpty = (*itIndex).empty();
 				size_t sequence = data["indeces"][sName][sKeys]["sequence"].integer();
 				size_t latest = data["sequence"].integer();
 				data["indeces"][sName][sKeys]["sequence"] = latest;
@@ -328,15 +348,22 @@ namespace json
 					std::string id = data["sequenceIndex"][i]["_id"].string();
 					std::string rev = data["sequenceIndex"][i]["_rev"].string();
 					if(data["data"][id]["sequence"] == i){ // skip out of date documents
-						document ret = views[sName].map(data["data"][id]["docs"][rev]);
-						if(!ret.empty()){
-							if(!ret["key"].isA(JSON_OBJECT)){
-								if(matchLevel(keys, ret) >= keysSize){
+						document ret2 = views[sName].map(data["data"][id]["docs"][rev]);
+						bool bDeleted = false;
+						if(data["data"][id]["deleted"][rev].boolean() == true){
+							bDeleted = true;
+						}
+						if(!ret2.empty() && !(bEmpty && bDeleted)){
+							if(!ret2["key"].isA(JSON_OBJECT)){
+								if(matchLevel(keys, ret2) >= keysSize){
 									document index;
 									index["id"] = id;
 									
-									index["key"] = ret["key"];
-									index["value"] = ret["value"];
+									index["key"] = ret2["key"];
+									index["value"] = ret2["value"];
+									if(bDeleted){
+										index["deleted"] = true;
+									}
 									newChanges.push_back(index);
 								}
 							}
@@ -350,7 +377,7 @@ namespace json
 
 				newChanges.sort(&viewSort);
 
-				if((*itIndex).empty()){
+				if(bEmpty){
 					(*itIndex) = newChanges;
 					if(data["config"]["autoSave"].boolean()){
 						ret["save"] = save();
@@ -374,7 +401,12 @@ namespace json
 					}
 					itNew = newChanges.begin();
 					for(size_t i = 0; i < l; i++){
-						if((*itIndex)[i]["key"] > (*itNew)["key"]){
+						if((*itNew)["deleted"].boolean()){
+							++itNew;
+							if(itNew == newChanges.end()){
+								break;
+							}
+						} else if((*itIndex)[i]["key"] > (*itNew)["key"]){
 							(*itIndex).insert(i, (*itNew));
 							l++;
 							++itNew;
@@ -384,7 +416,8 @@ namespace json
 						}
 					}
 					for(;itNew != newChanges.end(); ++itNew){
-						(*itIndex).push_back((*itNew));
+						if(!(*itNew)["deleted"].boolean())
+							(*itIndex).push_back((*itNew));
 					}
 					if(data["config"]["autoSave"].boolean()){
 						ret["save"] = save();

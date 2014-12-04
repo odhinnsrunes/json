@@ -42,6 +42,7 @@ namespace json
 
 			document getDocument(std::string id, std::string rev = "");
 			document setDocument(document doc);
+			document deleteDocument(std::string id, std::string rev);
 
 			std::string generateUUID();
 
