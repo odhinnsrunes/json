@@ -134,17 +134,24 @@ namespace json
 		document ret;
 		bool bOk = true;
 		std::string id;
+
 		if(doc.exists("_id")){
 			id.assign(doc["_id"].string());
 			if(!doc.exists("_rev") && data["data"].exists(id)){
 				ret["error"] = "Document already exists and no _rev was given.";
 				bOk = false;
 			} else {
-				document oldDoc = getDocument(id);
-				if(doc["_rev"] != oldDoc["_rev"]){
-					ret["error"] = "Document already exists and _rev given is not up to date.";
-					bOk = false;
-				}
+				if(data["data"].exists(id)){			
+					std::string oldRev;
+					iterator it = data["data"][id]["revs"].begin();
+					if(it != data["data"][id]["revs"].end()){
+						oldRev = (*it).string();
+					}		
+					if(doc["_rev"] != oldRev){
+						ret["error"] = "Document already exists and _rev given is not up to date.";
+						bOk = false;
+					}
+				}	
 			}
 		} else {
 			id.assign(generateUUID());
