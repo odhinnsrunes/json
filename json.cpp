@@ -2562,8 +2562,12 @@ namespace json
 	}
 		
 	void value::sort(bool (*compareFunc)(value&, value&)) {
-		if (arr)
+		if (arr){
+			DEBUGPTR oldDebug = debug;
+			debug = NULL;
 			std::sort(arr->begin(), arr->end(), compareFunc);
+			debug = oldDebug;
+		}
 	}
 
 	double value::number() {
