@@ -205,7 +205,7 @@ namespace json
 
 	bool database::viewSort(json::value &a, json::value &b)
 	{
-		return (a["key"] > b["key"]);
+		return (a["key"] < b["key"]);
 	}
 
 	size_t database::matchLevel(value& keys, value& mappedResult)
@@ -327,6 +327,8 @@ namespace json
 					return ret;
 				}
 
+				newChanges.sort(&viewSort);
+
 				if((*itIndex).empty()){
 					(*itIndex) = newChanges;
 					if(data["config"]["autoSave"].boolean()){
@@ -336,7 +338,6 @@ namespace json
 					return ret;
 				}
 
-				newChanges.sort(&viewSort);
 				iterator itNew = newChanges.begin();
 				if(itNew != newChanges.end()){
 					size_t l = (*itIndex).size();
