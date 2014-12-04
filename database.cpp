@@ -226,7 +226,7 @@ namespace json
 		}
 	}
 
-	document database::getView(document & ret, std::string sName, document keys, bool bReduce, size_t limit)
+	document database::getView(document & ret, std::string sName, document keys, bool bReduce, size_t limit, size_t offset)
 	{
 		mtx.lock();
 		if(views.find(sName) == views.end()){
@@ -236,6 +236,13 @@ namespace json
         ret.clear();
 		if(keys.exists("key")){
 			getViewWorker(ret, sName, keys["key"], bReduce);
+			if(offset && ret["rows"].isA(JSON_ARRAY)){
+				myVec::iterator it = ret["rows"].begin().arr();
+				it += offset;
+				if(it != ret["rows"].end().arr()){
+					ret["rows"].erase(ret["rows"].begin(), it);
+				}
+			}
 			if(limit){
 				ret["rows"].resize(limit);
 			}
@@ -250,11 +257,19 @@ namespace json
 				ret["total_rows"] += val["total_rows"];
 				ret["rows"] += val["rows"];
 			}
+			if(offset && ret["rows"].isA(JSON_ARRAY)){
+				myVec::iterator it = ret["rows"].begin().arr();
+				it += offset;
+				if(it != ret["rows"].end().arr()){
+					ret["rows"].erase(ret["rows"].begin(), it);
+				}
+			}
 			if(limit){
 				ret["rows"].resize(limit);
 			}
 			if(bReduce && views[sName].reduce){
-				value rere; // this is where grouping needs to happen.
+				value rere; 
+				// this is where grouping needs to happen.
 				for(value & val : ret["rows"]){
 					rere.push_back(val["value"]);
 				}
