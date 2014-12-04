@@ -226,7 +226,7 @@ namespace json
 		}
 	}
 
-	document database::getView(document & ret, std::string sName, document keys, bool bReduce)
+	document database::getView(document & ret, std::string sName, document keys, bool bReduce, size_t limit)
 	{
 		mtx.lock();
 		if(views.find(sName) == views.end()){
@@ -236,6 +236,9 @@ namespace json
         ret.clear();
 		if(keys.exists("key")){
 			getViewWorker(ret, sName, keys["key"], bReduce);
+			if(limit){
+				ret["rows"].resize(limit);
+			}
 		} else if(keys.exists("keys")){
 			size_t i = 0;
 			document temp;
@@ -246,6 +249,9 @@ namespace json
 			for(value & val : temp){
 				ret["total_rows"] += val["total_rows"];
 				ret["rows"] += val["rows"];
+			}
+			if(limit){
+				ret["rows"].resize(limit);
 			}
 			if(bReduce && views[sName].reduce){
 				value rere; // this is where grouping needs to happen.

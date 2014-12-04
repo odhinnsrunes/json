@@ -51,7 +51,7 @@ namespace json
 			typedef document (*REDUCEPTR)(value & keys, value & values, bool bReReduce);
 
 			document addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce = NULL);
-			document getView(document & ret, std::string sName, document keys = document(), bool bReduce = true);
+			document getView(document & ret, std::string sName, document keys = document(), bool bReduce = true, size_t limit = 0);
 
 			document cleanUpViews();
 
