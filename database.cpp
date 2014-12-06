@@ -354,17 +354,37 @@ namespace json
 							bDeleted = true;
 						}
 						if(!ret2.empty() && !(bEmpty && bDeleted)){
-							if(!ret2["key"].isA(JSON_OBJECT)){
-								if(matchLevel(keys, ret2) >= keysSize){
-									document index;
-									index["id"] = id;
-									
-									index["key"] = ret2["key"];
-									index["value"] = ret2["value"];
-									if(bDeleted){
-										index["deleted"] = true;
+							if(ret2.isA(JSON_ARRAY)){
+								for(value & val : ret2){
+									if(val.isA(JSON_OBJECT)){
+										if(!val["key"].isA(JSON_OBJECT)){
+											if(matchLevel(keys, val) >= keysSize){
+												document index;
+												index["id"] = id;
+												
+												index["key"] = val["key"];
+												index["value"] = val["value"];
+												if(bDeleted){
+													index["deleted"] = true;
+												}
+												newChanges.push_back(index);
+											}
+										}
 									}
-									newChanges.push_back(index);
+								}
+							} else if (ret2.isA(JSON_OBJECT)) {
+								if(!ret2["key"].isA(JSON_OBJECT)){
+									if(matchLevel(keys, ret2) >= keysSize){
+										document index;
+										index["id"] = id;
+										
+										index["key"] = ret2["key"];
+										index["value"] = ret2["value"];
+										if(bDeleted){
+											index["deleted"] = true;
+										}
+										newChanges.push_back(index);
+									}
 								}
 							}
 						}
