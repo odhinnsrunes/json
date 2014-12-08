@@ -57,6 +57,7 @@ namespace json
 	{
 		save();
 	}
+	
 	document database::save()
 	{
 		mtx.lock();
@@ -69,22 +70,22 @@ namespace json
 	std::string database::generateUUID()
 	{
 	#ifdef WIN32
-	    UUID uuid;
-	    UuidCreate ( &uuid );
+		UUID uuid;
+		UuidCreate ( &uuid );
 
-	    unsigned char * str;
-	    UuidToStringA ( &uuid, &str );
+		unsigned char * str;
+		UuidToStringA ( &uuid, &str );
 
-	    std::string s( ( char* ) str );
+		std::string s( ( char* ) str );
 
-	    RpcStringFreeA ( &str );
+		RpcStringFreeA ( &str );
 	#else
-	    uuid_t uuid;
-	    uuid_generate_random ( uuid );
-	    char s[37];
-	    uuid_unparse ( uuid, s );
+		uuid_t uuid;
+		uuid_generate_random ( uuid );
+		char s[37];
+		uuid_unparse ( uuid, s );
 	#endif
-	    return s;	
+		return s;	
 
 	}
 
@@ -132,7 +133,7 @@ namespace json
 	{
 		mtx.lock();
 		document ret;
-        iterator it = data["data"].find(id);
+		iterator it = data["data"].find(id);
 		if(it != data["data"].end()){
 			if(!rev.empty()){
 				ret = (*it)["docs"][rev];
@@ -271,7 +272,7 @@ namespace json
 			mtx.unlock();
 			return document();
 		}
-        ret.clear();
+		ret.clear();
 		if(keys.exists("key")){
 			getViewWorker(ret, sName, keys["key"], bReduce);
 			if(offset && ret["rows"].isA(JSON_ARRAY)){
