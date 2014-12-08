@@ -24,10 +24,19 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 */
 
 #include "database.hpp"
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
+// #include <boost/lexical_cast.hpp>
+// #include <boost/uuid/uuid.hpp>
+// #include <boost/uuid/uuid_generators.hpp>
+// #include <boost/uuid/uuid_io.hpp>
+
+extern "C"
+{
+#ifdef WIN32
+#include <Rpc.h>
+#else
+#include <uuid/uuid.h>
+#endif
+}
 
 namespace json
 {
@@ -63,11 +72,29 @@ namespace json
 
 	std::string database::generateUUID()
 	{
-		static boost::uuids::basic_random_generator<boost::mt19937> gen;
-		boost::uuids::uuid u = gen();
-//		boost::uuids::uuid u = boost::uuids::random_generator()(); // initialize uuid
+// 		static boost::uuids::basic_random_generator<boost::mt19937> gen;
+// 		boost::uuids::uuid u = gen();
+// //		boost::uuids::uuid u = boost::uuids::random_generator()(); // initialize uuid
 
-		return to_string(u);
+// 		return to_string(u);
+	#ifdef WIN32
+	    UUID uuid;
+	    UuidCreate ( &uuid );
+
+	    unsigned char * str;
+	    UuidToStringA ( &uuid, &str );
+
+	    std::string s( ( char* ) str );
+
+	    RpcStringFreeA ( &str );
+	#else
+	    uuid_t uuid;
+	    uuid_generate_random ( uuid );
+	    char s[37];
+	    uuid_unparse ( uuid, s );
+	#endif
+	    return s;	
+
 	}
 
 	document database::getConfig()
