@@ -68,11 +68,6 @@ namespace json
 
 	std::string database::generateUUID()
 	{
-// 		static boost::uuids::basic_random_generator<boost::mt19937> gen;
-// 		boost::uuids::uuid u = gen();
-// //		boost::uuids::uuid u = boost::uuids::random_generator()(); // initialize uuid
-
-// 		return to_string(u);
 	#ifdef WIN32
 	    UUID uuid;
 	    UuidCreate ( &uuid );
