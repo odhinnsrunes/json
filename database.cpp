@@ -24,10 +24,6 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 */
 
 #include "database.hpp"
-// #include <boost/lexical_cast.hpp>
-// #include <boost/uuid/uuid.hpp>
-// #include <boost/uuid/uuid_generators.hpp>
-// #include <boost/uuid/uuid_io.hpp>
 
 extern "C"
 {
