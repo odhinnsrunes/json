@@ -25,8 +25,8 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 #include "json.hpp"
 #include <mutex>
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid_io.hpp>
+// #include <boost/lexical_cast.hpp>
+// #include <boost/uuid/uuid_io.hpp>
 
 namespace json
 {
