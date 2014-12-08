@@ -114,13 +114,14 @@ namespace json
 	{
 		mtx.lock();
 		document ret;
-		if(data["data"].exists(id)){
+        iterator it = data["data"].find(id);
+		if(it != data["data"].end()){
 			if(!rev.empty()){
-				ret = data["data"][id]["docs"][rev];
+				ret = (*it)["docs"][rev];
 			} else {
-				iterator it = data["data"][id]["revs"].begin();
-				if(it != data["data"][id]["revs"].end()){
-					ret = data["data"][id]["docs"][(*it).string()];
+				iterator rit = (*it)["revs"].begin();
+				if(rit != (*it)["revs"].end()){
+					ret = (*it)["docs"][(*rit).string()];
 				}
 			}
 		}
