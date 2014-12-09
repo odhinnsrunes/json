@@ -3293,7 +3293,9 @@ namespace json
 
 	std::string document::write(int iDepth, bool bPretty, PREWRITEPTR preWriter) const
 	{
-		if (isA(JSON_OBJECT)) {
+		if(isA(JSON_VOID)){
+			return "null";
+		} else if (isA(JSON_OBJECT)) {
 			size_t l = obj->psize(iDepth, bPretty);
 			MovingCharPointer ptr(l);
 			obj->cprint(ptr, iDepth, bPretty);
