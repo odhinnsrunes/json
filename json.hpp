@@ -682,6 +682,9 @@ namespace json
 		: value(V) {
 			bParseSuccessful = true;
 		}
+
+		document(const document& V);
+		
 		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
 		typedef std::string& (*PREWRITEPTR)(const std::string& in, std::string& out);
 		bool parse(const std::string& inStr, PREPARSEPTR = NULL, std::string preParseFileName = "");
