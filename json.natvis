@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="json::atom">
+		<DisplayString Condition="myType == -1">empty</DisplayString>
+		<DisplayString Condition="myType == 0">null</DisplayString>
+		<DisplayString Condition="myType == 1">{m_boolean}</DisplayString>
+		<DisplayString Condition="myType == 3">{str}</DisplayString>
+		<DisplayString Condition="myType == 4">array (size={arr-&gt;_Mysize})</DisplayString>
+		<DisplayString Condition="myType == 5">object (size={obj-&gt;_Mysize})</DisplayString>
+		<DisplayString>{m_number}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="myType == 4">*arr</ExpandedItem>
+			<ExpandedItem Condition="myType == 5">*obj</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="std::pair&lt;std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt; const ,json::atom&gt;">
+		<DisplayString>{first}, {second}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="second.myType == 4">second.arr</ExpandedItem>
+			<ExpandedItem Condition="second.myType == 5">second.obj</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="json::iterator">
+		<DisplayString Condition="bNone == true">none</DisplayString>
+		<DisplayString Condition="bIsArray == true">array</DisplayString>
+		<DisplayString>object</DisplayString>
+		<Expand>
+			<Item Name="array" Condition="bNone == false &amp;&amp; bIsArray == true">arr_it</Item>
+			<Item Name="object" Condition="bNone == false &amp;&amp; bIsArray == false">obj_it</Item>
+		</Expand>			
+	</Type>
+	<Type Name="json::value">
+		<DisplayString Condition="myType == -1">empty</DisplayString>
+		<DisplayString Condition="myType == 0">null</DisplayString>
+		<DisplayString Condition="myType == 1">{m_boolean}</DisplayString>
+		<DisplayString Condition="myType == 3">{str}</DisplayString>
+		<DisplayString Condition="myType == 4">array (size={arr-&gt;_Mysize})</DisplayString>
+		<DisplayString Condition="myType == 5">object (size={obj-&gt;_Mysize})</DisplayString>
+		<DisplayString>{m_number}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="myType == 4">*arr</ExpandedItem>
+			<ExpandedItem Condition="myType == 5">*obj</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="std::pair&lt;std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt; const ,json::value&gt;">
+		<DisplayString>{first}, {second}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="second.myType == 4">second.arr</ExpandedItem>
+			<ExpandedItem Condition="second.myType == 5">second.obj</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="json::iterator">
+		<DisplayString Condition="bNone == true">none</DisplayString>
+		<DisplayString Condition="bIsArray == true">array</DisplayString>
+		<DisplayString>object</DisplayString>
+		<Expand>
+			<Item Name="array" Condition="bNone == false &amp;&amp; bIsArray == true">arr_it</Item>
+			<Item Name="object" Condition="bNone == false &amp;&amp; bIsArray == false">obj_it</Item>
+		</Expand>			
+	</Type>
+</AutoVisualizer>
