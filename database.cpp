@@ -299,12 +299,14 @@ namespace json
 		}
 	}
 
-	document database::getView(document & ret, std::string sName, document keys, bool bReduce, size_t limit, size_t offset)
+	document &database::getView(document & ret, std::string sName, document keys, bool bReduce, size_t limit, size_t offset)
 	{
 		mtx.lock();
 		if(views.find(sName) == views.end()){
 			mtx.unlock();
-			return document();
+			ret["error"] = "not_found";
+            ret["reason"] = "missing_named_view";
+            return ret;
 		}
 		ret.clear();
 		if(keys.exists("key")){
@@ -319,7 +321,6 @@ namespace json
 			if(limit){
 				ret["rows"].resize(limit);
 			}
-            ret["offset"] = offset;
 		} else if(keys.exists("keys")){
 			size_t i = 0;
 			document temp;
@@ -351,8 +352,7 @@ namespace json
 				value n = value((char*)NULL);
 				ret["rows"][0]["value"] = views[sName].reduce(n, rere, true);
 				ret["rows"][0]["key"] = (char*)NULL;
-				ret["total_rows"] = 1;
-                ret["offset"] = 0;
+//				ret["total_rows"] = 1;
 			}
 		} else {
 			getViewWorker(ret, sName, keys, bReduce);
@@ -366,8 +366,8 @@ namespace json
             if(limit){
                 ret["rows"].resize(limit);
             }
-            ret["offset"] = offset;
 		}
+        ret["update_seq"] = data["sequence"];
 		return ret;
 
 	}
