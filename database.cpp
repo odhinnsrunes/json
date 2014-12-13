@@ -303,11 +303,17 @@ namespace json
 	{
 		mtx.lock();
 		if(views.find(sName) == views.end()){
-			mtx.unlock();
 			ret["error"] = "not_found";
             ret["reason"] = "missing_named_view";
+            mtx.unlock();
             return ret;
 		}
+        if(bReduce && views[sName].reduce == NULL){
+            ret["error"] = "query_parse_error";
+            ret["reason"] = "Reduce is invalid for map-only views.";
+            mtx.unlock();
+            return ret;
+        }
 		ret.clear();
 		if(keys.exists("key")){
 			getViewWorker(ret, sName, keys["key"], bReduce);
