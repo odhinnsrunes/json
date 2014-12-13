@@ -135,20 +135,35 @@ namespace json
 		document ret;
 		iterator it = data["data"].find(id);
 		if(it != data["data"].end()){
-			if(!rev.empty()){
-				ret = (*it)["docs"][rev];
-			} else {
+             if(!rev.empty()){
+                 if(data["data"][id]["deleted"][rev] == true){
+                     ret["_id"] = id;
+                     ret["_rev"] = rev;
+                     ret["_deleted"] = true;
+                 } else {
+                     ret = (*it)["docs"][rev];
+                 }
+             } else if(data["data"][id].exists("deleted")) {
+                 ret["error"] = "not_found";
+                 ret["reason"] = "deleted";
+             } else {
 				iterator rit = (*it)["revs"].begin();
 				if(rit != (*it)["revs"].end()){
 					ret = (*it)["docs"][(*rit).string()];
-				}
+                } else {
+                    ret["error"] = "not_found";
+                    ret["reason"] = "missing";
+                }
 			}
-		}
+        } else {
+            ret["error"] = "not_found";
+            ret["reason"] = "missing";
+        }
 		mtx.unlock();
 		return ret;
 	}
 
-	document database::setDocument(document doc)
+	document database::setDocument(document doc, bool bDontSave)
 	{
 		mtx.lock();
 		document ret;
@@ -158,7 +173,8 @@ namespace json
 		if(doc.exists("_id")){
 			id.assign(doc["_id"].string());
 			if(!doc.exists("_rev") && data["data"].exists(id)){
-				ret["error"] = "Document already exists and no _rev was given.";
+				ret["error"] = "conflict";
+                ret["reason"] = "Document update conflict.";
 				bOk = false;
 			} else {
 				if(data["data"].exists(id)){			
@@ -168,7 +184,8 @@ namespace json
 						oldRev = (*it).string();
 					}		
 					if(doc["_rev"] != oldRev){
-						ret["error"] = "Document already exists and _rev given is not up to date.";
+                        ret["error"] = "conflict";
+                        ret["reason"] = "Document update conflict.";
 						bOk = false;
 					}
 				}	
@@ -178,23 +195,28 @@ namespace json
 			doc["_id"] = id;
 		}
 		if(bOk){
-			doc["_rev"] = generateUUID();
-			size_t lRevs = data["data"][doc["_id"].string()]["revs"].size();
-			data["data"][doc["_id"].string()]["revs"].push_front(doc["_rev"].string());
-			data["data"][doc["_id"].string()]["docs"][doc["_rev"].string()] = doc;
-			data["data"][doc["_id"].string()]["sequence"] = data["sequence"];
-			data["sequenceIndex"][data["sequence"].integer()]["_id"] = doc["_id"].string();
-			data["sequenceIndex"][data["sequence"].integer()]["_rev"] = doc["_rev"].string();
+            size_t lRevs = data["data"][id]["revs"].size();
+            i64 revIndex = data["data"][id]["revindex"].integer() + 1;
+            data["data"][id]["revindex"] = revIndex;
+            std::string newRev = std::to_string(revIndex);
+            newRev.append("-");
+            newRev.append(generateUUID());
+			doc["_rev"] = newRev;
+			data["data"][id]["revs"].push_front(newRev);
+			data["data"][id]["docs"][newRev] = doc;
+			data["data"][id]["sequence"] = data["sequence"];
+			data["sequenceIndex"][data["sequence"].integer()]["_id"] = id;
+			data["sequenceIndex"][data["sequence"].integer()]["_rev"] = newRev;
 			data["sequence"] = data["sequence"] + 1;
 			size_t lMax = (size_t)data["config"]["maxRevisions"].integer();
 			if(lMax > 0){
 				for(size_t lIndex = lMax; lIndex < lRevs; lIndex++){
-					data["data"][doc["_id"].string()]["docs"].erase(data["data"][doc["_id"].string()]["revs"].pop_back().string());
+					data["data"][id]["docs"].erase(data["data"][id]["revs"].pop_back().string());
 				}
 			}
 			ret["_id"] = doc["_id"];
 			ret["_rev"] = doc["_rev"];
-			if(data["config"]["autoSave"].boolean()){
+			if(data["config"]["autoSave"].boolean() && !bDontSave){
 				ret["save"] = save();
 			}
 		}
@@ -206,17 +228,29 @@ namespace json
 	{
 		mtx.lock();
 		document ret;
-		if(data["data"].exists(id)){
-			document doc = setDocument(getDocument(id));
-			data["data"][id]["deleted"][doc["_rev"].string()] = true;
-			ret["_id"] = id;
-			ret["_rev"] = doc["_rev"];
-			ret["deleted"] = true;
-			if(data["config"]["autoSave"].boolean()){
-				ret["save"] = save();
-			}
-		}
-		
+        
+        json::document doc = getDocument(id);
+        if(doc.exists("error")){
+            ret = doc;
+        } else {
+            if(data["data"][id]["deleted"][doc["_rev"].string()].boolean()) {
+                ret["error"] = "not_found";
+                ret["reason"] = "deleted";
+            } else if(doc["_rev"] == rev){
+                json::document res = setDocument(doc, true);
+                data["data"][id]["deleted"][res["_rev"].string()] = true;
+                if(data["config"]["autoSave"].boolean()){
+                    ret["save"] = save();
+                }
+                ret["ok"] = true;
+                ret["id"] = id;
+                ret["rev"] = res["_rev"];
+            } else {
+                ret["error"] = "conflict";
+                ret["reason"] = "Document update conflict.";
+            }
+        }
+
 		mtx.unlock();
 		return ret;
 	}

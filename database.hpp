@@ -39,7 +39,7 @@ namespace json
 			document setConfigValue(std::string sKey, value aValue);
 
 			document getDocument(std::string id, std::string rev = "");
-			document setDocument(document doc);
+			document setDocument(document doc, bool bDontSave = false);
 			document deleteDocument(std::string id, std::string rev);
 
 			std::string generateUUID();
