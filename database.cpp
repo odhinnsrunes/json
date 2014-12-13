@@ -319,6 +319,7 @@ namespace json
 			if(limit){
 				ret["rows"].resize(limit);
 			}
+            ret["offset"] = offset;
 		} else if(keys.exists("keys")){
 			size_t i = 0;
 			document temp;
@@ -351,9 +352,21 @@ namespace json
 				ret["rows"][0]["value"] = views[sName].reduce(n, rere, true);
 				ret["rows"][0]["key"] = (char*)NULL;
 				ret["total_rows"] = 1;
+                ret["offset"] = 0;
 			}
 		} else {
 			getViewWorker(ret, sName, keys, bReduce);
+            if(offset && ret["rows"].isA(JSON_ARRAY)){
+                myVec::iterator it = ret["rows"].begin().arr();
+                it += offset;
+                if(it != ret["rows"].end().arr()){
+                    ret["rows"].erase(ret["rows"].begin(), it);
+                }
+            }
+            if(limit){
+                ret["rows"].resize(limit);
+            }
+            ret["offset"] = offset;
 		}
 		return ret;
 
@@ -378,7 +391,7 @@ namespace json
 			ret["rows"][0]["key"] = (char*)NULL;
 			ret["total_rows"] = 1;
 		}
-		ret["name"] = sName;
+//		ret["name"] = sName;
 		mtx.unlock();
 		return ret;
 	}
