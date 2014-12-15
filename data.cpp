@@ -96,6 +96,7 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 									if (ret.exists(childName)) {
 										if (!ret[childName].isA(json::JSON_ARRAY)) {
 											json::value a = ret[childName];
+											ret.erase(childName);
 											ret[childName][0] = a;
 										}
 										parseXMLElement(ret[childName][ret[childName].size()], child);
