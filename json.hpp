@@ -68,6 +68,8 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #ifndef JSON_HPP_
 #define JSON_HPP_
 
+#define JSON_DOCUMENT_VERSION "1.0.0"
+
 #ifndef JSON_NUMBER_PRECISION
 #define JSON_NUMBER_PRECISION 14
 #endif
