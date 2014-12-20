@@ -177,7 +177,7 @@ namespace json
 		value(bool V);
 		value(const char* V);
 		value(char* V);
-		value(std::string* V);
+		value(std::string V);
 		value(object& V);
 		value(array& V);
 		

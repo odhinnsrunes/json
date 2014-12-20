@@ -1563,7 +1563,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	value::value(std::string& V) {
+	value::value(std::string V) {
 		m_number = 0;
 		m_boolean = false;
 		str.assign(V);
