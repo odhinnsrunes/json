@@ -96,8 +96,8 @@ Some other functions for working with JSON are:
 - emptyObject() - creates an empty object {} at the location specified.
 - push\_back(value) - pushes the value to the end of an array.  Creates the array if it doesn't exist.
 - push\_front(value) - pushes the value to the start of an array.  Creates the array if it doesn't exist.
-- pop\_back() - returns a json value (json::atom) that is the last item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
-- pop\_front() - returns a json value (json::atom) that is the first item in an array and removes it from the array.  Returns an atom with an isA() type of json::JSON\_VOID if the array is empty.
+- pop\_back() - returns a json value (json::value) that is the last item in an array and removes it from the array.  Returns an value with an isA() type of json::JSON\_VOID if the array is empty.
+- pop\_front() - returns a json value (json::value) that is the first item in an array and removes it from the array.  Returns an value with an isA() type of json::JSON\_VOID if the array is empty.
 - insert(number, string or iterators and a value) - will insert a new value into an existing array or object at the point indicated.  This will invalidate any iterators referencing the array or object in question.  For an object, this is the same as just adding the value the normal way.
 
 Some Examples of these are:
@@ -148,7 +148,7 @@ For normal iterators:
     json::iterator itObject= jDoc["some_object"].find("some_sub_value");
     for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
         std::string sKey = it.key().string(); // this will work for arrays as well, but the key will always return 0.
-                                              // key() returns a JSON atom (value).
+                                              // key() returns a JSON value (value).
         std::cout << "key = " << sKey << ", value = " << (*it).number() << "\n";
     }
 
@@ -157,7 +157,7 @@ For reverse_iterators:
     json::iterator itObject= jDoc["some_object"].find("some_sub_value");
     for(json::reverse_iterator rit = (*itObject).rbegin(); rit != (*itObject).rend(); ++rit){
         std::string sKey = rit.key().string(); // this will work for arrays as well, but the key will always return 0.
-                                              // key() returns a JSON atom (value).
+                                              // key() returns a JSON value (value).
         std::cout << "key = " << sKey << ", value = " << (*rit).number() << "\n";
     }
 
