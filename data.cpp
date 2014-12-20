@@ -310,11 +310,6 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 		default:
 			break;
 		case json::JSON_BOOLEAN:
-			// if (bPretty) {
-			// 	for (int i = 0; i < depth; i++) {
-			// 		str.append("\t");
-			// 	}
-			// }
 			str.append(ret.boolean() ? "true" : "false");
 			break;
 
@@ -344,8 +339,6 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 				if (strchr("1234567890", key[0])) {
 					bIsNumericKey = true;
 				}
-//			for (size_t i = 0; i < ret.size(); i++) {
-//				std::string key = ret.getKey((int)i);
 				if (bPretty && str.size()) {
 					if (str[str.size() - 1] != '\n')
 						str.append("\n");
@@ -393,7 +386,6 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 						}
 						str.append(key);
 						str.push_back('>');
-						//str = str + "</" + key + ">";
 						if (bPretty)
 							str.append("\n");
 					}
@@ -428,7 +420,6 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 					}
 					str.append(key);
 					str.push_back('>');
-//					str = str + "</" + key + ">";
 					if (bPretty)
 						str.append("\n");
 				}
@@ -464,12 +455,7 @@ std::string document::writeXML(std::string rootElem, bool bPretty, bool bTabs, P
 
 	
 	if (isA(json::JSON_OBJECT)) {
-		// std::string key = this->getKey(0);
-		// ret = ret + "<" + key + ">"
 		writeXML(ret, *(json::value*)this, iStartDepth, bPretty, bTabs);
-		// ret = ret + "</" + key + ">"
-		// if (bPretty)
-		// 	ret.append("\n");
 	}
 	if (sRootTag.size()) {
 		ret.append("</");
