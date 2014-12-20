@@ -156,7 +156,7 @@ namespace json
 		
 		friend void nullParse(value& ret, instring& inputString, bool* bFailed);
 		friend void valueParse(value& a, instring& inputString, bool* bFailed);
-        friend void numberParse(value& ret, instring& s, bool* bFailed);
+		friend void numberParse(value& ret, instring& s, bool* bFailed);
 		static void swap(value& lhs, value& rhs) {
 			using std::swap;
 			swap(lhs.m_number, rhs.m_number);
@@ -177,7 +177,7 @@ namespace json
 		value(bool V);
 		value(const char* V);
 		value(char* V);
-		value(std::string V);
+		value(std::string* V);
 		value(object& V);
 		value(array& V);
 		
@@ -193,13 +193,13 @@ namespace json
 		
 		~value();
 		
-        value& operator=(const value& V);
-        // value& operator=(const bool &V);
-        // value& operator=(const std::string& V);
-        // value& operator=(const char* V);
-        // template <typename T>
-        // value& operator=(T V);
-        
+		value& operator=(const value& V);
+		// value& operator=(const bool &V);
+		// value& operator=(const std::string& V);
+		// value& operator=(const char* V);
+		// template <typename T>
+		// value& operator=(T V);
+		
 		int isA() const;
 		bool isA(int i) const
 		{
@@ -240,20 +240,14 @@ namespace json
 		void insert(iterator position, iterator first, iterator last);  // Array / Object (position ignored)
 		void insert(iterator first, iterator last);					 // Array (append) / Object
 		
-        void resize(size_t iCount);
-        void resize(size_t iCount, value val);
-        
+		void resize(size_t iCount);
+		void resize(size_t iCount, value val);
+		
 		bool empty() const; // Is array empty or object empty or string empty.  Number and booleans return false, NULL and VOID return true.
 		
 		std::string getKey(size_t index); // VERY slow for objects.  Don't use inside a for loop.  Use iterators instead.
 		
-		// value& get(std::string index, value V);
-		// value& get(size_t index, value V);
-		
 		value& at(size_t index);
-		
-		// void set(std::string index, value V);
-		// void set(int index, value V);
 		
 		bool operator==(value V) const;
 		bool operator!=(value V) const;
@@ -282,8 +276,8 @@ namespace json
 		value operator-();
 		
 		size_t size() const;
-        void clear();
-        void destroy();
+		void clear();
+		void destroy();
 		
 		void sort(bool (*compareFunc)(value&, value&));
 		
@@ -322,42 +316,42 @@ namespace json
 		static DEBUGPTR debug;
 	};
 
-    void numberParse(value& ret, instring& s, bool* bFailed);
-    
+	void numberParse(value& ret, instring& s, bool* bFailed);
+	
 	class instring
 	{
 	public:
 		instring(const std::string& in);
 		instring(const instring& in);
 		instring(char* in);
-        
+		
 		~instring();
-        
-        char &take();
-        void skip();
+		
+		char &take();
+		void skip();
 		char &peek() const;
 		size_t tell() const;
-        
+		
 		void seek(size_t newPos);
 		char* getPos();
-        
+		
 		instring& operator=(std::string& in);
 		instring& operator=(const char* in);
 		instring& operator=(instring& in);
-        
+		
 		void set(std::string& in);
 		void set(const char* in);
 		
-        
+		
 		operator std::string() const
 		{
 			return std::string(str);
 		}
-        
+		
 		instring operator+(std::string& V) const;
 		instring operator+(const char* V) const;
 		instring operator+(double V) const;
-        
+		
 		std::string Str() const;
 		std::string SoFar() const;
 	private:
@@ -416,7 +410,7 @@ namespace json
 	
 	class iterator : public std::iterator<std::input_iterator_tag, value>{
 	public:
-        friend class json::reverse_iterator;
+		friend class json::reverse_iterator;
 		iterator() {
 			bNone = true;
 			bIsArray = false;
@@ -424,12 +418,10 @@ namespace json
 		iterator(const myMap::iterator & it) {
 			bNone = false;
 			obj_it = it;
-//			arr_it = NULL;
 			bIsArray = false;
 		}
 		iterator(const myVec::iterator & it) {
 			bNone = false;
-//			obj_it = NULL;
 			arr_it = it;
 			bIsArray = true;
 		}
@@ -474,7 +466,7 @@ namespace json
 			operator--();
 			return tmp;
 		}
-        		
+				
 		bool operator==(const iterator& rhs) {
 			if (bNone && rhs.bNone)
 				return true;
@@ -541,24 +533,20 @@ namespace json
 		reverse_iterator(const myMap::reverse_iterator & it) {
 			bNone = false;
 			obj_it = it;
-            //			arr_it = NULL;
 			bIsArray = false;
 		}
 		reverse_iterator(const myVec::reverse_iterator & it) {
 			bNone = false;
-            //			obj_it = NULL;
 			arr_it = it;
 			bIsArray = true;
 		}
 		reverse_iterator(const myMap::iterator & it) {
 			bNone = false;
 			obj_it = myMap::reverse_iterator(it);
-            //			arr_it = NULL;
 			bIsArray = false;
 		}
 		reverse_iterator(const myVec::iterator & it) {
 			bNone = false;
-            //			obj_it = NULL;
 			arr_it =  myVec::reverse_iterator(it);
 			bIsArray = true;
 		}
@@ -568,7 +556,7 @@ namespace json
 			obj_it = it.obj_it;
 			bIsArray = it.bIsArray;
 		}
-        
+		
 		reverse_iterator(const json::iterator& it) {
 			bNone = it.bNone;
 			arr_it = myVec::reverse_iterator(it.arr_it);
@@ -610,7 +598,7 @@ namespace json
 			operator--();
 			return tmp;
 		}
-		        
+				
 		bool operator==(const reverse_iterator& rhs) {
 			if (bNone && rhs.bNone)
 				return true;
@@ -725,61 +713,7 @@ namespace json
 		
 	std::ostream& operator<<(std::ostream& S, document& doc);
 	std::ostream& operator<<(std::ostream& S, value& doc);
-    // template <typename T>
-    // value& value::operator=(T V) {
-    //     if (debug) {
-    //         if(myType != JSON_NUMBER){
-    //             switch(myType) {
-    //                 case JSON_NULL:
-    //                     debug("json operator= changed type from NULL to %s", typeName(JSON_NUMBER).c_str());
-    //                     break;
-                        
-    //                 case JSON_BOOLEAN:
-    //                     debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_NUMBER).c_str());
-    //                     break;
-                        
-    //                 case JSON_NUMBER:
-    //                     debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_NUMBER).c_str());
-    //                     break;
-                        
-    //                 case JSON_STRING:
-    //                     debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_NUMBER).c_str());
-    //                     break;
-                        
-    //                 case JSON_ARRAY:
-    //                     debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_NUMBER).c_str(), this->print(0, true).c_str());
-    //                     break;
-                        
-    //                 case JSON_OBJECT:
-    //                     debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_NUMBER).c_str(), this->print(0, true).c_str());
-    //                     break;
-                        
-    //                 default:
-    //                     break;
-    //             }
-    //         }
-    //     }
-        
-    //     m_number = V;
-    //     m_boolean = V != 0;
-        
-    //     // if (!V.str.empty()) {
-    //     //        str.assign("");
-    //     // } else {
-    //     str.clear();
-    //     // }
-        
-    //     myType = JSON_NUMBER;
-    //     if (obj)
-    //         delete obj;
-    //     obj = NULL;
-        
-    //     if (arr)
-    //         delete arr;
-    //     arr = NULL;
-    //     return *this;
-    // }
-    
+	
 }
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
 #pragma warn + 8026

@@ -63,7 +63,7 @@ void JSONDebug(const char * format, ...) {
 		if (n > 0 && n != (size_t)-1 && b) {
 			size = n;
 		} else if (n == (size_t)-1) {
-			size = size * 2; // stupid nonconformant microsoft
+			size = size * 2; 
 		} else {
 			size = n * 2;
 		}
@@ -131,7 +131,7 @@ namespace json
 	{
 		typedef CharType Ch;
 
-		static Ch* Encode(Ch* buffer, unsigned codepoint) { // NOT INLINE
+		static Ch* Encode(Ch* buffer, unsigned codepoint) { 
 			if (codepoint <= 0x7F)
 				*buffer++ = codepoint & 0xFF;
 			else if (codepoint <= 0x7FF) {
@@ -152,7 +152,6 @@ namespace json
 			return buffer;
 		}
 	};
-
 
 	double Pow10(int n) {
 		if (!(n <= 308))
@@ -179,7 +178,6 @@ namespace json
 		s << szError << "  Line: " << line <<  " Column: " << pos;
 		instring ostring(s.str());
 		inputString = ostring;
-		// inputString.set(s.str().c_str());
 	}
 
 	void nullParse(value& ret, instring& inputString, bool* bFailed) {
@@ -315,7 +313,6 @@ namespace json
 	}
 
 	void numberParse(value& ret, instring& s, bool* bFailed) { 
-		// Parse minus
 		char * pStart = s.getPos();
 		bool minus = false;
 		if (s.peek() == '-') {
@@ -323,12 +320,8 @@ namespace json
 			s.take();
 		}
 
-		// Parse int: zero / ( digit1-9 *DIGIT )
 		double d;
-//		while (s.peek() == '0') {
-//            d = 0;
-//            s.take();
-//        }
+
 		if (s.peek() >= '0' && s.peek() <= '9') {
 			d = s.take() - '0';
 
@@ -337,7 +330,7 @@ namespace json
 					generateError(s, "Number too big to store in double");
 					*bFailed = true;
 					ret = value();
-					return; // value();
+					return; 
 				}
 				d = d * 10 + (s.take() - '0');
 			}
@@ -345,10 +338,9 @@ namespace json
 			generateError(s, "Expect a value here.");
 			*bFailed = true;
 			ret = value();
-			return; // value();
+			return; 
 		}
 
-		// Parse frac = decimal-point 1*DIGIT
 		int expFrac = 0;
 		if (s.peek() == '.') {
 			s.take();
@@ -372,7 +364,6 @@ namespace json
 			}
 		}
 
-		// Parse exp = e [ minus / plus ] 1*DIGIT
 		int exp = 0;
 		if (s.peek() == 'e' || s.peek() == 'E') {
 			s.take();
@@ -393,21 +384,19 @@ namespace json
 						generateError(s, "Number too big to store in double");
 						*bFailed = true;
 						ret = value();
-						return; // value();
+						return;
 					}
 				}
 			} else {
 				generateError(s, "At least one digit in exponent");
 				*bFailed = true;
 				ret = value();
-				return; // value();
+				return;
 			}
 
 			if (expMinus)
 				exp = -exp;
 		}
-
-		// Finish parsing, call event according to the type of m_number.
 
 		d *= Pow10(exp + expFrac);
 		ret = minus ? -d : d;
@@ -434,7 +423,7 @@ namespace json
 			*bFailed = true;
 			return;
 		}
-		inputString.take(); // Skip '{'
+		inputString.take();
 
 		ret.myType = JSON_OBJECT;
 		SkipWhitespace(inputString);
@@ -505,7 +494,7 @@ namespace json
 			arr = value();
 			return;
 		}
-		inputString.take(); // Skip '['
+		inputString.take();
 
 		arr.myType = JSON_ARRAY;
 		SkipWhitespace(inputString);
@@ -518,7 +507,7 @@ namespace json
 
 		if (inputString.peek() == ']') {
 			inputString.take();
-			return; // arr;
+			return; 
 		}
 
 		for (;;) {
@@ -602,17 +591,6 @@ namespace json
 		const char* str = in.c_str();
 		for (size_t i = 0; i < l; i++) {
 			ret += escape[(unsigned char)*(str++)];
-//			switch (escape[(unsigned char)*(str++)]) {
-//			case 0:
-//				ret++;
-//				break;
-//			case 'u':
-//				ret += 6;
-//				break;
-//			default:
-//				ret += 2;
-//				break;
-//			}
 		}
 		return ret;
 	}
@@ -635,7 +613,6 @@ namespace json
 		size_t l = ins.size();
 		const char* in = ins.c_str();
 		for (size_t i = 0; i < l; i++, in++) {
-//			char cCurrent = *(in++);
 			switch (escape[(unsigned char)(*in)]) {
 			case 0:
 				ptr.set((*in));
@@ -676,26 +653,17 @@ namespace json
 
 	inline void MovingCharPointer::set(const std::string& str) {
 		size_t l = str.size();
-//		if (m_current + l <= m_max) {
-			memcpy(m_current, str.c_str(), l);
-			m_current += l;
-//			*m_current = 0;
-//		}
+		memcpy(m_current, str.c_str(), l);
+		m_current += l;
 	}
 
 	inline void MovingCharPointer::set(const char* n, size_t size) {
-//		if (m_current + size <= m_max) {
-			memcpy(m_current, n, size);
-			m_current += size;
-//			*m_current = 0;
-//		}
+		memcpy(m_current, n, size);
+		m_current += size;
 	}
 
 	inline void MovingCharPointer::set(char n) {
-//		if (m_current + 1 <= m_max) {
-			*m_current++ = n;
-			//*m_current = 0;
-//		}
+		*m_current++ = n;
 	}
 
 	char* MovingCharPointer::orig() {
@@ -954,15 +922,9 @@ namespace json
 		case JSON_STRING:
 			return str.size() > 0;
 		case JSON_ARRAY:
-//			if (arr)
-				return !arr->empty();
-//			else
-//				return false;
+			return !arr->empty();
 		case JSON_OBJECT:
-//			if (obj)
-				return !obj->empty();
-//			else
-//				return false;
+			return !obj->empty();
 		}
 	}
 
@@ -1278,13 +1240,7 @@ namespace json
 			if (obj->find(index) != obj->end()) {
 				return true;
 			}
-		}/* else if (isA(JSON_ARRAY) && arr != NULL){
-			for (iterator it = begin(); it != end(); ++it){
-				if ((*it).exists(index)){
-					return true;
-				}
-			}
-		}*/
+		}
 		return false;
 	}
 
@@ -1400,103 +1356,6 @@ namespace json
 		return ret;
 	}
 
-	// value& value::get(std::string index, value V) {
-	// 	if (obj == NULL) {
-	// 		obj = new object();
-	// 		if (arr)
-	// 			delete arr;
-	// 		arr = NULL;
-	// 	}
-	// 	if (isA() == JSON_NULL) {
-	// 		myType = JSON_OBJECT;
-	// 		m_number = 0.0;
-	// 		m_boolean = false;
-	// 		str.clear();
-	// 		obj->insert(std::pair<std::string, value>(index, value(V)));
-	// 		return obj->find(index)->second;
-	// 	} else if (isA() == JSON_OBJECT) {
-	// 		if (obj->find(index) == obj->end()) {
-	// 			obj->insert(std::pair<std::string, value>(index, value(V)));
-	// 		}
-	// 		return obj->find(index)->second;
-	// 	} else {
-	// 		static value a;
-	// 		return a;
-	// 	}
-	// }
-
-	// inline void value::set(std::string index, value V) {
-	// 	if (obj == NULL) {
-	// 		obj = new object();
-	// 		if (arr)
-	// 			delete arr;
-	// 		arr = NULL;
-	// 	}
-	// 	if (isA() == JSON_NULL) {
-	// 		myType = JSON_OBJECT;
-	// 		m_number = 0.0;
-	// 		m_boolean = false;
-	// 		str.clear();
-	// 		obj->insert(std::pair<std::string, value>(index, V));
-	// 	} else if (isA() == JSON_OBJECT) {
-	// 		if (obj->find(index) == obj->end()) {
-	// 			obj->insert(std::pair<std::string, value>(index, V));
-	// 		} else {
-	// 			obj->find(index)->second = V;
-	// 		}
-	// 	}
-	// }
-
-	// value& value::get(size_t index, value V) {
-	// 	if (arr == NULL) {
-	// 		arr = new array();
-	// 		if (obj)
-	// 			delete obj;
-	// 		obj = NULL;
-	// 	}
-	// 	if (isA() == JSON_NULL) {
-	// 		myType = JSON_ARRAY;
-	// 		m_number = 0.0;
-	// 		m_boolean = false;
-	// 		str.clear();
-	// 		arr->resize(index);
-	// 		arr->push_back(V);
-	// 		return arr->at(index);
-	// 	} else if (isA() == JSON_ARRAY) {
-	// 		if (index >= arr->size()) {
-	// 			arr->resize(index);
-	// 			arr->push_back(V);
-	// 		}
-	// 		return arr->at(index);
-	// 	} else {
-	// 		static value a;
-	// 		return a;
-	// 	}
-	// }
-
-	// inline void value::set(int index, value V) {
-	// 	if (arr == NULL) {
-	// 		arr = new array();
-	// 		if (obj)
-	// 			delete obj;
-	// 		obj = NULL;
-	// 	}
-	// 	if (isA() == JSON_NULL && index >= 0) {
-	// 		myType = JSON_ARRAY;
-	// 		m_number = 0.0;
-	// 		m_boolean = false;
-	// 		arr->resize(index);
-	// 		arr->push_back(V);
-	// 	} else if (isA() == JSON_ARRAY && index >= 0) {
-	// 		if (index >= (int)arr->size()) {
-	// 			arr->resize(index);
-	// 			arr->push_back(V);
-	// 		} else {
-	// 			arr->at(index) = V;
-	// 		}
-	// 	}
-	// }
-
 	std::string value::getKey(size_t index) {
 		if (isA() == JSON_OBJECT) {
 			if (obj == NULL) {
@@ -1508,7 +1367,6 @@ namespace json
 			size_t i = 0;
 			for (object::iterator it = obj->begin(); it != obj->end(); ++it) {
 				if (i++ == index) {
-					//std::string *ret = &it->first;
 					return it->first;
 				}
 			}
@@ -1642,11 +1500,7 @@ namespace json
 		m_number = V.m_number;
 		m_boolean = V.m_boolean;
 
-		// if (!V.str.empty()) {
-			str.assign(V.str);
-		// } else {
-			// str.clear();
-		// }
+		str.assign(V.str);
 
 		myType = V.myType;
 		
@@ -1671,165 +1525,6 @@ namespace json
 		}
 		return *this;
 	}
-
-		// value& value::operator=(const bool & V) {
-		//     if (debug) {
-		//         if(myType != JSON_BOOLEAN){
-		//             switch(myType) {
-		//                 case JSON_NULL:
-		//                     debug("json operator= changed type from NULL to %s", typeName(JSON_BOOLEAN).c_str());
-		//                     break;
-							
-		//                 case JSON_BOOLEAN:
-		//                     debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_BOOLEAN).c_str());
-		//                     break;
-							
-		//                 case JSON_NUMBER:
-		//                     debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_BOOLEAN).c_str());
-		//                     break;
-							
-		//                 case JSON_STRING:
-		//                     debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_BOOLEAN).c_str());
-		//                     break;
-							
-		//                 case JSON_ARRAY:
-		//                     debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_BOOLEAN).c_str(), this->print(0, true).c_str());
-		//                     break;
-							
-		//                 case JSON_OBJECT:
-		//                     debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_BOOLEAN).c_str(), this->print(0, true).c_str());
-		//                     break;
-							
-		//                 default:
-		//                     break;
-		//             }
-		//         }
-		//     }
-			
-		//     m_number = (double)V;
-		//     m_boolean = V;
-			
-		//     // if (!V.str.empty()) {
-		//     //        str.assign("");
-		//     // } else {
-		//     str.clear();
-		//     // }
-			
-		//     myType = JSON_BOOLEAN;
-		//     if (obj)
-		//         delete obj;
-		//     obj = NULL;
-			
-		//     if (arr)
-		//         delete arr;
-		//     arr = NULL;
-		//     return *this;
-		// }
-
-		// value& value::operator=(const std::string & V) {
-		//     if (debug) {
-		//         if(myType != JSON_STRING){
-		//             switch(myType) {
-		//                 case JSON_NULL:
-		//                     debug("json operator= changed type from NULL to %s", typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_BOOLEAN:
-		//                     debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_NUMBER:
-		//                     debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_STRING:
-		//                     debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_ARRAY:
-		//                     debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
-		//                     break;
-							
-		//                 case JSON_OBJECT:
-		//                     debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
-		//                     break;
-							
-		//                 default:
-		//                     break;
-		//             }
-		//         }
-		//     }
-			
-		//     m_number = 0;
-		//     m_boolean = false;
-			
-		//     str.assign(V);
-			
-		//     myType = JSON_STRING;
-		//     if (obj)
-		//         delete obj;
-		//     obj = NULL;
-			
-		//     if (arr)
-		//         delete arr;
-		//     arr = NULL;
-		//     return *this;
-		// }
-		
-		// value& value::operator=(const char * V) {
-		//     if (debug) {
-		//         if(myType != JSON_STRING){
-		//             switch(myType) {
-		//                 case JSON_NULL:
-		//                     debug("json operator= changed type from NULL to %s", typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_BOOLEAN:
-		//                     debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_NUMBER:
-		//                     debug("json operator= changed type from Number %f to %s", m_number, typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_STRING:
-		//                     debug("json operator= changed type from String %s to %s", str.c_str(), typeName(JSON_STRING).c_str());
-		//                     break;
-							
-		//                 case JSON_ARRAY:
-		//                     debug("json operator(size_t) changed type from Array to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
-		//                     break;
-							
-		//                 case JSON_OBJECT:
-		//                     debug("json operator(size_t) changed type from Object to %s, orphanning:\n%s\n", typeName(JSON_STRING).c_str(), this->print(0, true).c_str());
-		//                     break;
-							
-		//                 default:
-		//                     break;
-		//             }
-		//         }
-		//     }
-			
-		//     m_number = 0;
-		//     m_boolean = false;
-			
-		//     if(V == NULL){
-		//         str.clear();
-		//         myType = JSON_NULL;
-		//     } else {
-		//         str.assign(V);
-		//         myType = JSON_STRING;
-		//     }
-			
-		//     if (obj)
-		//         delete obj;
-		//     obj = NULL;
-			
-		//     if (arr)
-		//         delete arr;
-		//     arr = NULL;
-		//     return *this;
-		// }
 		
 	value::value(bool V) {
 		m_number = (double)V;
@@ -1840,7 +1535,7 @@ namespace json
 		arr = NULL;
 	}
 
-	value::value(const char* V) { // could this be by ref instead of by val?
+	value::value(const char* V) { 
 		m_number = 0;
 		m_boolean = false;
 
@@ -1854,7 +1549,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	value::value(char* V) { // could this be by ref instead of by val?
+	value::value(char* V) { 
 		m_number = 0;
 		m_boolean = false;
 
@@ -1868,7 +1563,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	value::value(std::string V) { // could this be by ref instead of by val?
+	value::value(std::string& V) {
 		m_number = 0;
 		m_boolean = false;
 		str.assign(V);
@@ -1876,7 +1571,7 @@ namespace json
 		obj = NULL;
 		arr = NULL;
 	}
-	value::value(object& V) { // could this be by ref instead of by val?
+	value::value(object& V) { 
 		m_number = 0;
 		m_boolean = false;
 
@@ -1900,7 +1595,6 @@ namespace json
 			case JSON_OBJECT:
 			{
 				for (value & val : *this){
-//				for (iterator it = begin(); it != end(); ++it) {
 					if (!val.isA(JSON_VOID)) {
 						return myType;
 					}
@@ -2102,13 +1796,6 @@ namespace json
 		if (obj) {
 			return obj->operator[](index);
 		}
-//        if (arr){
-//            for (iterator it = begin(); it != end(); ++it){
-//                if ((*it).exists(index)){
-//                    return (*it)[index];
-//                }
-//            }
-//        }
 		if (myType != JSON_VOID) {
 			if (debug) {
 				switch(myType) {
@@ -2280,7 +1967,6 @@ namespace json
 			case JSON_ARRAY:
 			{
 				for (const value & val : *this){
-//				for (iterator it = begin(); it != end(); ++it){
 					if (!val.empty()){
 						return false;
 					}
@@ -2300,7 +1986,6 @@ namespace json
 	bool array::empty() const
 	{
 		for(const value & val : *this){
-//		for (myVec::const_iterator it = this->begin(); it != this->end(); ++it) {
 			if (!val.empty()) {
 				return false;
 			}
@@ -2311,7 +1996,6 @@ namespace json
 	bool object::empty() const
 	{
 		for (const std::pair<std::string, value> &pair: *this) {
-//		for (myMap::const_iterator it = this->begin(); it != this->end(); ++it) {
 			if (!pair.second.empty()) {
 				return false;
 			}
@@ -2322,9 +2006,6 @@ namespace json
 	size_t value::size() const
 	{
 		switch (myType) {
-		// case JSON_STRING:
-		// 	return str.size();
-
 		case JSON_ARRAY:
 		{
 			size_t ret = arr->size();
@@ -2342,7 +2023,6 @@ namespace json
 		{
 			size_t ret = 0;
 			for (const value & val : *this) {
-//			for (iterator it = begin(); it != end(); ++it) {
 				if (val.isA() != JSON_VOID) {
 					ret++;
 				}
@@ -2427,40 +2107,7 @@ namespace json
 					}
 				}
 			}
-		} //else if (myType == JSON_STRING) {
-//			object::iterator it;
-//			const char* getKey = searchFor.getKey(0).c_str();
-//			const value getVal = searchFor[getKey];
-//			int iGetType = searchFor[getKey].myType;
-//			int iIndex = 0;
-//			for (it = obj->begin(); it != obj->end(); ++it) {
-//				if (searchFor.myType == JSON_OBJECT && it->second.myType == JSON_OBJECT) {
-//					if (bSubStr && ((it->second)[getKey].myType == JSON_STRING && iGetType == JSON_STRING)) {
-//						if ((it->second)[getKey].str.find(getVal.str) != std::string::npos) {
-//							retVal[iIndex++] = (it->second);
-//						}
-//					} else {
-//						if ((it->second)[getKey] == getVal) {
-//							retVal[iIndex++] = (it->second);
-//						}
-//					}
-//				} else if (searchFor.myType == JSON_STRING && it->second.myType == JSON_STRING) {
-//					if (bSubStr) {
-//						if (str.find(searchFor.str) != std::string::npos) {
-//							retVal[iIndex++] = (it->second);
-//						}
-//					} else {
-//						if (str == searchFor.str) {
-//							retVal[iIndex++] = (it->second);
-//						}
-//					}
-//				} else if (searchFor.myType == it->second.myType) {
-//					if (searchFor == (it->second)) {
-//						retVal[iIndex++] = (it->second);
-//					}
-//				}
-//			}
-//		}
+		}
 		return retVal;
 	}
 
@@ -2545,7 +2192,6 @@ namespace json
 
 		m_number = 0;
 		m_boolean = false;
-//		myType = JSON_VOID;
 	}
 
 	void value::destroy() {
@@ -3233,40 +2879,7 @@ namespace json
 			inStr = sOut.c_str();
 		}
 		instring in(inStr);
-		// if (in.peek() == '{') {
-		// 	myType = JSON_OBJECT;
-		// 	objectParse(*this, in, &bFailed);
-		// 	if (bFailed)
-		// 		strParseResult = in.Str();
-		// } else if (in.peek() == '[') {
-		// 	myType = JSON_ARRAY;
-		// 	arrayParse(*this, in, &bFailed);
-		// 	if (bFailed)
-		// 		strParseResult = in.Str();
-		// } else if (in.peek() == '"') {
-		// 	myType = JSON_ARRAY;
-		// 	stringParse(*this, in, &bFailed);
-		// 	if (bFailed)
-		// 		strParseResult = in.Str();
-		// } else if (in.peek() == 't') {
-		// 	myType = JSON_ARRAY;
-		// 	trueParse(*this, in, &bFailed);
-		// 	if (bFailed)
-		// 		strParseResult = in.Str();
-		// } else if (in.peek() == 'f') {
-		// 	myType = JSON_ARRAY;
-		// 	trueParse(*this, in, &bFailed);
-		// 	if (bFailed)
-		// 		strParseResult = in.Str();
-		// } else if (in.peek() == 'f') {
-		// 	myType = JSON_ARRAY;
-		// 	trueParse(*this, in, &bFailed);
-		// 	if (bFailed)
-		// 		strParseResult = in.Str();
-		// } else {
-		// 	bFailed = true;
-		// 	strParseResult = "JSON Documents must begin with { or [.";
-		// }
+
 		valueParse(*this, in, &bFailed);
 		if (bFailed) {
 			strParseResult = in.Str();
