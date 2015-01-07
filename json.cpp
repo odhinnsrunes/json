@@ -432,6 +432,12 @@ namespace json
 			if (ret.arr)
 				delete ret.arr;
 			ret.arr = NULL;
+            ret.obj->setNotEmpty();
+            if(ret.pParentArray){
+                ret.obj->setParentArray(ret.pParentArray);
+            } else if (ret.pParentObject) {
+                ret.obj->setParentObject(ret.pParentObject);
+            }
 		}
 		if (inputString.peek() == '}') {
 			inputString.take();
@@ -462,8 +468,9 @@ namespace json
 				return;
 			}
 			SkipWhitespace(inputString);
-
-			valueParse((*ret.obj)[key], inputString, bFailed);
+            value &temp = (*ret.obj)[key];
+            temp.setParentObject(ret.obj);
+			valueParse(temp, inputString, bFailed);
 			if (*bFailed) {
 				ret = value();
 				return;
@@ -503,6 +510,12 @@ namespace json
 			if (arr.obj)
 				delete arr.obj;
 			arr.obj = NULL;
+            if(arr.pParentArray){
+                arr.arr->setParentArray(arr.pParentArray);
+            } else if (arr.pParentObject) {
+                arr.arr->setParentObject(arr.pParentObject);
+            }
+            arr.arr->setNotEmpty();
 		}
 
 		if (inputString.peek() == ']') {
@@ -514,7 +527,9 @@ namespace json
 
 			size_t l = arr.arr->size();
 			arr.arr->resize(l + 1);
-			valueParse(arr.arr->at(l), inputString, bFailed);
+            value & temp = arr.arr->at(l);
+            temp.setParentArray(arr.arr);
+			valueParse(temp, inputString, bFailed);
 			if (*bFailed) {
 				arr = value();
 				return;
@@ -1228,6 +1243,9 @@ namespace json
 			return false;
 		}
 		if (isA(JSON_ARRAY) && arr != NULL) {
+			if (arr->empty()) {
+				return false;
+			}
 			if (index < arr->size()) {
 				return true;
 			}
@@ -1237,6 +1255,9 @@ namespace json
 	
 	bool value::exists(std::string index) {
 		if (isA(JSON_OBJECT) && obj != NULL) {
+			if (obj->empty()) {
+				return false;
+			}
 			if (obj->find(index) != obj->end()) {
 				return true;
 			}
@@ -1385,6 +1406,8 @@ namespace json
 		myType = JSON_VOID;
 		obj = NULL;
 		arr = NULL;
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 
 	value::value(const value& V) {
@@ -1407,6 +1430,8 @@ namespace json
 		if (V.arr) {
 			arr = new array(V.arr);
 		}
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 #ifdef __BORLANDC__
 	value::value(document& V) {
@@ -1431,6 +1456,8 @@ namespace json
 		if (V.arr) {
 			arr = new array(V.arr);
 		}
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 
 	std::string value::typeName(JSONTypes type)
@@ -1523,6 +1550,23 @@ namespace json
 		} else if(V.arr){
 			*arr = *V.arr;
 		}
+		if(myType != JSON_VOID){
+			if(pParentObject){
+				pParentObject->setNotEmpty();
+				if(arr){
+					arr->setParentObject(pParentObject);
+				} else if (obj) {
+					obj->setParentObject(pParentObject);
+				}
+			} else if(pParentArray){
+				pParentArray->setNotEmpty();
+				if(arr){
+					arr->setParentArray(pParentArray);
+				} else if (obj) {
+					obj->setParentArray(pParentArray);
+				}
+			}
+		}
 		return *this;
 	}
 		
@@ -1533,6 +1577,8 @@ namespace json
 		myType = JSON_BOOLEAN;
 		obj = NULL;
 		arr = NULL;
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 
 	value::value(const char* V) { 
@@ -1548,6 +1594,8 @@ namespace json
 
 		obj = NULL;
 		arr = NULL;
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 	value::value(char* V) { 
 		m_number = 0;
@@ -1562,6 +1610,8 @@ namespace json
 
 		obj = NULL;
 		arr = NULL;
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 	value::value(std::string V) {
 		m_number = 0;
@@ -1570,6 +1620,8 @@ namespace json
 		myType = JSON_STRING;
 		obj = NULL;
 		arr = NULL;
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 	value::value(object& V) { 
 		m_number = 0;
@@ -1578,6 +1630,8 @@ namespace json
 		myType = JSON_OBJECT;
 		obj = new object(V);
 		arr = NULL;
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 	value::value(array& V) {
 		m_number = 0;
@@ -1586,20 +1640,26 @@ namespace json
 		myType = JSON_ARRAY;
 		obj = NULL;
 		arr = new array(V);
+		pParentObject = NULL;
+		pParentArray = NULL;
 	}
 
 	int value::isA() const
 	{
 		switch(myType) {
 			case JSON_ARRAY:
+			{
+				if (arr->empty()) {
+					return JSON_VOID;
+				}
+				break;
+			}
 			case JSON_OBJECT:
 			{
-				for (value & val : *this){
-					if (!val.isA(JSON_VOID)) {
-						return myType;
-					}
+				if (obj->empty()) {
+					return JSON_VOID;
 				}
-				return JSON_VOID;
+				break;
 			}
 			default:
 				break;
@@ -1681,6 +1741,12 @@ namespace json
 		}
 		myType = JSON_ARRAY;
 		arr = new array();
+		if(pParentObject){
+			arr->setParentObject(pParentObject);
+		} else if(pParentArray){
+			arr->setParentArray(pParentArray);
+		}
+		arr->setNotEmpty();
 		return *this;
 	}
 
@@ -1730,6 +1796,12 @@ namespace json
 		}
 		myType = JSON_OBJECT;
 		obj = new object();
+		if(pParentObject){
+			obj->setParentObject(pParentObject);
+		} else if(pParentArray){
+			obj->setParentArray(pParentArray);
+		}
+		obj->setNotEmpty();
 		return *this;
 	}
 
@@ -1740,10 +1812,14 @@ namespace json
 		}
 		if (arr) {
 			if (index < arr->size()) {
-				return arr->at(index);
+				value & ret = arr->at(index);
+				ret.setParentArray(arr);
+				return ret;
 			} else {
 				arr->resize(index + 1);
-				return arr->at(index);
+				value & ret = arr->at(index);
+				ret.setParentArray(arr);
+				return ret;
 			}
 		}
 
@@ -1788,13 +1864,22 @@ namespace json
 
 		myType = JSON_ARRAY;
 		arr = new array();
+        if(pParentObject){
+            arr->setParentObject(pParentObject);
+        } else if(pParentArray) {
+            arr->setParentArray(pParentArray);
+        }
 		arr->resize(index + 1);
-		return arr->at(index);
+		value & ret = arr->at(index);
+		ret.setParentArray(arr);
+		return ret;
 	}
 
 	value& value::operator[](std::string index) {
 		if (obj) {
-			return obj->operator[](index);
+			value& ret = obj->operator[](index);
+			ret.setParentObject(obj);
+			return ret;
 		}
 		if (myType != JSON_VOID) {
 			if (debug) {
@@ -1833,7 +1918,14 @@ namespace json
 		}
 		myType = JSON_OBJECT;
 		obj = new object();
-		return obj->operator[](index);
+        if(pParentObject){
+            obj->setParentObject(pParentObject);
+        } else if(pParentArray) {
+            obj->setParentArray(pParentArray);
+        }
+		value & ret = obj->operator[](index);
+		ret.setParentObject(obj);
+		return ret;
 	}
 
 	void value::push_back(value val) {
@@ -1873,8 +1965,17 @@ namespace json
 			if (obj)
 				delete obj;
 			obj = NULL;
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 		}
+		val.setParentArray(arr);
 		arr->push_back(val);
+		if(val.myType != JSON_VOID){
+			arr->setNotEmpty();
+		}
 	}
 	
 	void value::push_front(value val) {
@@ -1914,8 +2015,17 @@ namespace json
 			if (obj)
 				delete obj;
 			obj = NULL;
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 		}
+		val.setParentArray(arr);
 		arr->push_front(val);
+		if(val.myType != JSON_VOID){
+			arr->setNotEmpty();
+		}
 	}
 	
 	value value::pop_back()
@@ -1964,14 +2074,15 @@ namespace json
 	{
 		switch (isA()) {
 			case JSON_OBJECT:
+				return obj->empty();
 			case JSON_ARRAY:
 			{
-				for (const value & val : *this){
-					if (!val.empty()){
-						return false;
-					}
-				}
-				return true;
+				// for (const value & val : *this){
+				// 	if (!val.empty()){
+				// 		return false;
+				// 	}
+				// }
+				return arr->empty();
 			}
 										
 			case JSON_NULL:
@@ -1985,24 +2096,75 @@ namespace json
 	
 	bool array::empty() const
 	{
-		for(const value & val : *this){
-			if (!val.empty()) {
-				return false;
-			}
-		}
-		return true;
+		// for(const value & val : *this){
+		// 	if (!val.empty()) {
+		// 		return false;
+		// 	}
+		// }
+		return !bNotEmpty;
 	}
-	
+
+	void array::setNotEmpty() 
+	{
+		bNotEmpty = true;
+		if(pParentArray){
+			pParentArray->setNotEmpty();
+		} else if(pParentObject){
+			pParentObject->setNotEmpty();
+		}
+	}
+
+    void object::setParentArray(array * pSetTo)
+    {
+        pParentArray = pSetTo;
+        if (bNotEmpty && pParentArray) {
+            pParentArray->setNotEmpty();
+        }
+    }
+    
+    void object::setParentObject(object * pSetTo)
+    {
+        pParentObject = pSetTo;
+        if (bNotEmpty && pParentObject) {
+            pParentObject->setNotEmpty();
+        }
+    }
+    
+    void array::setParentArray(array * pSetTo)
+    {
+        pParentArray = pSetTo;
+        if (bNotEmpty && pParentArray) {
+            pParentArray->setNotEmpty();
+        }
+    }
+    
+    void array::setParentObject(object * pSetTo)
+    {
+        pParentObject = pSetTo;
+        if (bNotEmpty && pParentObject) {
+            pParentObject->setNotEmpty();
+        }
+    }
+        
 	bool object::empty() const
 	{
-		for (const std::pair<std::string, value> &pair: *this) {
-			if (!pair.second.empty()) {
-				return false;
-			}
-		}
-		return true;
+		// for (const std::pair<std::string, value> &pair: *this) {
+		// 	if (!pair.second.empty()) {
+		// 		return false;
+		// 	}
+		// }
+		return !bNotEmpty;
 	}
-	
+	void object::setNotEmpty() 
+	{
+		bNotEmpty = true;
+		if(pParentArray){
+			pParentArray->setNotEmpty();
+		} else if(pParentObject){
+			pParentObject->setNotEmpty();
+		}
+	}
+
 	size_t value::size() const
 	{
 		switch (myType) {
@@ -2503,6 +2665,11 @@ namespace json
 			{
 				value ret = *this;
 				ret.insert(ret.end(), V.begin(), V.end());
+				if(ret.obj){
+					ret.obj->setNotEmpty();
+				} else if(arr) {
+					ret.arr->setNotEmpty();
+				}
 				return ret;
 			}
 		}
@@ -2597,6 +2764,11 @@ namespace json
 			case JSON_ARRAY:
 			case JSON_OBJECT:
 				insert(end(), V.begin(), V.end());
+				if(obj){
+					obj->setNotEmpty();
+				} else if(arr) {
+					arr->setNotEmpty();
+				}
 				break;
 
 			default:

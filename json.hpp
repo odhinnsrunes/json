@@ -195,6 +195,16 @@ namespace json
 		
 		~value();
 		
+		void setParentObject(object* pSetTo)
+		{
+			pParentObject = pSetTo;
+		}
+
+		void setParentArray(array* pSetTo)
+		{
+			pParentArray = pSetTo;
+		}
+
 		value& operator=(const value& V);
 		// value& operator=(const bool &V);
 		// value& operator=(const std::string& V);
@@ -315,6 +325,9 @@ namespace json
 		object* obj;
 		array* arr;
 		
+		object* pParentObject;
+		array* pParentArray;
+
 		static DEBUGPTR debug;
 	};
 
@@ -370,21 +383,40 @@ namespace json
 	{
 	public:
 		object()
-		: myMap() {
+		: myMap() 
+		{
+			bNotEmpty = false;
+			pParentArray = NULL;
+			pParentObject = NULL;
 		}
 		~object() {
 		}
 		
 		object(const object& V)
-		: myMap((myMap)V) {
+		: myMap((myMap)V) 
+		{
+			bNotEmpty = V.bNotEmpty;
+			pParentArray = NULL;
+			pParentObject = NULL;
 		}
 		object(const object* V)
-		: myMap(*(myMap*)V) {
+		: myMap(*(myMap*)V) 
+		{
+			bNotEmpty = V->bNotEmpty;
+			pParentArray = NULL;
+			pParentObject = NULL;
 		}
 		
 		bool empty() const;
-		void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
+		void setNotEmpty();
+        void setParentArray(array * pSetTo);
+        void setParentObject(object * pSetTo);
+        void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		size_t psize(int depth, bool bPretty) const;
+	private:
+		bool bNotEmpty;
+		array* pParentArray;
+		object* pParentObject;
 	};
 	
 	class array : public myVec
@@ -392,22 +424,41 @@ namespace json
 	public:
 		array()
 		: myVec() {
+			bNotEmpty = false;
+            pParentArray = NULL;
+            pParentObject = NULL;
 		}
 		array(int C)
 		: myVec(C) {
+			bNotEmpty = true;
+            pParentArray = NULL;
+            pParentObject = NULL;
 		}
 		array(const array& V)
 		: myVec((myVec)V) {
+			bNotEmpty = V.bNotEmpty;
+            pParentArray = NULL;
+            pParentObject = NULL;
 		}
 		array(const array* V)
 		: myVec(*(myVec*)V) {
+			bNotEmpty = V->bNotEmpty;
+            pParentArray = NULL;
+            pParentObject = NULL;
 		}
 		~array() {
 		}
 		
 		bool empty() const;
-		void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
+		void setNotEmpty();
+        void setParentArray(array * pSetTo);
+        void setParentObject(object * pSetTo);
+        void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		size_t psize(int depth, bool bPretty) const;
+	private:
+		bool bNotEmpty;
+		array* pParentArray;
+		object* pParentObject;
 	};
 	
 	class iterator : public std::iterator<std::input_iterator_tag, value>{
