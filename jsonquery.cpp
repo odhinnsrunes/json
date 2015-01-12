@@ -229,7 +229,7 @@ namespace json
 						}
 					} else if (working.isA(JSON_OBJECT)) {
 						for (iterator it = (*this)["select"].begin(); it != (*this)["select"].end(); ++it) {
-							std::string sIndex = (*it).string();
+							// std::string sIndex = (*it).string();
 							iterator w = working.find((*it).string());
 							iterator r = retVal.find((*it).string());
 							switch (op) {

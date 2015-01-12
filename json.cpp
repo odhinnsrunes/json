@@ -50,11 +50,11 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 void JSONDebug(const char * format, ...) {
 	std::string s;
-	size_t n;
 	size_t size = 100;
 	bool b = false;
 	va_list marker;
 	while (!b) {
+		size_t n;
 		s.resize(size);
 		va_start(marker, format);
 		n = vsnprintf((char*)s.c_str(), size, format, marker);
@@ -320,7 +320,7 @@ namespace json
 			s.take();
 		}
 
-		double d;
+		double d = 0;
 
 		if (s.peek() >= '0' && s.peek() <= '9') {
 			d = s.take() - '0';
@@ -763,6 +763,8 @@ namespace json
 	}
 	
 	instring& instring::operator=(instring& in) {
+		if (this == &in)
+			return *this;
 		pos = in.pos;
 		size = in.size;
 		delete[] str;
@@ -2077,11 +2079,6 @@ namespace json
 				return obj->empty();
 			case JSON_ARRAY:
 			{
-				// for (const value & val : *this){
-				// 	if (!val.empty()){
-				// 		return false;
-				// 	}
-				// }
 				return arr->empty();
 			}
 										
@@ -2096,11 +2093,6 @@ namespace json
 	
 	bool array::empty() const
 	{
-		// for(const value & val : *this){
-		// 	if (!val.empty()) {
-		// 		return false;
-		// 	}
-		// }
 		return !bNotEmpty;
 	}
 
@@ -2903,7 +2895,7 @@ namespace json
 	
 	value value::operator++(int)
 	{
-		value ret = *this;
+		value ret(*this);
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
@@ -2928,7 +2920,7 @@ namespace json
 	
 	value value::operator--(int)
 	{
-		value ret = *this;
+		value ret(*this);
 		switch (myType) {
 			case JSON_VOID:
 			case JSON_NULL:
@@ -2992,10 +2984,10 @@ namespace json
 		return S;
 	}
 	
-	document::document(const document& V) 
+	document::document(const document& V) : strParseResult(V.strParseResult)
 	{
 		bParseSuccessful = V.bParseSuccessful;
-		strParseResult = V.strParseResult;
+		// strParseResult = V.strParseResult;
 		m_number = V.m_number;
 		m_boolean = V.m_boolean;
 
@@ -3146,7 +3138,7 @@ namespace json
 		if (fd) {
 			std::string w = write(bPretty, preWriter);
 			if(fwrite(w.data(), 1, w.size(), fd) != w.size()){
-				printf("Failed Writing %lu bytes to %s.", w.size(), inStr.c_str());
+				printf("Failed Writing %lu bytes to %s.", (unsigned long)w.size(), inStr.c_str());
 			}
 			fclose(fd);
 			return true;
@@ -3157,7 +3149,7 @@ namespace json
 	int document::appendToArrayFile(std::string sFile, const document & atm, bool bPretty)
 	{
 		FILE* fd = fopen(sFile.c_str(), "r+b");
-		int iError = 0;
+		// int iError = 0;
 		if(!fd){
 			fd = fopen(sFile.c_str(), "wb");
 			if(fd){
@@ -3168,59 +3160,59 @@ namespace json
 				}
 			}
 		} else {
-			char cFirst = fgetc(fd);
+			int cFirst = fgetc(fd);
 			if(cFirst == '['){
 				fseek(fd, -1, SEEK_END);
-				iError = ferror(fd);
+				// iError = ferror(fd);
 				while(fgetc(fd) != ']'){
 					fseek(fd, -2, SEEK_CUR);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 				};
 				char c;
 				do{
 					fseek(fd, -2, SEEK_CUR);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 					c = fgetc(fd);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 				} while (c == '\r' || c == '\n' || c == '\t');
 				fseek(fd, 0, SEEK_CUR);
 				if(c != '['){
 					fputc(',', fd);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 				}
 				if(bPretty){
 					fputc('\n', fd);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 					fputc('\t', fd);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 				}
 			} else if(cFirst == EOF){
 				fputc('[', fd);
-				iError = ferror(fd);
+				// iError = ferror(fd);
 				if(bPretty){
 					fputc('\n', fd);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 					fputc('\t', fd);
-					iError = ferror(fd);
+					// iError = ferror(fd);
 				}
 			} else {
 				fclose(fd);
-				iError = ferror(fd);
+				// iError = ferror(fd);
 				return -1;
 			}
 		}
 		if(fd){
 			std::string sNew = atm.write(2, bPretty);
 			fwrite(sNew.data(), 1, sNew.size(), fd);
-			iError = ferror(fd);
+			// iError = ferror(fd);
 			if(bPretty){
 				fputc('\n', fd);
-				iError = ferror(fd);
+				// iError = ferror(fd);
 			}
 			fputc(']', fd);
-			iError = ferror(fd);
+			// iError = ferror(fd);
 			int iPos = (int)ftell(fd);
-			iError = ferror(fd);
+			// iError = ferror(fd);
 			fclose(fd);
 			return iPos;
 		}

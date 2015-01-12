@@ -74,8 +74,8 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 				break;
 
 			case TiXmlNode::TINYXML_DOCUMENT:
-				{				
-					TiXmlElement * rootElem = ((TiXmlDocument*)elem)->RootElement();
+				{	
+					const TiXmlElement * rootElem = (elem->ToDocument())->RootElement();
 					const TiXmlAttribute * att = rootElem->FirstAttribute();
 					while (att) {
 						std::string childName = "@";
@@ -84,7 +84,7 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 						att = att->Next();
 					}
 					sRootTag = rootElem->Value();
-					for (TiXmlElement * child = rootElem->FirstChildElement(); child; child = child->NextSiblingElement() ) {
+					for (const TiXmlElement * child = rootElem->FirstChildElement(); child; child = child->NextSiblingElement() ) {
 						if (child != NULL) {
 							switch (child->Type()) {
 								case TiXmlNode::TINYXML_ELEMENT:

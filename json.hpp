@@ -191,6 +191,8 @@ namespace json
 			myType = JSON_NUMBER;
 			obj = NULL;
 			arr = NULL;
+			pParentObject = NULL;
+			pParentArray = NULL;
 		}
 		
 		~value();
@@ -468,20 +470,21 @@ namespace json
 			bNone = true;
 			bIsArray = false;
 		}
-		iterator(const myMap::iterator & it) {
+		iterator(const myMap::iterator & it) : obj_it(it){
 			bNone = false;
-			obj_it = it;
+			// obj_it = it;
 			bIsArray = false;
 		}
-		iterator(const myVec::iterator & it) {
+		iterator(const myVec::iterator & it) : arr_it(it) {
 			bNone = false;
-			arr_it = it;
+			// arr_it = it;
 			bIsArray = true;
+			dumbRet.clear();
 		}
-		iterator(const iterator& it) {
+		iterator(const iterator& it) : arr_it(it.arr_it), obj_it(it.obj_it), dumbRet() {
 			bNone = it.bNone;
-			arr_it = it.arr_it;
-			obj_it = it.obj_it;
+			// arr_it = it.arr_it;
+			// obj_it = it.obj_it;
 			bIsArray = it.bIsArray;
 		}
 		~iterator() {}
@@ -570,11 +573,11 @@ namespace json
 		myMap::iterator & obj() { return obj_it; }
 		
 	private:
-		value dumbRet;
 		bool bNone;
 		myVec::iterator arr_it;
 		myMap::iterator obj_it;
 		bool bIsArray;
+		value dumbRet;
 	};
 	
 	class reverse_iterator : public std::iterator<std::input_iterator_tag, value>{
@@ -583,37 +586,37 @@ namespace json
 			bNone = true;
 			bIsArray = false;
 		}
-		reverse_iterator(const myMap::reverse_iterator & it) {
+		reverse_iterator(const myMap::reverse_iterator & it) : obj_it(it) {
 			bNone = false;
-			obj_it = it;
+			// obj_it = it;
 			bIsArray = false;
 		}
-		reverse_iterator(const myVec::reverse_iterator & it) {
+		reverse_iterator(const myVec::reverse_iterator & it) : arr_it(it) {
 			bNone = false;
-			arr_it = it;
+			// arr_it = it;
 			bIsArray = true;
 		}
-		reverse_iterator(const myMap::iterator & it) {
+		reverse_iterator(const myMap::iterator & it) : obj_it(myMap::reverse_iterator(it)) {
 			bNone = false;
-			obj_it = myMap::reverse_iterator(it);
+			// obj_it = myMap::reverse_iterator(it);
 			bIsArray = false;
 		}
-		reverse_iterator(const myVec::iterator & it) {
+		reverse_iterator(const myVec::iterator & it) : arr_it(myVec::reverse_iterator(it)) {
 			bNone = false;
-			arr_it =  myVec::reverse_iterator(it);
+			// arr_it =  myVec::reverse_iterator(it);
 			bIsArray = true;
 		}
-		reverse_iterator(const reverse_iterator& it) {
+		reverse_iterator(const reverse_iterator& it) : arr_it(it.arr_it), obj_it(it.obj_it), dumbRet() {
 			bNone = it.bNone;
-			arr_it = it.arr_it;
-			obj_it = it.obj_it;
+			// arr_it = it.arr_it;
+			// obj_it = it.obj_it;
 			bIsArray = it.bIsArray;
 		}
 		
-		reverse_iterator(const json::iterator& it) {
+		reverse_iterator(const json::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)){
 			bNone = it.bNone;
-			arr_it = myVec::reverse_iterator(it.arr_it);
-			obj_it = myMap::reverse_iterator(it.obj_it);
+			// arr_it = myVec::reverse_iterator(it.arr_it);
+			// obj_it = myMap::reverse_iterator(it.obj_it);
 			bIsArray = it.bIsArray;
 		}
 		~reverse_iterator() {}
@@ -702,11 +705,11 @@ namespace json
 		myMap::reverse_iterator & obj() { return obj_it; }
 		
 	private:
-		value dumbRet;
 		bool bNone;
 		myVec::reverse_iterator arr_it;
 		myMap::reverse_iterator obj_it;
 		bool bIsArray;
+		value dumbRet;
 	};
 	
 	
@@ -755,7 +758,7 @@ namespace json
 		}
 
 		template<typename T>
-		document(T V) : value(V) {}
+		document(T V) : value(V) { bParseSuccessful = true; }
 
 		static int appendToArrayFile(std::string sFile, const document & atm, bool bPretty);
 
