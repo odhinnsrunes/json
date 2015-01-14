@@ -3138,7 +3138,7 @@ namespace json
 		if (fd) {
 			std::string w = write(bPretty, preWriter);
 			if(fwrite(w.data(), 1, w.size(), fd) != w.size()){
-				printf("Failed Writing %lu bytes to %s.", (unsigned long)w.size(), inStr.c_str());
+				debug("Failed Writing to %s.", inStr.c_str());
 			}
 			fclose(fd);
 			return true;
