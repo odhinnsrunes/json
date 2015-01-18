@@ -224,7 +224,20 @@ namespace json
 		value& emptyObject();
 		
 		double number();
+		double _double();
+		float _float();
 		i64 integer();
+		i64 _int64();
+		ui64 _uint64();
+		int _int();
+		long _long();
+		short _short();
+		char _char();
+		unsigned int _uint();
+		unsigned long _ulong();
+		unsigned short _ushort();
+		unsigned char _uchar();
+
 		bool boolean();
 		std::string& string();
 		const char* safeCString();

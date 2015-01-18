@@ -2404,6 +2404,46 @@ namespace json
 		return (i64)number();
 	}
 
+	ui64 value::_uint64() {
+		return (ui64)number();
+	}
+
+	float value::_float() {
+		return (float)number();
+	}
+
+	long value::_long() {
+		return (long)number();
+	}
+
+	int value::_int() {
+		return (int)number();
+	}
+
+	short value::_short() {
+		return (short)number();
+	}
+
+	char value::_char() {
+		return (char)number();
+	}
+
+	unsigned long value::_ulong() {
+		return (long)number();
+	}
+
+	unsigned int value::_uint() {
+		return (int)number();
+	}
+
+	unsigned short value::_ushort() {
+		return (short)number();
+	}
+
+	unsigned char value::_uchar() {
+		return (char)number();
+	}
+
 	std::string& value::string() {
 		switch (myType) {
 		case JSON_STRING:
