@@ -224,10 +224,8 @@ namespace json
 		value& emptyObject();
 		
 		double number();
-		double _double();
 		float _float();
 		i64 integer();
-		i64 _int64();
 		ui64 _uint64();
 		int _int();
 		long _long();
