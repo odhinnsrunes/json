@@ -2361,7 +2361,7 @@ namespace json
 		arr = NULL;
 	}
 		
-	void value::sort(bool (*compareFunc)(value&, value&)) {
+	void value::sort(bool (*compareFunc)(const value&, const value&)) {
 		if (arr){
 			DEBUGPTR oldDebug = debug;
 			debug = NULL;

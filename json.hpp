@@ -304,7 +304,7 @@ namespace json
 		void clear();
 		void destroy();
 		
-		void sort(bool (*compareFunc)(value&, value&));
+		void sort(bool (*compareFunc)(const value&, const value&));
 		
 		value simpleSearch(value& searchFor, bool bSubStr = false);
 		size_t simpleCount(value& searchFor, bool bSubStr = false);
