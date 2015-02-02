@@ -267,6 +267,8 @@ namespace json
 		
 		void resize(size_t iCount);
 		void resize(size_t iCount, value val);
+
+		bool pruneEmptyValues();
 		
 		bool empty() const; // Is array empty or object empty or string empty.  Number and booleans return false, NULL and VOID return true.
 		

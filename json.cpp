@@ -1260,8 +1260,21 @@ namespace json
 			if (obj->empty()) {
 				return false;
 			}
-			if (obj->find(index) != obj->end()) {
-				return true;
+			json::iterator it = obj->find(index);
+			if (it != obj->end()) {
+				switch((*it).isA()){
+					default:
+					case JSON_VOID:
+						return false;
+					case JSON_NULL:
+					case JSON_BOOLEAN:
+					case JSON_NUMBER:
+					case JSON_STRING:
+						return true;
+					case JSON_ARRAY:
+					case JSON_OBJECT:
+						return !(*it).empty();
+				}
 			}
 		}
 		return false;
@@ -2069,6 +2082,101 @@ namespace json
 		}
 		if(arr){
 			arr->resize(iCount, val);
+		}
+	}
+
+	bool value::pruneEmptyValues()
+	{
+		switch(myType){
+			default:
+			case JSON_VOID:
+				return false;
+
+			case JSON_NULL:
+				m_number = 0;
+				m_boolean = false;
+				myType = JSON_VOID;
+				str.clear();
+				return false;
+
+			case JSON_BOOLEAN:
+				if(m_boolean == false){
+					m_number = 0;
+					myType = JSON_VOID;
+					str.clear();
+					return false;
+				}
+				return true;
+
+			case JSON_NUMBER:
+				if(m_number == 0.0){
+					m_boolean = false;
+					myType = JSON_VOID;
+					str.clear();
+					return false;
+				}
+				return true;
+
+			case JSON_STRING:
+				if(str.empty()){
+					m_number = 0;
+					m_boolean = false;
+					myType = JSON_VOID;
+					return false;
+				}
+				return true;
+
+			case JSON_ARRAY:
+			{
+				bool bNotEmpty = false;
+				for(reverse_iterator rit = (*this).rbegin(); rit != (*this).rend(); ++rit){
+					if((*rit).isA(JSON_NULL) && bNotEmpty == true){
+						continue;  // NULLs are placeholders in arrays and only ones after the last non null value are pruned.
+					}
+					if((*rit).pruneEmptyValues()){
+						bNotEmpty = true;
+					}
+				}
+				if(bNotEmpty == false){
+					m_number = 0.0;
+					m_boolean = false;
+					str.clear();
+					myType = JSON_VOID;
+					if(obj){
+						delete obj;
+						obj = NULL;
+					}
+					if(arr){
+						delete arr;
+						arr = NULL;
+					}
+				}
+				return bNotEmpty;
+			}
+			case JSON_OBJECT:
+			{
+				bool bNotEmpty = false;
+				for(value &val : *this){
+					if(val.pruneEmptyValues()){
+						bNotEmpty = true;
+					}
+				}
+				if(bNotEmpty == false){
+					m_number = 0.0;
+					m_boolean = false;
+					str.clear();
+					myType = JSON_VOID;
+					if(obj){
+						delete obj;
+						obj = NULL;
+					}
+					if(arr){
+						delete arr;
+						arr = NULL;
+					}
+				}
+				return bNotEmpty;
+			}
 		}
 	}
 		
