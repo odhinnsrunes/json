@@ -688,26 +688,26 @@ namespace json
 
 	instring::instring(const std::string& in) {
 		pos = 0;
-		size = in.size();
-		str = new char[size + 1];
-		memcpy(str, in.c_str(), size);
-		str[size] = 0;
+		m_size = in.size();
+		str = new char[m_size + 1];
+		memcpy(str, in.c_str(), m_size);
+		str[m_size] = 0;
 	}
 
 	instring::instring(const instring& in) {
 		pos = in.pos;
-		size = in.size;
-		str = new char[size + 1];
-		memcpy(str, in.str, size);
-		str[size] = 0;
+		m_size = in.m_size;
+		str = new char[m_size + 1];
+		memcpy(str, in.str, m_size);
+		str[m_size] = 0;
 	}
 
 	instring::instring(char* in) {
 		pos = 0;
-		size = strlen(in);
-		str = new char[size + 1];
-		memcpy(str, in, size);
-		str[size] = 0;
+		m_size = strlen(in);
+		str = new char[m_size + 1];
+		memcpy(str, in, m_size);
+		str[m_size] = 0;
 	}
 
 	instring::~instring() {
@@ -732,8 +732,13 @@ namespace json
 		return pos;
 	}
 
+	inline size_t instring::size() const
+	{
+		return m_size;
+	}
+
 	void instring::seek(size_t newPos) {
-		if (newPos < size) {
+		if (newPos < m_size) {
 			pos = newPos;
 		}
 	}
@@ -744,21 +749,21 @@ namespace json
 
 	instring& instring::operator=(std::string& in) {
 		pos = 0;
-		size = in.size();
+		m_size = in.size();
 		delete[] str;
-		str = new char[size + 1];
-		memcpy(str, in.c_str(), size);
-		str[size] = 0;
+		str = new char[m_size + 1];
+		memcpy(str, in.c_str(), m_size);
+		str[m_size] = 0;
 		return *this;
 	}
 	
 	instring& instring::operator=(const char* in) {
 		pos = 0;
-		size = strlen(in);
+		m_size = strlen(in);
 		delete[] str;
-		str = new char[size + 1];
-		memcpy(str, in, size);
-		str[size] = 0;
+		str = new char[m_size + 1];
+		memcpy(str, in, m_size);
+		str[m_size] = 0;
 		return *this;
 	}
 	
@@ -766,30 +771,30 @@ namespace json
 		if (this == &in)
 			return *this;
 		pos = in.pos;
-		size = in.size;
+		m_size = in.m_size;
 		delete[] str;
-		str = new char[size + 1];
-		memcpy(str, in.str, size);
-		str[size] = 0;
+		str = new char[m_size + 1];
+		memcpy(str, in.str, m_size);
+		str[m_size] = 0;
 		return *this;
 	}
 	
 	void instring::set(std::string& in) {
 		pos = 0;
-		size = in.size();
+		m_size = in.size();
 		delete[] str;
-		str = new char[size + 1];
-		memcpy(str, in.c_str(), size);
-		str[size] = 0;
+		str = new char[m_size + 1];
+		memcpy(str, in.c_str(), m_size);
+		str[m_size] = 0;
 	}
 	
 	void instring::set(const char* in) {
 		pos = 0;
-		size = strlen(in);
+		m_size = strlen(in);
 		delete[] str;
-		str = new char[size + 1];
-		memcpy(str, in, size);
-		str[size] = 0;
+		str = new char[m_size + 1];
+		memcpy(str, in, m_size);
+		str[m_size] = 0;
 	}
 	
 	instring instring::operator+(double V) const
@@ -2469,7 +2474,7 @@ namespace json
 		arr = NULL;
 	}
 		
-	void value::sort(bool (*compareFunc)(const value&, const value&)) {
+	void value::sort(bool (*compareFunc)(value&, value&)) {
 		if (arr){
 			DEBUGPTR oldDebug = debug;
 			debug = NULL;
@@ -3191,7 +3196,10 @@ namespace json
 			inStr = sOut.c_str();
 		}
 		instring in(inStr);
-
+		SkipWhitespace(in);
+		if(in.tell() >= in.size()){
+			return true;
+		}
 		valueParse(*this, in, &bFailed);
 		if (bFailed) {
 			strParseResult = in.Str();

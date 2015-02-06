@@ -306,7 +306,7 @@ namespace json
 		void clear();
 		void destroy();
 		
-		void sort(bool (*compareFunc)(const value&, const value&));
+		void sort(bool (*compareFunc)(value&, value&));
 		
 		value simpleSearch(value& searchFor, bool bSubStr = false);
 		size_t simpleCount(value& searchFor, bool bSubStr = false);
@@ -361,7 +361,7 @@ namespace json
 		void skip();
 		char &peek() const;
 		size_t tell() const;
-		
+		size_t size() const;
 		void seek(size_t newPos);
 		char* getPos();
 		
@@ -387,7 +387,7 @@ namespace json
 	private:
 		char* str;
 		size_t pos;
-		size_t size;
+		size_t m_size;
 	};
 
 	typedef std::map<std::string, json::value> myMap;
