@@ -1825,6 +1825,24 @@ namespace json
 		return *this;
 	}
 
+	value & value::toArray()
+	{
+		if(myType == JSON_ARRAY){
+			return *this;
+		}
+		value temp = *this;
+		m_number = 0;
+		m_boolean = false;
+		str.clear();
+		myType = JSON_ARRAY;
+		if (obj)
+			delete obj;
+		obj = NULL;
+		arr = new array();
+		(*this)[0] = temp;
+		return *this;
+	}
+
 	value& value::operator[](size_t index) {
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json find: index %lu out of bounds", index);

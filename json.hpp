@@ -222,6 +222,8 @@ namespace json
 
 		value& emptyArray();
 		value& emptyObject();
+
+		value& toArray();
 		
 		double number();
 		float _float();
