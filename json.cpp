@@ -2491,17 +2491,26 @@ namespace json
 			delete arr;
 		arr = NULL;
 	}
-		
-	void value::sort(bool (*compareFunc)(value&, value&)) {
-		if (arr){
-			DEBUGPTR oldDebug = debug;
-			debug = NULL;
-			std::sort(arr->begin(), arr->end(), compareFunc);
-			debug = oldDebug;
-		}
-	}
-
-	double value::number() {
+#ifdef __GNUC__
+    void value::sort(bool (*compareFunc)(const value&, const value&)) {
+        if (arr){
+            DEBUGPTR oldDebug = debug;
+            debug = NULL;
+            std::sort(arr->begin(), arr->end(), compareFunc);
+            debug = oldDebug;
+        }
+    }
+#else
+    void value::sort(bool (*compareFunc)(value&, value&)) {
+        if (arr){
+            DEBUGPTR oldDebug = debug;
+            debug = NULL;
+            std::sort(arr->begin(), arr->end(), compareFunc);
+            debug = oldDebug;
+        }
+    }
+#endif
+    double value::number() {
 		switch (myType) {
 		case JSON_NUMBER:
 			return m_number;
@@ -3155,7 +3164,7 @@ namespace json
 		return S;
 	}
 	
-	document::document(const document& V) : strParseResult(V.strParseResult)
+    document::document(const document& V) : value((const value &)V), strParseResult(V.strParseResult)
 	{
 		bParseSuccessful = V.bParseSuccessful;
 		// strParseResult = V.strParseResult;

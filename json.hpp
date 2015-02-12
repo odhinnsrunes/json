@@ -308,8 +308,11 @@ namespace json
 		void clear();
 		void destroy();
 		
-		void sort(bool (*compareFunc)(value&, value&));
-		
+#ifdef __GNUC__
+        void sort(bool (*compareFunc)(const value&, const value&));
+#else
+        void sort(bool (*compareFunc)(value&, value&));
+#endif
 		value simpleSearch(value& searchFor, bool bSubStr = false);
 		size_t simpleCount(value& searchFor, bool bSubStr = false);
 		virtual value merge(value& V);
