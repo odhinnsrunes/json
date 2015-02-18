@@ -28,6 +28,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <algorithm>
 #include <iomanip>
 #include <stdarg.h>
+#include <thread>
 
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
 #pragma warn - 8026

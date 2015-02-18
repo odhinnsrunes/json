@@ -93,7 +93,6 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 #include <list>
 #include <algorithm>
-#include <thread>
 
 void JSONDebug(const char *format, ...);
 
