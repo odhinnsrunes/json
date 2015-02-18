@@ -898,7 +898,7 @@ namespace json
 		}
 	}
 
-	iterator value::find(size_t index)
+	iterator value::find(size_t index) const
 	{
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json find: index %lu out of bounds", index);
@@ -911,7 +911,7 @@ namespace json
 		return iterator();
 	}
 	
-	iterator value::find(std::string index)
+	iterator value::find(std::string index) const 
 	{
 		if (obj) {
 			return obj->find(index);
@@ -919,7 +919,7 @@ namespace json
 		return iterator();
 	}
 	
-	reverse_iterator value::rfind(size_t index) {
+	reverse_iterator value::rfind(size_t index) const {
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json rfind: index %lu out of bounds", index);
 			return reverse_iterator();
@@ -927,7 +927,7 @@ namespace json
 		return reverse_iterator(find(index));
 	}
 	
-	reverse_iterator value::rfind(std::string index) {
+	reverse_iterator value::rfind(std::string index) const {
 		return reverse_iterator(find(index));
 	}
 	
@@ -2463,6 +2463,36 @@ namespace json
 		return retVal;
 	}
 
+	inline void value::threadDelete(object * obj)
+	{
+		// if(obj) {
+			std::thread t(value::threadDeleteObjectWorker, obj);
+			t.detach();
+		// }
+	}
+	
+	inline void value::threadDelete(array * arr)
+	{
+		// if(arr) {
+			std::thread t(value::threadDeleteArrayWorker, arr);
+			t.detach();
+		// }
+	}
+	
+	void value::threadDeleteObjectWorker(object* obj)
+	{
+//		if(obj){
+			delete obj;
+//		}
+	}
+	
+	void value::threadDeleteArrayWorker(array* arr) {
+//		if(arr){
+			delete arr;
+//		}
+	}
+		
+
 	void value::clear() {
 		if (arr){
 			delete arr;
@@ -2470,6 +2500,22 @@ namespace json
 		}
 		if (obj){
 			delete obj;
+			obj = new object();
+		}
+		if (!str.empty())
+			str.clear();
+
+		m_number = 0;
+		m_boolean = false;
+	}
+
+	void value::threadedClear() {
+		if (arr){
+			threadDelete(arr);
+			arr = new array();
+		}
+		if (obj){
+			threadDelete(obj);
 			obj = new object();
 		}
 		if (!str.empty())
@@ -2491,6 +2537,20 @@ namespace json
 			delete arr;
 		arr = NULL;
 	}
+
+	void value::threadedDestroy() {
+		m_number = 0;
+		m_boolean = false;
+		str.clear();
+		myType = JSON_VOID;
+		if (obj)
+			threadDelete(obj);
+		obj = NULL;
+		if (arr)
+			threadDelete(arr);
+		arr = NULL;
+	}
+
 #ifdef __GNUC__
     void value::sort(bool (*compareFunc)(const value&, const value&)) {
         if (arr){

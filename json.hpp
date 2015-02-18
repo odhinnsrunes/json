@@ -93,6 +93,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 #include <list>
 #include <algorithm>
+#include <thread>
 
 void JSONDebug(const char *format, ...);
 
@@ -306,8 +307,10 @@ namespace json
 		
 		size_t size() const;
 		void clear();
+		void threadedClear();
 		void destroy();
-		
+		void threadedDestroy();
+
 #ifdef __GNUC__
         void sort(bool (*compareFunc)(const value&, const value&));
 #else
@@ -321,10 +324,10 @@ namespace json
 		iterator end() const;
 		reverse_iterator rbegin() const;
 		reverse_iterator rend() const;
-		iterator find(size_t index);
-		iterator find(std::string index);
-		reverse_iterator rfind(size_t index);
-		reverse_iterator rfind(std::string index);
+		iterator find(size_t index) const;
+		iterator find(std::string index) const;
+		reverse_iterator rfind(size_t index) const;
+		reverse_iterator rfind(std::string index) const;
 		
 		typedef void (*DEBUGPTR)(const char *, ...);
 		void debugPrint() const { if (debug) { debug("%s\n", print(0, true).c_str()); } }
@@ -333,6 +336,11 @@ namespace json
 		static std::string typeName(JSONTypes type);
 	protected:
 		
+        static void threadDelete(object *);
+        static void threadDelete(array *);
+        static void threadDeleteObjectWorker(object *);
+        static void threadDeleteArrayWorker(array *);
+
 		void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		std::string print(int depth = 0, bool bPretty = false) const;
 		

@@ -55,7 +55,7 @@ namespace json
 			document cleanUpViews();
 
 		private:
-			static bool viewSort(json::value &a, json::value &b);
+			static bool viewSort(const json::value &a, const json::value &b);
 			document indexView(std::string &sName, std::string &sKeys, value &keys);
 			size_t matchLevel(value& keys, value& mappedResult);
 			value&  getViewWorker(value & ret, std::string & sName, value & keys, bool bReduce);

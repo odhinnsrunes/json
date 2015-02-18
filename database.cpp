@@ -276,9 +276,9 @@ namespace json
 		return ret;
 	}
 
-	bool database::viewSort(json::value &a, json::value &b)
+	bool database::viewSort(const json::value &a, const json::value &b)
 	{
-		return (a["key"] < b["key"]);
+		return (*(a.find("key")) < *(b.find("key")));
 	}
 
 	size_t database::matchLevel(value& keys, value& mappedResult)
