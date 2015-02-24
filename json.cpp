@@ -28,6 +28,9 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <algorithm>
 #include <iomanip>
 #include <stdarg.h>
+#if defined _WIN32 && defined __clang__
+#define __uncaught_exception std::uncaught_exception
+#endif
 #include <thread>
 
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
