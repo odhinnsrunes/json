@@ -2229,7 +2229,7 @@ namespace json
 	bool array::empty() const
 	{
 
-		return myVec::size() == 0 ? true : !bNotEmpty;
+		return myVec::empty() ? true : !bNotEmpty;
 	}
 
 	void array::setNotEmpty() 
@@ -2281,7 +2281,7 @@ namespace json
 		// 		return false;
 		// 	}
 		// }
-		return myMap::size() == 0 ? true : !bNotEmpty;
+		return myMap::empty() ? true : !bNotEmpty;
 	}
 	void object::setNotEmpty() 
 	{
