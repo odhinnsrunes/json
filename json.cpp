@@ -3232,25 +3232,25 @@ namespace json
     document::document(const document& V) : value((const value &)V), strParseResult(V.strParseResult)
 	{
 		bParseSuccessful = V.bParseSuccessful;
-		// strParseResult = V.strParseResult;
-		m_number = V.m_number;
-		m_boolean = V.m_boolean;
+		strParseResult = V.strParseResult;
+		// m_number = V.m_number;
+		// m_boolean = V.m_boolean;
 
-		if (!V.str.empty()) {
-			str.assign(V.str);
-		}
+		// if (!V.str.empty()) {
+		// 	str.assign(V.str);
+		// }
 
-		myType = V.myType;
+		// myType = V.myType;
 
-		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+		// obj = NULL;
+		// if (V.obj) {
+		// 	obj = new object(V.obj);
+		// }
 
-		arr = NULL;
-		if (V.arr) {
-			arr = new array(V.arr);
-		}
+		// arr = NULL;
+		// if (V.arr) {
+		// 	arr = new array(V.arr);
+		// }
 	}
 	bool document::parse(const std::string& inStr, PREPARSEPTR preParser, std::string preParseFileName) {
 		return parse(inStr.c_str(), inStr.size(), preParser, preParseFileName);
