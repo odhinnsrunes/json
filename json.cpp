@@ -3416,7 +3416,7 @@ namespace json
 					fseek(fd, -2, SEEK_CUR);
 					// iError = ferror(fd);
 				};
-				char c;
+				int c;
 				do{
 					fseek(fd, -2, SEEK_CUR);
 					// iError = ferror(fd);
