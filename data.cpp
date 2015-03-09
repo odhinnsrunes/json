@@ -127,33 +127,36 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 					if (elem->Value()) {
 						const TiXmlNode *child = NULL;
                         bool bEmpty = true;
-						while ((child = elem->IterateChildren(child))) {
-                            bEmpty = false;
-							switch (child->Type()) {
-								case TiXmlNode::TINYXML_ELEMENT:
-									{
-										std::string childName = child->Value();
-										if (childName[0] == '_' && strchr("1234567890", childName[1])) {
-											childName = childName.substr(1);
-										}
-										if (ret.exists(childName)) {
-											if (!ret[childName].isA(json::JSON_ARRAY)) {
-												json::value a = ret[childName];
-												ret.erase(childName);
-												ret[childName][0] = a;
+						do {
+							child = elem->IterateChildren(child);
+							if (child) {
+	                            bEmpty = false;
+								switch (child->Type()) {
+									case TiXmlNode::TINYXML_ELEMENT:
+										{
+											std::string childName = child->Value();
+											if (childName[0] == '_' && strchr("1234567890", childName[1])) {
+												childName = childName.substr(1);
 											}
-											parseXMLElement(ret[childName][ret[childName].size()], child);
-										} else {
-											parseXMLElement(ret[childName], child);
+											if (ret.exists(childName)) {
+												if (!ret[childName].isA(json::JSON_ARRAY)) {
+													json::value a = ret[childName];
+													ret.erase(childName);
+													ret[childName][0] = a;
+												}
+												parseXMLElement(ret[childName][ret[childName].size()], child);
+											} else {
+												parseXMLElement(ret[childName], child);
+											}
+											break;
 										}
+		
+									default:
+										parseXMLElement(ret, child);
 										break;
-									}
-	
-								default:
-									parseXMLElement(ret, child);
-									break;
+								}
 							}
-						}
+						} while (child);
                         if (bEmpty){
                             if (ret.isA(json::JSON_OBJECT)){
                                 ret["#value"] = "";
