@@ -247,8 +247,8 @@ namespace json
 		value& operator[](size_t index);
 		value& operator[](std::string index);
 		
-		void push_back(value val);									   // Array
-		void push_front(value val);									  // Array
+		void push_back(const value& val);									   // Array
+		void push_front(const value& val);									  // Array
 		
 		value pop_back();												// Array
 		value pop_front();											   // Array

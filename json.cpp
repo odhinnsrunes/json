@@ -1970,7 +1970,7 @@ namespace json
 		return ret;
 	}
 
-	void value::push_back(value val) {
+	void value::push_back(const value& val) {
 		if (myType != JSON_ARRAY) {
 			if (debug) {
 				switch(myType) {
@@ -2013,14 +2013,15 @@ namespace json
                 arr->setParentArray(pParentArray);
             }
 		}
-		val.setParentArray(arr);
-		arr->push_back(val);
+		arr->emplace_back(val);
+		arr->back().setParentArray(arr);
+
 		if(val.myType != JSON_VOID){
 			arr->setNotEmpty();
 		}
 	}
 	
-	void value::push_front(value val) {
+	void value::push_front(const value &val) {
 		if (myType != JSON_ARRAY) {
 			if (debug) {
 				switch(myType) {
@@ -2063,8 +2064,8 @@ namespace json
                 arr->setParentArray(pParentArray);
             }
 		}
-		val.setParentArray(arr);
-		arr->push_front(val);
+		arr->emplace_front(val);
+		arr->front().setParentArray(arr);
 		if(val.myType != JSON_VOID){
 			arr->setNotEmpty();
 		}
