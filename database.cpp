@@ -36,7 +36,17 @@ extern "C"
 
 namespace json
 {
+	database::database()
+	{
+
+	}
+
 	database::database(std::string sSetPath)
+	{
+		init(sSetPath);
+	}
+
+	void database::init(const std::string &sSetPath)
 	{
 		mtx.lock();
 		sPath = sSetPath;
@@ -299,16 +309,17 @@ namespace json
 		}
 	}
 
-	document &database::getView(document & ret, std::string sName, document keys, bool bReduce, size_t limit, size_t offset)
+	document &database::getView(document & ret, const std::string sName, document keys, bool bReduce, size_t limit, size_t offset)
 	{
 		mtx.lock();
-		if(views.find(sName) == views.end()){
+		std::string mmName = sName;
+		if(views.find(mmName) == views.end()){
 			ret["error"] = "not_found";
             ret["reason"] = "missing_named_view";
             mtx.unlock();
             return ret;
 		}
-        if(bReduce && views[sName].reduce == NULL){
+		if(bReduce && views[mmName].reduce == NULL){
             ret["error"] = "query_parse_error";
             ret["reason"] = "Reduce is invalid for map-only views.";
             mtx.unlock();
@@ -316,7 +327,7 @@ namespace json
         }
 		ret.clear();
 		if(keys.exists("key")){
-			getViewWorker(ret, sName, keys["key"], bReduce);
+			getViewWorker(ret, mmName, keys["key"], bReduce);
 			if(offset && ret["rows"].isA(JSON_ARRAY)){
 				myVec::iterator it = ret["rows"].begin().arr();
 				it += offset;
@@ -332,7 +343,7 @@ namespace json
 			document temp;
 			ret["total_rows"] = 0;
 			for(value & at : keys["keys"]){
-				getViewWorker(temp[i++], sName, at, bReduce);
+				getViewWorker(temp[i++], mmName, at, bReduce);
 			}
 			for(value & val : temp){
 				ret["total_rows"] += val["total_rows"];
@@ -348,7 +359,7 @@ namespace json
 			if(limit){
 				ret["rows"].resize(limit);
 			}
-			if(bReduce && views[sName].reduce){
+			if(bReduce && views[mmName].reduce){
 				value rere; 
 				// this is where grouping needs to happen.
 				for(value & val : ret["rows"]){
@@ -356,12 +367,12 @@ namespace json
 				}
 				ret["rows"].clear();
 				value n = value((char*)NULL);
-				ret["rows"][0]["value"] = views[sName].reduce(n, rere, true);
+				ret["rows"][0]["value"] = views[mmName].reduce(n, rere, true);
 				ret["rows"][0]["key"] = (char*)NULL;
 //				ret["total_rows"] = 1;
 			}
 		} else {
-			getViewWorker(ret, sName, keys, bReduce);
+			getViewWorker(ret, mmName, keys, bReduce);
             if(offset && ret["rows"].isA(JSON_ARRAY)){
                 myVec::iterator it = ret["rows"].begin().arr();
                 it += offset;
@@ -378,7 +389,7 @@ namespace json
 
 	}
 
-	value & database::getViewWorker(value & ret, std::string & sName, value & keys, bool bReduce)
+	value & database::getViewWorker(value & ret, const std::string & sName, value & keys, bool bReduce)
 	{
 		std::string sKeys = document(keys).write();
 		indexView(sName, sKeys, keys);
@@ -403,7 +414,7 @@ namespace json
 	}
 
 
-	document database::indexView(std::string &sName, std::string &sKeys, value &keys)
+	document database::indexView(const std::string &sName, std::string &sKeys, value &keys)
 	{
 		mtx.lock();
 		document ret;
@@ -417,7 +428,7 @@ namespace json
 				data["indeces"][sName][sKeys]["sequence"] = latest;
 				document newChanges;
 				size_t keysSize = keys.size();
-				for(size_t i = sequence + 1; i < latest; i++){
+				for(size_t i = sequence; i < latest; i++){
 					std::string id = data["sequenceIndex"][i]["_id"].string();
 					std::string rev = data["sequenceIndex"][i]["_rev"].string();
 					if(data["data"][id]["sequence"] == i){ // skip out of date documents

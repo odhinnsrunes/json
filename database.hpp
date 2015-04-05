@@ -30,8 +30,12 @@ namespace json
 {
 	class database{
 		public:
+            database();
 			database(std::string sSetPath);
             ~database();
+
+			void init(const std::string &sSetPath);
+
 			document getConfig();
 			document setConfig(document jSetConfig);
 
@@ -50,15 +54,15 @@ namespace json
 			typedef document (*REDUCEPTR)(value & keys, value & values, bool bReReduce);
 
 			document addView(std::string sSetName, std::string sSetVersion, MAPPTR setMap, REDUCEPTR setReduce = NULL);
-			document &getView(document & ret, std::string sName, document keys = document(), bool bReduce = true, size_t limit = 0, size_t offset = 0);
+			document &getView(document & ret, const std::string sName, document keys = document(), bool bReduce = true, size_t limit = 0, size_t offset = 0);
 
 			document cleanUpViews();
 
 		private:
 			static bool viewSort(const json::value &a, const json::value &b);
-			document indexView(std::string &sName, std::string &sKeys, value &keys);
+			document indexView(const std::string &sName, std::string &sKeys, value &keys);
 			size_t matchLevel(value& keys, value& mappedResult);
-			value&  getViewWorker(value & ret, std::string & sName, value & keys, bool bReduce);
+			value&  getViewWorker(value & ret, const std::string &sName, value & keys, bool bReduce);
 
 			struct view{
 				MAPPTR map;
