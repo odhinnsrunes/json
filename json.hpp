@@ -230,6 +230,7 @@ namespace json
 		i64 integer();
 		ui64 _uint64();
 		int _int();
+        size_t _size_t();
 		long _long();
 		short _short();
 		char _char();

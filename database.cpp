@@ -215,8 +215,8 @@ namespace json
 			data["data"][id]["revs"].push_front(newRev);
 			data["data"][id]["docs"][newRev] = doc;
 			data["data"][id]["sequence"] = data["sequence"];
-			data["sequenceIndex"][data["sequence"].integer()]["_id"] = id;
-			data["sequenceIndex"][data["sequence"].integer()]["_rev"] = newRev;
+            data["sequenceIndex"][data["sequence"]._size_t()]["_id"] = id;
+            data["sequenceIndex"][data["sequence"]._size_t()]["_rev"] = newRev;
 			data["sequence"] = data["sequence"] + 1;
 			size_t lMax = (size_t)data["config"]["maxRevisions"].integer();
 			if(lMax > 0){
@@ -286,7 +286,11 @@ namespace json
 		return ret;
 	}
 
-	bool database::viewSort(const json::value &a, const json::value &b)
+#ifdef __GNUC__
+    bool database::viewSort(const json::value &a, const json::value &b)
+#else
+    bool database::viewSort(json::value &a, json::value &b)
+#endif
 	{
 		return (*(a.find("key")) < *(b.find("key")));
 	}
@@ -423,8 +427,8 @@ namespace json
 				data["indeces"][sName][sKeys]["data"];
 				iterator itIndex = data["indeces"][sName][sKeys].find("data");
 				bool bEmpty = (*itIndex).empty();
-				size_t sequence = data["indeces"][sName][sKeys]["sequence"].integer();
-				size_t latest = data["sequence"].integer();
+                size_t sequence = data["indeces"][sName][sKeys]["sequence"]._size_t();
+                size_t latest = data["sequence"]._size_t();
 				data["indeces"][sName][sKeys]["sequence"] = latest;
 				document newChanges;
 				size_t keysSize = keys.size();

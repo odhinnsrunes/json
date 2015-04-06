@@ -2622,11 +2622,15 @@ namespace json
 		return (long)number();
 	}
 
-	int value::_int() {
-		return (int)number();
-	}
+    int value::_int() {
+        return (int)number();
+    }
 
-	short value::_short() {
+    size_t value::_size_t() {
+        return (size_t)number();
+    }
+
+    short value::_short() {
 		return (short)number();
 	}
 
