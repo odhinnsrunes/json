@@ -1306,7 +1306,7 @@ namespace json
 				delete obj;
 			obj = NULL;
 		}
-		if (index < arr->size()) {
+        if (index <= arr->size()) {
 			return iterator(arr->insert(arr->begin() + index, V));
 		}
 		return iterator();
@@ -2230,7 +2230,7 @@ namespace json
 	bool array::empty() const
 	{
 
-		return myVec::empty() ? true : !bNotEmpty;
+        return myVec::empty() && !bNotEmpty;
 	}
 
 	void array::setNotEmpty() 
@@ -2282,7 +2282,7 @@ namespace json
 		// 		return false;
 		// 	}
 		// }
-		return myMap::empty() ? true : !bNotEmpty;
+        return myMap::empty() && !bNotEmpty;
 	}
 	void object::setNotEmpty() 
 	{
