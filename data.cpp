@@ -280,7 +280,7 @@ bool document::parseXMLFile(std::string inStr, PREPARSEPTR preParser, bool bReWr
 	return false;
 }
 	
-std::string XMLEscape(const std::string& in) {
+std::string XMLEscape(const std::string& in, bool bAttribute) {
 	std::string out;
 	for (std::string::const_iterator it = in.begin(); it != in.end(); ++it) {
 		switch (*it) {
@@ -290,17 +290,41 @@ std::string XMLEscape(const std::string& in) {
 			case '&':
 				out.append("&amp;");
 				break;
-			case '\'':
-				out.append("&apos;");
-				break;
-			case '\"':
-				out.append("&quot;");
-				break;
 			case '>':
 				out.append("&gt;");
 				break;
 			case '<':
 				out.append("&lt;");
+				break;
+			case '\'':
+				if(bAttribute)
+					out.append("&apos;");
+				else
+					out.push_back(*it);
+				break;
+			case '\"':
+				if(bAttribute)
+					out.append("&quot;");
+				else
+					out.push_back(*it);
+				break;
+			case '\r':
+				if(bAttribute)
+					out.append("&#xD;");
+				else
+					out.push_back(*it);
+				break;
+			case '\n':
+				if(bAttribute)
+					out.append("&#xA;");
+				else
+					out.push_back(*it);
+				break;
+			case '\t':
+				if(bAttribute)
+					out.append("&#x9;");
+				else
+					out.push_back(*it);
 				break;
 		}
 	}
@@ -371,7 +395,7 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 									str.push_back(' ');
 									str.append(subKey.substr(1));
 									str.append("=\"");
-									str.append((*it).string());
+									str.append(XMLEscape((*it).string(), true));
 									str.push_back('\"');
 								}
 							}
@@ -405,7 +429,7 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 								str.push_back(' ');
 								str.append(subKey.substr(1));
 								str.append("=\"");
-								str.append((*it).string());
+								str.append(XMLEscape((*it).string(), true));
 								str.push_back('\"');
 							}
 						}

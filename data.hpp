@@ -28,7 +28,7 @@ class TiXmlNode;
 #include "json.hpp"
 namespace data
 {
-	std::string XMLEscape(const std::string& in);
+	std::string XMLEscape(const std::string& in, bool bAttribute = false);
 	
 	class document : public json::document
 	{
