@@ -2229,8 +2229,12 @@ namespace json
 	
 	bool array::empty() const
 	{
-
-        return myVec::empty() && !bNotEmpty;
+		if(myVec::empty()){
+			bNotEmpty = false;
+			return true;
+		} else {
+			return !bNotEmpty;
+		}
 	}
 
 	void array::setNotEmpty() 
@@ -2282,6 +2286,12 @@ namespace json
 		// 		return false;
 		// 	}
 		// }
+		if(myMap::empty()){
+			bNotEmpty = false;
+			return true;
+		} else {
+			return !bNotEmpty;
+		}
         return myMap::empty() && !bNotEmpty;
 	}
 	void object::setNotEmpty() 
