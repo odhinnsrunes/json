@@ -2292,7 +2292,7 @@ namespace json
 		} else {
 			return !bNotEmpty;
 		}
-        return myMap::empty() && !bNotEmpty;
+        // return myMap::empty() && !bNotEmpty;
 	}
 	void object::setNotEmpty() 
 	{
