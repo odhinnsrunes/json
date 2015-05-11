@@ -62,6 +62,9 @@ int isNumeric(std::string data) {
 	if (bHaveDot) {
 		return 2;
 	} else {
+		if(data.size() > 1 && data[0] == '0'){
+			return 0;
+		}
 		return 1;
 	}
 }
