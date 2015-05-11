@@ -36,6 +36,7 @@ int isNumeric(std::string data) {
 	}
 	const char szOk[] = "1234567890";
 	bool bHaveDot = false;
+	bool bHaveMinus = false;
 	for (std::string::iterator it = data.begin(); it != data.end(); ++it) {
 		bool bOk = false;
 		for (size_t i = 0; i < 10; i++) {
@@ -43,6 +44,10 @@ int isNumeric(std::string data) {
 				bOk = true;
 				break;
 			} else if (i == 0 && (*it) == '-') {
+				if(bHaveMinus) {
+					return 0;
+				}
+				bHaveMinus = true;
 				bOk = true;
 				break;
 			} else if ((*it) == '.') {
