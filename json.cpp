@@ -25,6 +25,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 
 #include "json.hpp"
+#include <assert.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdarg.h>
@@ -904,6 +905,7 @@ namespace json
 
 	iterator value::find(size_t index) const
 	{
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json find: index %lu out of bounds", index);
 			return iterator();
@@ -924,6 +926,7 @@ namespace json
 	}
 	
 	reverse_iterator value::rfind(size_t index) const {
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json rfind: index %lu out of bounds", index);
 			return reverse_iterator();
@@ -1211,6 +1214,7 @@ namespace json
 	}
 
 	void value::erase(size_t index) {
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json erase: index %lu out of bounds", index);
 			return;
@@ -1249,6 +1253,7 @@ namespace json
 	}
 
 	bool value::exists(size_t index) {
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json exists: index %lu out of bounds", index);
 			return false;
@@ -1291,6 +1296,7 @@ namespace json
 
 	iterator value::insert(size_t index, value V)
 	{
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json insert: index %lu out of bounds", index);
 			return iterator();
@@ -1402,6 +1408,7 @@ namespace json
 	}
 
 	std::string value::getKey(size_t index) {
+		assert(i64(index) >= 0);
 		if (isA() == JSON_OBJECT) {
 			if (obj == NULL) {
 				obj = new object();
@@ -1700,6 +1707,7 @@ namespace json
 
 	value& value::at(size_t index)
 	{
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json at: index %lu out of bounds", index);
 			return *this;
@@ -1848,6 +1856,7 @@ namespace json
 	}
 
 	value& value::operator[](size_t index) {
+		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
 			debug("json find: index %lu out of bounds", index);
 			return *this;
