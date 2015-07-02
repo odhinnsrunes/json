@@ -307,6 +307,7 @@ namespace json
 		value operator-();
 		
 		size_t size() const;
+		size_t arraySize();
 		void clear();
 		void threadedClear();
 		void destroy();

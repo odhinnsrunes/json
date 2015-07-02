@@ -2349,6 +2349,13 @@ namespace json
 		}
 	}
 
+	size_t value::arraySize()
+	{
+		if(!isA(JSON_ARRAY))
+			toArray();
+		return size();
+	}
+
 	value value::simpleSearch(value& searchFor, bool bSubStr) {
 		value retVal;
 
