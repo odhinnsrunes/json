@@ -27,63 +27,97 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <iomanip>
 #include <fstream>
 
-#ifdef _WIN32
-#define endStr "\r\n"
-#else
+// #ifdef _WIN32
+// #define endStr "\r\n"
+// #else
 #define endStr "\n"
-#endif
+// #endif
 
-std::string write(const std::string &sPrefix, json::value & val)
+void write(const std::string &sPrefix, json::value & val, std::string & dest)
 {
 	switch (val.isA())
 	{
 		default:
 		case json::JSON_VOID:
-			return std::string();
+			break;
 
 		case json::JSON_NULL:
-			return sPrefix + " = (char*)NULL;" + endStr;
+		{
+			dest.append(sPrefix);
+			dest.append(" = (char*)NULL;");
+			dest.append(endStr);
+			break;
+		}
 
 		case json::JSON_BOOLEAN:
 			if (val.boolean()) {
-				return sPrefix + " = true;" + endStr;
+				dest.append(sPrefix);
+				dest.append(" = true;");
+				dest.append(endStr);
+				break;
 			} else {
-				return sPrefix + " = false;" + endStr;
+				dest.append(sPrefix);
+				dest.append(" = false;");
+				dest.append(endStr);
+				break;
 			}
 
 		case json::JSON_NUMBER:
 			if (val.string().empty()) {
 				std::ostringstream s;
 				s << std::setprecision(JSON_NUMBER_PRECISION) << val.number();
-				return sPrefix + " = " + s.str() + ";" + endStr;
+				dest.append(sPrefix);
+				dest.append(" = ");
+				dest.append(s.str());
+				dest.append(";");
+				dest.append(endStr);
+				break;
 			} else {
-				return sPrefix + " = " + val.string() + ";" + endStr;
+				dest.append(sPrefix);
+				dest.append(" = ");
+				dest.append(val.string());
+				dest.append(";");
+				dest.append(endStr);
+				break;
 			}
 
 		case json::JSON_STRING:
-			return sPrefix + " = \"" + val.string() + "\";" + endStr;
+		{
+			dest.append(sPrefix);
+			dest.append(" = \"");
+			dest.append(val.string());
+			dest.append("\";");
+			dest.append(endStr);
+			break;
+		}
 
 		case json::JSON_ARRAY:
 		{
-			std::string ret;
 			size_t iIndex = 0;
 			for (json::value & subVal : val) {
-				std::string sNewPrefix = sPrefix + "[" + std::to_string(iIndex++) + "]";
-				ret.append(write(sNewPrefix, subVal));
+				std::string sNewPrefix(sPrefix);
+				sNewPrefix.reserve(sPrefix.size() + 24);
+				sNewPrefix.append("[");
+				sNewPrefix.append(std::to_string(iIndex++));
+				sNewPrefix.append("]");
+				write(sNewPrefix, subVal, dest);
 			}
-			return ret;
+
+			break;
 		}
 
 		case json::JSON_OBJECT:
 		{
-			std::string ret;
 			for (json::value & subVal : val) {
-				std::string sNewPrefix = sPrefix + "[\"" + subVal.key() + "\"]";
-				ret.append(write(sNewPrefix, subVal));
+				std::string sNewPrefix(sPrefix);
+				sNewPrefix.reserve(sPrefix.size() + subVal.key().size() + 2);
+				sNewPrefix.append("[\"");
+				sNewPrefix.append(subVal.key());
+				sNewPrefix.append("\"]");
+				write(sNewPrefix, subVal, dest);
 			}
-			return ret;
+			break;
 		}
-
 	}
 }
 
@@ -99,12 +133,19 @@ int main(int argc, char const *argv[])
 	json::document jDoc;
 
 	if (jDoc.parseFile(argv[1])) {
+		std::string output;
+		write(argv[2], jDoc, output);
+
 		if (argc < 4) {
-			std::cout << write(argv[2], jDoc);
+			std::cout << "json::document " << argv[2] << ";" << std::endl << std::endl;
+
+			std::cout << output;
 		} else {
 			std::ofstream ofs (argv[3], std::ofstream::out);
 
-  			ofs << write(argv[2], jDoc);
+			ofs << "json::document " << argv[2] << ";" << std::endl << std::endl;
+
+  			ofs << output;
 
   			ofs.close();
 		}
