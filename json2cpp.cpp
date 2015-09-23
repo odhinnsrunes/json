@@ -27,11 +27,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <iomanip>
 #include <fstream>
 
-// #ifdef _WIN32
-// #define endStr "\r\n"
-// #else
 #define endStr "\n"
-// #endif
 
 void write(const std::string &sPrefix, json::value & val, std::string & dest)
 {
