@@ -88,7 +88,37 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 					while (att) {
 						std::string childName = "@";
 						childName.append(att->Name());
-						ret[childName] = att->Value();
+						int iValType = isNumeric(att->Value());
+						if (iValType != 0) {
+	                        std::string sValue = att->Value();
+	                        
+	                        json::instring in(sValue);
+	                        bool bFailed = false;
+	                        if (ret.isA(json::JSON_OBJECT)){
+	                        	json::numberParse(ret[childName]["#value"], in, &bFailed);
+	                        } else {
+	                        	json::numberParse(ret[childName], in, &bFailed);
+	                        }
+						} else {
+							std::string val = att->Value();
+							if (ret.isA(json::JSON_OBJECT)){
+								if(val == "true" || val == "YES"){
+									ret[childName]["#value"] = true;
+								} else if(val == "false" || val == "NO"){
+									ret[childName]["#value"] = false;
+								} else {
+									ret[childName]["#value"] = elem->Value();
+								}
+							} else {
+								if(val == "true" || val == "YES"){
+									ret[childName] = true;
+								} else if(val == "false" || val == "NO"){
+									ret[childName] = false;
+								} else {
+									ret[childName] = att->Value();
+								}
+							}
+						}
 						att = att->Next();
 					}
 					sRootTag = rootElem->Value();
@@ -129,7 +159,37 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 					while (att) {
 						std::string childName = "@";
 						childName.append(att->Name());
-						ret[childName] = att->Value();
+						int iValType = isNumeric(att->Value());
+						if (iValType != 0) {
+	                        std::string sValue = att->Value();
+	                        
+	                        json::instring in(sValue);
+	                        bool bFailed = false;
+	                        if (ret.isA(json::JSON_OBJECT)){
+	                        	json::numberParse(ret[childName]["#value"], in, &bFailed);
+	                        } else {
+	                        	json::numberParse(ret[childName], in, &bFailed);
+	                        }
+						} else {
+							std::string val = att->Value();
+							if (ret.isA(json::JSON_OBJECT)){
+								if(val == "true" || val == "YES"){
+									ret[childName]["#value"] = true;
+								} else if(val == "false" || val == "NO"){
+									ret[childName]["#value"] = false;
+								} else {
+									ret[childName]["#value"] = elem->Value();
+								}
+							} else {
+								if(val == "true" || val == "YES"){
+									ret[childName] = true;
+								} else if(val == "false" || val == "NO"){
+									ret[childName] = false;
+								} else {
+									ret[childName] = att->Value();
+								}
+							}
+						}
 						att = att->Next();
 					}
 					if (elem->Value()) {
