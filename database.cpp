@@ -65,7 +65,8 @@ namespace json
 
 	database::~database()
 	{
-		save();
+		if(data["config"]["autoSave"].boolean())
+            save();
 	}
 	
 	document database::save()
