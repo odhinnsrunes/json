@@ -93,6 +93,9 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 #include <list>
 #include <algorithm>
+#ifdef _USE_ADDED_ORDER_
+#include "arbitrary_order_map.hpp"
+#endif
 
 void JSONDebug(const char *format, ...);
 
@@ -406,9 +409,11 @@ namespace json
 		size_t pos;
 		size_t m_size;
 	};
-
+#ifdef _USE_ADDED_ORDER_
+	typedef arbitrary_order_map<std::string, json::value> myMap;
+#else
 	typedef std::map<std::string, json::value> myMap;
-	
+#endif
 	typedef std::deque<json::value> myVec;
 
 	class object : public myMap
