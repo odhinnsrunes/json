@@ -31,7 +31,8 @@ namespace data
 {
 
 int isNumeric(std::string data) {
-	if (data.size() > JSON_NUMBER_PRECISION) {
+	size_t l = data.size();
+	if (l == 0 || l > JSON_NUMBER_PRECISION) {
 		return 0;
 	}
 	const char szOk[] = "1234567890";
