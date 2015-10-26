@@ -555,7 +555,12 @@ std::string document::writeXML(std::string rootElem, bool bPretty, bool bTabs, P
 	}
 	if (sRootTag.size()) {
 		ret.append("</");
-		ret.append(sRootTag);
+		size_t spacePos = sRootTag.find_first_of(' ');
+		if (spacePos != std::string::npos) {
+			ret.append(sRootTag.substr(0, spacePos));
+		} else {
+			ret.append(sRootTag);
+		}
 		ret.append(">");
 	}
 
