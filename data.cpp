@@ -227,9 +227,7 @@ void document::parseXMLElement(json::value & ret, const TiXmlNode * elem)
 							}
 						} while (child);
                         if (bEmpty){
-                            if (ret.isA(json::JSON_OBJECT)){
-                                ret["#value"] = "";
-                            } else {
+                            if (!ret.isA(json::JSON_OBJECT)){
                                 ret = "";
                             }
                         }
