@@ -1855,6 +1855,111 @@ namespace json
 		return *this;
 	}
 
+	value & value::toObject(std::string key)
+	{
+		if(myType == JSON_OBJECT){
+			return *this;
+		}
+		value temp = *this;
+		m_number = 0;
+		m_boolean = false;
+		str.clear();
+		myType = JSON_OBJECT;
+		if (arr)
+			delete arr;
+		arr = NULL;
+		obj = new object();
+		(*this)[key] = temp;
+		return *this;
+	}
+
+	value & value::toString()
+	{
+		if(myType == JSON_STRING){
+			return *this;
+		}
+		value temp = *this;
+		m_number = 0;
+		m_boolean = false;
+
+		str = temp.string();
+		
+		myType = JSON_STRING;
+		if (arr)
+			delete arr;
+		if (obj)
+			delete obj;
+		arr = NULL;
+		obj = NULL;
+		
+		return *this;
+	}
+
+	value & value::toNumber()
+	{
+		if(myType == JSON_NUMBER){
+			return *this;
+		}
+		value temp = *this;
+		m_number = temp.number();
+		m_boolean = false;
+
+		str.clear();
+		
+		myType = JSON_NUMBER;
+		if (arr)
+			delete arr;
+		if (obj)
+			delete obj;
+		arr = NULL;
+		obj = NULL;
+		
+		return *this;
+	}
+
+	value & value::toBool()
+	{
+		if(myType == JSON_BOOLEAN){
+			return *this;
+		}
+		value temp = *this;
+		m_number = 0;
+		m_boolean = temp.boolean();
+
+		str.clear();
+		
+		myType = JSON_BOOLEAN;
+		if (arr)
+			delete arr;
+		if (obj)
+			delete obj;
+		arr = NULL;
+		obj = NULL;
+		
+		return *this;
+	}
+
+	value & value::toNull()
+	{
+		if(myType == JSON_NULL){
+			return *this;
+		}
+		m_number = 0;
+		m_boolean = false;
+
+		str.clear();
+		
+		myType = JSON_NULL;
+		if (arr)
+			delete arr;
+		if (obj)
+			delete obj;
+		arr = NULL;
+		obj = NULL;
+		
+		return *this;
+	}
+
 	value& value::operator[](size_t index) {
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {

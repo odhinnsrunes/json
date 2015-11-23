@@ -228,6 +228,11 @@ namespace json
 		value& emptyObject();
 
 		value& toArray();
+		value& toObject(std::string key);
+		value& toString();
+		value& toNumber();
+		value& toBool();
+		value& toNull();
 		
 		double number();
 		float _float();
