@@ -2753,8 +2753,16 @@ namespace json
 		return (long)number();
 	}
 
+    double value::_double() {
+        return number();
+    }
+
     int value::_int() {
         return (int)number();
+    }
+
+    i64 value::_int64() {
+        return (i64)number();
     }
 
     size_t value::_size_t() {

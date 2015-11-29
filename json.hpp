@@ -239,6 +239,8 @@ namespace json
 		i64 integer();
 		ui64 _uint64();
 		int _int();
+		i64 _int64();
+		double _double();
         size_t _size_t();
 		long _long();
 		short _short();
