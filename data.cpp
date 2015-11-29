@@ -433,7 +433,7 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 				if (strchr("1234567890", key[0])) {
 					bIsNumericKey = true;
 				}
-				if (bPretty && str.size()) {
+				if (bPretty && str.size() && !ret[key].isA(json::JSON_VOID)) {
 					if (str[str.size() - 1] != '\n')
 						str.append("\n");
 					
@@ -483,7 +483,7 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 						if (bPretty)
 							str.append("\n");
 					}
-				} else {
+				} else if(!ret[key].isA(json::JSON_VOID)){
 					str.push_back('<');
 					if (bIsNumericKey) {
 						str.append("_");
