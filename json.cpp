@@ -2761,7 +2761,7 @@ namespace json
         return (int)number();
     }
 
-    i64 value::_int64() {
+    i64 value::_integer64() {
         return (i64)number();
     }
 
