@@ -1308,6 +1308,11 @@ namespace json
 			if (!str.empty())
 				str.clear();
 			arr = new array();
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 			if (obj)
 				delete obj;
 			obj = NULL;
@@ -1327,6 +1332,11 @@ namespace json
 			if (!str.empty())
 				str.clear();
 			obj = new object();
+            if(pParentObject){
+                obj->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                obj->setParentArray(pParentArray);
+            }
 			if (arr)
 				delete arr;
 			arr = NULL;
@@ -1350,6 +1360,11 @@ namespace json
 				if (!str.empty())
 					str.clear();
 				arr = new array();
+                if(pParentObject){
+                    arr->setParentObject(pParentObject);
+                } else if(pParentArray) {
+                    arr->setParentArray(pParentArray);
+                }
 				if (obj)
 					delete obj;
 				obj = NULL;
@@ -1363,6 +1378,11 @@ namespace json
 				if (!str.empty())
 					str.clear();
 				obj = new object();
+                if(pParentObject){
+                    obj->setParentObject(pParentObject);
+                } else if(pParentArray) {
+                    obj->setParentArray(pParentArray);
+                }
 				if (arr)
 					delete arr;
 				arr = NULL;
@@ -1380,6 +1400,11 @@ namespace json
 				if (!str.empty())
 					str.clear();
 				arr = new array();
+                if(pParentObject){
+                    arr->setParentObject(pParentObject);
+                } else if(pParentArray) {
+                    arr->setParentArray(pParentArray);
+                }
 				if (obj)
 					delete obj;
 				obj = NULL;
@@ -1393,6 +1418,11 @@ namespace json
 				if (!str.empty())
 					str.clear();
 				obj = new object();
+                if(pParentObject){
+                    obj->setParentObject(pParentObject);
+                } else if(pParentArray) {
+                    obj->setParentArray(pParentArray);
+                }
 				if (arr)
 					delete arr;
 				arr = NULL;
@@ -1412,6 +1442,11 @@ namespace json
 		if (isA() == JSON_OBJECT) {
 			if (obj == NULL) {
 				obj = new object();
+                if(pParentObject){
+                    obj->setParentObject(pParentObject);
+                } else if(pParentArray) {
+                    obj->setParentArray(pParentArray);
+                }
 				if (arr)
 					delete arr;
 				arr = NULL;
@@ -1851,6 +1886,11 @@ namespace json
 			delete obj;
 		obj = NULL;
 		arr = new array();
+        if(pParentObject){
+            arr->setParentObject(pParentObject);
+        } else if(pParentArray){
+            arr->setParentArray(pParentArray);
+        }
 		(*this)[0] = temp;
 		return *this;
 	}
@@ -1869,6 +1909,11 @@ namespace json
 			delete arr;
 		arr = NULL;
 		obj = new object();
+        if(pParentObject){
+            obj->setParentObject(pParentObject);
+        } else if(pParentArray){
+            obj->setParentArray(pParentArray);
+        }
 		(*this)[key] = temp;
 		return *this;
 	}
@@ -2212,6 +2257,11 @@ namespace json
 	void value::resize(size_t iCount){
 		if(myType == JSON_VOID){
 			arr = new array();
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 		}
 		if(arr){
 			arr->resize(iCount);
@@ -2221,6 +2271,11 @@ namespace json
 	void value::resize(size_t iCount, value val){
 		if(myType == JSON_VOID){
 			arr = new array();
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 		}
 		if(arr){
 			arr->resize(iCount, val);
@@ -2634,10 +2689,20 @@ namespace json
 		if (arr){
 			delete arr;
 			arr = new array();
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 		}
 		if (obj){
 			delete obj;
 			obj = new object();
+            if(pParentObject){
+                obj->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                obj->setParentArray(pParentArray);
+            }
 		}
 		if (!str.empty())
 			str.clear();
@@ -2650,10 +2715,20 @@ namespace json
 		if (arr){
 			threadDelete(arr);
 			arr = new array();
+            if(pParentObject){
+                arr->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                arr->setParentArray(pParentArray);
+            }
 		}
 		if (obj){
 			threadDelete(obj);
 			obj = new object();
+            if(pParentObject){
+                obj->setParentObject(pParentObject);
+            } else if(pParentArray) {
+                obj->setParentArray(pParentArray);
+            }
 		}
 		if (!str.empty())
 			str.clear();
