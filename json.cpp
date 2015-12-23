@@ -2080,6 +2080,7 @@ namespace json
 		if (obj) {
 			value& ret = obj->operator[](index);
 			ret.setParentObject(obj);
+			ret.m_key.assign(index);
 			return ret;
 		}
 		if (myType != JSON_VOID) {
@@ -2126,6 +2127,7 @@ namespace json
         }
 		value & ret = obj->operator[](index);
 		ret.setParentObject(obj);
+		ret.m_key.assign(index);
 		return ret;
 	}
 
@@ -2386,7 +2388,12 @@ namespace json
 			{
 				return arr->empty();
 			}
-										
+					
+			case JSON_STRING:
+			{
+				return str.empty();
+			}					
+
 			case JSON_NULL:
 			case JSON_VOID:
 				return true;
@@ -2398,7 +2405,7 @@ namespace json
 	
 	bool array::empty() const
 	{
-		if(myVec::empty()){
+		if (!bNotEmpty && myVec::empty()) {
 			// bNotEmpty = false;
 			return true;
 		} else {
@@ -2455,7 +2462,7 @@ namespace json
 		// 		return false;
 		// 	}
 		// }
-		if(myMap::empty()){
+		if (!bNotEmpty && myMap::empty()) {
 			// bNotEmpty = false;
 			return true;
 		} else {
@@ -2466,9 +2473,9 @@ namespace json
 	void object::setNotEmpty() 
 	{
 		bNotEmpty = true;
-		if(pParentArray){
+		if (pParentArray) {
 			pParentArray->setNotEmpty();
-		} else if(pParentObject){
+		} else if (pParentObject) {
 			pParentObject->setNotEmpty();
 		}
 	}

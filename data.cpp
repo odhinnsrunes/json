@@ -418,61 +418,111 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 
 		case json::JSON_OBJECT:
 		{
-			for (json::iterator it = ret.begin(); it != ret.end(); ++it) {
-				std::string key = it.key().c_str();
+			
+			for (json::value & val : ret) {
+				bool bEmpty = true;
+				std::string key = val.key();
 				if (key.size() > 1) {
 					if (key[0] == '@') {
 						continue;
 					}
 				}
 				if (key == "#value") {
-					str.append(XMLEscape((*it).string()));
+					str.append(XMLEscape(val.string()));
 					continue;
 				}
 				bool bIsNumericKey = false;
 				if (strchr("1234567890", key[0])) {
 					bIsNumericKey = true;
 				}
-				if (bPretty && str.size() && !ret[key].isA(json::JSON_VOID)) {
+				if (bPretty && str.size() && !val.isA(json::JSON_VOID)) {
 					if (str[str.size() - 1] != '\n')
 						str.append("\n");
 					
 					if (bTabs){
-						for (int k = 0; k < depth; k++) {
-							str.append("\t");
-						}
+						// for (int k = 0; k < depth; k++) {
+							str.append(depth, '\t');
+						// }
 					}
 				}
-				if (ret[key].isA(json::JSON_ARRAY)) {
-					for (size_t j = 0; j < ret[key].size(); j++) {
+				if (val.isA(json::JSON_ARRAY)) {
+					bEmpty = false;
+					size_t l = val.size();
+					for (size_t j = 0; j < l; j++) {
 						if (bPretty && bTabs && j > 0) {
-							for (int i = 0; i < depth; i++) {
-								str.append("\t");
-							}
+							// for (int i = 0; i < depth; i++) {
+								str.append(depth, '\t');
+							// }
 						}
 						str.push_back('<');
 						if (bIsNumericKey) {
 							str.append("_");
 						}
 						str.append(key);
-						for (json::iterator it = ret[key][j].begin(); it != ret[key][j].end(); ++it) {
-							std::string subKey = it.key().string();
+						for (json::value & val2 : val[j]) {
+							std::string subKey = val2.key();
 							if (subKey.size() > 1) {
 								if (subKey[0] == '@') {
 									str.push_back(' ');
 									str.append(subKey.substr(1));
 									str.append("=\"");
-									str.append(XMLEscape((*it).string(), true));
+									str.append(XMLEscape(val2.string(), true));
 									str.push_back('\"');
 								}
 							}
 						}
-						str.push_back('>');
-						writeXML(str, ret[key][j], depth + 1, bPretty, bTabs);
-						if (bPretty && bTabs && str[str.size() - 1] == '\n') {
-							for (int k = 0; k < depth; k++) {
-								str.append("\t");
+						if (val[j].empty() || val[j].size() == 0) {
+							str.append(" />");
+							if (bPretty)
+								str.append("\n");
+						} else {
+							str.push_back('>');
+							writeXML(str, val[j], depth + 1, bPretty, bTabs);
+							if (bPretty && bTabs && str[str.size() - 1] == '\n') {
+								//for (int k = 0; k < depth; k++) {
+									str.append(depth, '\t');
+								//}
 							}
+							str.append("</");
+							if (bIsNumericKey) {
+								str.append("_");
+							}
+							str.append(key);
+							str.push_back('>');
+							if (bPretty)
+								str.append("\n");
+						}
+					}
+				} else if(!val.isA(json::JSON_VOID)){
+					bEmpty = false;
+					str.push_back('<');
+					if (bIsNumericKey) {
+						str.append("_");
+					}
+					str.append(key);
+					for (json::value & val2 : val) {
+						std::string subKey = val2.key();
+						if (subKey.size() > 1) {
+							if (subKey[0] == '@') {
+								str.push_back(' ');
+								str.append(subKey.substr(1));
+								str.append("=\"");
+								str.append(XMLEscape(val2.string(), true));
+								str.push_back('\"');
+							}
+						}
+					}
+					if (val.empty() || val.size() == 0) {
+						str.append(" />");
+						if (bPretty)
+							str.append("\n");
+					} else {
+						str.push_back('>');
+						writeXML(str, val, depth + 1, bPretty, bTabs);
+						if (bPretty && bTabs && str[str.size() - 1] == '\n') {
+							// for (int k = 0; k < depth; k++) {
+								str.append(depth, '\t');
+							// }
 						}
 						str.append("</");
 						if (bIsNumericKey) {
@@ -483,37 +533,19 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 						if (bPretty)
 							str.append("\n");
 					}
-				} else if(!ret[key].isA(json::JSON_VOID)){
+				}
+				if(bEmpty && !(val.empty() || val.size() == 0)) {
+					if (bPretty && bTabs && str[str.size() - 1] == '\n') {
+						// for (int k = 0; k < depth; k++) {
+							str.append(depth, '\t');
+						// }
+					}
 					str.push_back('<');
 					if (bIsNumericKey) {
 						str.append("_");
 					}
 					str.append(key);
-					for (json::iterator it = ret[key].begin(); it != ret[key].end(); ++it) {
-						std::string subKey = it.key().string();
-						if (subKey.size() > 1) {
-							if (subKey[0] == '@') {
-								str.push_back(' ');
-								str.append(subKey.substr(1));
-								str.append("=\"");
-								str.append(XMLEscape((*it).string(), true));
-								str.push_back('\"');
-							}
-						}
-					}
-					str.push_back('>');
-					writeXML(str, ret[key], depth + 1, bPretty, bTabs);
-					if (bPretty && bTabs && str[str.size() - 1] == '\n') {
-						for (int k = 0; k < depth; k++) {
-							str.append("\t");
-						}
-					}
-					str.append("</");
-					if (bIsNumericKey) {
-						str.append("_");
-					}
-					str.append(key);
-					str.push_back('>');
+					str.append(" />");
 					if (bPretty)
 						str.append("\n");
 				}
@@ -541,6 +573,22 @@ std::string document::writeXML(std::string rootElem, bool bPretty, bool bTabs, P
 	if (sRootTag.size()) {
 		ret.append("<");
 		ret.append(sRootTag);
+		size_t spacePos = sRootTag.find_first_of(' ');
+		if (spacePos == std::string::npos && isA(json::JSON_OBJECT)) {
+			for (json::value & val : *this) {
+				std::string key = val.key();
+				if (key.size() > 1) {
+					if (key[0] == '@'){
+						ret.append(" ");
+						ret.append(key.substr(1));
+						ret.append("=\"");
+						ret.append(XMLEscape(val.string(), true));
+						ret.append("\"");
+					}
+				}
+			}
+		}
+		 
 		ret.append(">");
 		if (bPretty) {
 			ret.append("\n");
