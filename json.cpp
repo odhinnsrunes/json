@@ -1498,6 +1498,7 @@ namespace json
 		}
 		pParentObject = NULL;
 		pParentArray = NULL;
+		// m_key = V.m_key;
 	}
 #ifdef __BORLANDC__
 	value::value(document& V) {
@@ -1524,6 +1525,7 @@ namespace json
 		}
 		pParentObject = NULL;
 		pParentArray = NULL;
+		// m_key = V.m_key;
 	}
 
 	std::string value::typeName(JSONTypes type)
@@ -1633,6 +1635,7 @@ namespace json
 				}
 			}
 		}
+		// m_key = V.m_key;
 		return *this;
 	}
 		
@@ -2080,7 +2083,7 @@ namespace json
 		if (obj) {
 			value& ret = obj->operator[](index);
 			ret.setParentObject(obj);
-			ret.m_key.assign(index);
+			// ret.m_key.assign(index);
 			return ret;
 		}
 		if (myType != JSON_VOID) {
@@ -2127,7 +2130,7 @@ namespace json
         }
 		value & ret = obj->operator[](index);
 		ret.setParentObject(obj);
-		ret.m_key.assign(index);
+		// ret.m_key.assign(index);
 		return ret;
 	}
 

@@ -511,32 +511,32 @@ namespace json
 		iterator() {
 			bNone = true;
 			bIsArray = false;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		iterator(const myMap::iterator & it) : obj_it(it){
 			bNone = false;
 			// obj_it = it;
 			bIsArray = false;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		iterator(const myVec::iterator & it) : arr_it(it) {
 			bNone = false;
 			// arr_it = it;
 			bIsArray = true;
 			dumbRet.clear();
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		iterator(const iterator& it) : arr_it(it.arr_it), obj_it(it.obj_it), dumbRet() {
 			bNone = it.bNone;
 			// arr_it = it.arr_it;
 			// obj_it = it.obj_it;
 			bIsArray = it.bIsArray;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		~iterator() {
-			// if(bSetKey){
-			// 	obj_it->second.m_key.clear();
-			// }
+			if(bSetKey){
+				obj_it->second.m_key.clear();
+			}
 		}
 		
 		iterator& operator++() {
@@ -544,10 +544,10 @@ namespace json
 				if (bIsArray) {
 					++arr_it;
 				} else {
-					// if(bSetKey){
-					// 	obj_it->second.m_key.clear();
-					// 	bSetKey = false;
-					// }
+					if(bSetKey){
+						obj_it->second.m_key.clear();
+						bSetKey = false;
+					}
 					++obj_it;
 				}
 			}
@@ -565,10 +565,10 @@ namespace json
 				if (bIsArray) {
 					--arr_it;
 				} else {
-					// if(bSetKey){
-					// 	obj_it->second.m_key.clear();
-					// 	bSetKey = false;
-					// }
+					if(bSetKey){
+						obj_it->second.m_key.clear();
+						bSetKey = false;
+					}
 					--obj_it;
 				}
 			}
@@ -606,10 +606,10 @@ namespace json
 				if (bIsArray) {
 					return *arr_it;
 				} else {
-					// if(!bSetKey){
-					// 	obj_it->second.m_key.assign(obj_it->first);
-					// 	bSetKey = true;
-					// }
+					if(!bSetKey){
+						obj_it->second.m_key.assign(obj_it->first);
+						bSetKey = true;
+					}
 					return obj_it->second;
 				}
 			} else {
@@ -640,7 +640,7 @@ namespace json
 		myMap::iterator obj_it;
 		bool bIsArray;
 		value dumbRet;
-		// bool bSetKey;
+		bool bSetKey;
 	};
 	
 	class reverse_iterator : public std::iterator<std::input_iterator_tag, value>{
@@ -648,38 +648,38 @@ namespace json
 		reverse_iterator() {
 			bNone = true;
 			bIsArray = false;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		reverse_iterator(const myMap::reverse_iterator & it) : obj_it(it) {
 			bNone = false;
 			// obj_it = it;
 			bIsArray = false;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		reverse_iterator(const myVec::reverse_iterator & it) : arr_it(it) {
 			bNone = false;
 			// arr_it = it;
 			bIsArray = true;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		reverse_iterator(const myMap::iterator & it) : obj_it(myMap::reverse_iterator(it)) {
 			bNone = false;
 			// obj_it = myMap::reverse_iterator(it);
 			bIsArray = false;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		reverse_iterator(const myVec::iterator & it) : arr_it(myVec::reverse_iterator(it)) {
 			bNone = false;
 			// arr_it =  myVec::reverse_iterator(it);
 			bIsArray = true;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		reverse_iterator(const reverse_iterator& it) : arr_it(it.arr_it), obj_it(it.obj_it), dumbRet() {
 			bNone = it.bNone;
 			// arr_it = it.arr_it;
 			// obj_it = it.obj_it;
 			bIsArray = it.bIsArray;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		
 		reverse_iterator(const json::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)){
@@ -687,13 +687,13 @@ namespace json
 			// arr_it = myVec::reverse_iterator(it.arr_it);
 			// obj_it = myMap::reverse_iterator(it.obj_it);
 			bIsArray = it.bIsArray;
-			// bSetKey = false;
+			bSetKey = false;
 		}
 		~reverse_iterator() 
 		{
-			// if(bSetKey){
-			// 	obj_it->second.m_key.clear();
-			// }
+			if(bSetKey){
+				obj_it->second.m_key.clear();
+			}
 		}
 		
 		reverse_iterator& operator++() {
@@ -701,10 +701,10 @@ namespace json
 				if (bIsArray) {
 					++arr_it;
 				} else {
-					// if(bSetKey){
-					// 	obj_it->second.m_key.clear();
-					// 	bSetKey = false;
-					// }
+					if(bSetKey){
+						obj_it->second.m_key.clear();
+						bSetKey = false;
+					}
 					++obj_it;
 				}
 			}
@@ -722,10 +722,10 @@ namespace json
 				if (bIsArray) {
 					--arr_it;
 				} else {
-					// if(bSetKey){
-					// 	obj_it->second.m_key.clear();
-					// 	bSetKey = false;
-					// }
+					if(bSetKey){
+						obj_it->second.m_key.clear();
+						bSetKey = false;
+					}
 					--obj_it;
 				}
 			}
@@ -763,10 +763,10 @@ namespace json
 				if (bIsArray) {
 					return *arr_it;
 				} else {
-					// if(!bSetKey){
-					// 	(obj_it->second).m_key.assign(obj_it->first);
-					// 	bSetKey = true;
-					// }
+					if(!bSetKey){
+						(obj_it->second).m_key.assign(obj_it->first);
+						bSetKey = true;
+					}
 					return obj_it->second;
 				}
 			} else {
@@ -797,7 +797,7 @@ namespace json
 		myMap::reverse_iterator obj_it;
 		bool bIsArray;
 		value dumbRet;
-		// bool bSetKey;
+		bool bSetKey;
 	};
 	
 	
