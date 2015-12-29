@@ -230,6 +230,7 @@ namespace json
 		value& toArray();
 		value& toObject(std::string key);
 		value& toString();
+		value& toString(int iDecimalPlaces);
 		value& toNumber();
 		value& toBool();
 		value& toNull();

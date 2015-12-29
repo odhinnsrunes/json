@@ -27,6 +27,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include "json.hpp"
 #include <assert.h>
 #include <algorithm>
+#include <cmath>
 #include <iomanip>
 #include <stdarg.h>
 #if defined _WIN32 && defined __clang__
@@ -1921,9 +1922,47 @@ namespace json
 		return *this;
 	}
 
+	value & value::toString(int iDecimalPlaces)
+	{
+		if (myType == JSON_STRING){
+			return *this;
+		}
+		value temp = *this;
+		m_number = 0;
+		m_boolean = false;
+
+		if (iDecimalPlaces >= 0 && temp.isA(JSON_NUMBER)) {
+			temp.m_number = (double)((i64)(temp.m_number * (pow(10, iDecimalPlaces)) + 0.5)) / (double)pow(10, iDecimalPlaces);
+		}
+		str = temp.string();
+		if (iDecimalPlaces >= 0 && iDecimalPlaces <= JSON_NUMBER_PRECISION && temp.isA(JSON_NUMBER)) {
+			size_t p = str.find('.');
+			if (p != std::string::npos) {
+				size_t places = str.size() - p - 1;
+				if (places < (size_t)iDecimalPlaces) {
+					str.append((size_t)iDecimalPlaces - places, '0');
+				}
+			} else {
+				if (iDecimalPlaces > 0) {
+					str.append(".");
+					str.append((size_t)iDecimalPlaces, '0');
+				}
+			}
+		}
+		myType = JSON_STRING;
+		if (arr)
+			delete arr;
+		if (obj)
+			delete obj;
+		arr = NULL;
+		obj = NULL;
+		
+		return *this;
+	}
+
 	value & value::toString()
 	{
-		if(myType == JSON_STRING){
+		if (myType == JSON_STRING){
 			return *this;
 		}
 		value temp = *this;
@@ -1931,7 +1970,7 @@ namespace json
 		m_boolean = false;
 
 		str = temp.string();
-		
+
 		myType = JSON_STRING;
 		if (arr)
 			delete arr;
