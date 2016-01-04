@@ -1960,12 +1960,12 @@ namespace json
 
 	value & value::toString(int iDecimalPlaces)
 	{
+		if (iDecimalPlaces > JSON_NUMBER_PRECISION) {
+			iDecimalPlaces = JSON_NUMBER_PRECISION;
+		}
 		m_places = iDecimalPlaces;
 		if (myType == JSON_STRING){
 			return *this;
-		}
-		if (iDecimalPlaces > JSON_NUMBER_PRECISION) {
-			iDecimalPlaces = JSON_NUMBER_PRECISION;
 		}
 		value temp = *this;
 		m_number = 0;
@@ -2046,6 +2046,9 @@ namespace json
 
 	value & value::fixedDecimal(int iPlaces)
 	{
+		if (iPlaces > JSON_NUMBER_PRECISION) {
+			iPlaces = JSON_NUMBER_PRECISION;
+		}
 		m_places = iPlaces;
 
 		return *this;
