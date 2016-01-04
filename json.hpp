@@ -191,7 +191,7 @@ namespace json
 		value(T V) {
 			m_number = (double)V;
 			m_boolean = !(V == 0.0);
-			
+			m_places = -1;
 			myType = JSON_NUMBER;
 			obj = NULL;
 			arr = NULL;
