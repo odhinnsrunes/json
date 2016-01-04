@@ -958,6 +958,31 @@ namespace json
 		}
 	}
 
+	std::string & value::makeStringFromNumber(std::string & in, const int &iPlaces, double temp)
+	{
+		if (iPlaces >= 0) {
+			temp = round((double)((i64)(temp * (pow(10, iPlaces))))) / (double)pow(10, iPlaces);
+		}
+		std::ostringstream s;
+		s << std::setprecision(JSON_NUMBER_PRECISION) << temp;
+		in = s.str();
+		if (iPlaces >= 0) {
+			size_t p = in.find('.');
+			if (p != std::string::npos) {
+				size_t places = in.size() - p - 1;
+				if (places < (size_t)iPlaces) {
+					in.append((size_t)iPlaces - places, '0');
+				}
+			} else {
+				if (iPlaces > 0) {
+					in.append(".");
+					in.append((size_t)iPlaces, '0');
+				}
+			}
+		}
+		return in;
+	}
+
 	size_t value::psize(int depth, bool bPretty) const
 	{
 		switch (isA()) {
@@ -976,9 +1001,9 @@ namespace json
 
 		case JSON_NUMBER: {
 			if (str.empty()) {
-				std::ostringstream s;
-				s << std::setprecision(JSON_NUMBER_PRECISION) << m_number;
-				return s.str().size();
+				std::string s;
+				makeStringFromNumber(s, m_places, m_number);
+				return s.size();
 			} else {
 				return str.size();
 			}
@@ -1017,14 +1042,16 @@ namespace json
 
 		case JSON_NUMBER: {
 			if (str.empty()) {
-				std::ostringstream s;
-				s << std::setprecision(JSON_NUMBER_PRECISION) << m_number;
-				ptr.set(s.str().c_str(), s.str().size());
+				std::string s;
+				makeStringFromNumber(s, m_places, m_number);
+				ptr.set(s.c_str(), s.size());
 			} else {
 				ptr.set(str.c_str(), str.size());
 			}
+			
 			break;
 		}
+
 		case JSON_STRING: {
 			ptr.set('\"');
 			escape(ptr, str);
@@ -1468,6 +1495,7 @@ namespace json
 
 	value::value() {
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 
 		myType = JSON_VOID;
@@ -1480,6 +1508,7 @@ namespace json
 	value::value(const value& V) {
 
 		m_number = V.m_number;
+		m_places = V.m_places;
 		m_boolean = V.m_boolean;
 
 		if (!V.str.empty()) {
@@ -1507,6 +1536,7 @@ namespace json
 	value::value(const document& V) {
 #endif
 		m_number = V.m_number;
+		m_places = V.m_places;
 		m_boolean = V.m_boolean;
 
 		if (!V.str.empty()) {
@@ -1642,6 +1672,7 @@ namespace json
 		
 	value::value(bool V) {
 		m_number = (double)V;
+		m_places = -1;
 		m_boolean = !(V == 0);
 
 		myType = JSON_BOOLEAN;
@@ -1653,6 +1684,7 @@ namespace json
 
 	value::value(const char* V) { 
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 
 		if (V) {
@@ -1669,6 +1701,7 @@ namespace json
 	}
 	value::value(char* V) { 
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 
 		if (V) {
@@ -1685,6 +1718,7 @@ namespace json
 	}
 	value::value(std::string V) {
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 		str.assign(V);
 		myType = JSON_STRING;
@@ -1695,6 +1729,7 @@ namespace json
 	}
 	value::value(object& V) { 
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 
 		myType = JSON_OBJECT;
@@ -1705,6 +1740,7 @@ namespace json
 	}
 	value::value(array& V) {
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 
 		myType = JSON_ARRAY;
@@ -1924,11 +1960,12 @@ namespace json
 
 	value & value::toString(int iDecimalPlaces)
 	{
-		if (iDecimalPlaces > JSON_NUMBER_PRECISION) {
-			iDecimalPlaces = JSON_NUMBER_PRECISION;
-		}
+		m_places = iDecimalPlaces;
 		if (myType == JSON_STRING){
 			return *this;
+		}
+		if (iDecimalPlaces > JSON_NUMBER_PRECISION) {
+			iDecimalPlaces = JSON_NUMBER_PRECISION;
 		}
 		value temp = *this;
 		m_number = 0;
@@ -2004,6 +2041,13 @@ namespace json
 		arr = NULL;
 		obj = NULL;
 		
+		return *this;
+	}
+
+	value & value::fixedDecimal(int iPlaces)
+	{
+		m_places = iPlaces;
+
 		return *this;
 	}
 
@@ -2927,9 +2971,7 @@ namespace json
 
 		case JSON_NUMBER: {
 			if (str.empty()) {
-				std::ostringstream s;
-				s << std::setprecision(JSON_NUMBER_PRECISION) << m_number;
-				str = s.str();
+				makeStringFromNumber(str, m_places, m_number);
 			}
 			break;
 		}
@@ -3489,7 +3531,7 @@ namespace json
 			break;
 
 		case JSON_NUMBER:
-			S << std::setprecision(JSON_NUMBER_PRECISION) << doc.number();
+			S << doc.string();
 			break;
 
 		case JSON_STRING: {

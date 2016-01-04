@@ -234,6 +234,7 @@ namespace json
 		value& toNumber();
 		value& toBool();
 		value& toNull();
+		value& fixedDecimal(int iPlaces);
 		
 		double number();
 		float _float();
@@ -361,6 +362,7 @@ namespace json
 		size_t psize(int depth, bool bPretty) const;
 		
 		double m_number;
+		int m_places;
 		bool m_boolean;
 		std::string str;
 		JSONTypes myType;
@@ -372,6 +374,9 @@ namespace json
 		object* pParentObject;
 		array* pParentArray;
 		static DEBUGPTR debug;
+
+	private:
+		static std::string &makeStringFromNumber(std::string & in, const int &iPlaces, double dNumber);
 	};
 
 	void numberParse(value& ret, instring& s, bool* bFailed);
