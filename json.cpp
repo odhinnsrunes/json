@@ -1935,7 +1935,7 @@ namespace json
 		m_boolean = false;
 
 		if (iDecimalPlaces >= 0 && temp.isA(JSON_NUMBER)) {
-			temp.m_number = (double)((i64)(temp.m_number * (pow(10, iDecimalPlaces)) + 0.5)) / (double)pow(10, iDecimalPlaces);
+			temp.m_number = round((double)((i64)(temp.m_number * (pow(10, iDecimalPlaces))))) / (double)pow(10, iDecimalPlaces);
 		}
 		str = temp.string();
 		if (iDecimalPlaces >= 0 && temp.isA(JSON_NUMBER)) {
