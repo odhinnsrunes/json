@@ -200,6 +200,7 @@ namespace json
 		ret.str.clear();
 
 		ret.m_number = 0.0;
+		ret.m_places = -1;
 
 		ret.obj = NULL;
 		ret.arr = NULL;
@@ -579,6 +580,7 @@ namespace json
 				delete a.arr;
 			a.m_boolean = false;
 			a.m_number = 0.0;
+			a.m_places = -1;
 			if (!a.str.empty())
 				a.str.clear();
 
@@ -1331,6 +1333,7 @@ namespace json
 		}
 		if (myType != JSON_ARRAY) {
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			myType = JSON_ARRAY;
 			if (!str.empty())
@@ -1355,6 +1358,7 @@ namespace json
 	{
 		if (myType != JSON_OBJECT) {
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			myType = JSON_OBJECT;
 			if (!str.empty())
@@ -1383,6 +1387,7 @@ namespace json
 		if (position.IsArray() && first.IsArray() && last.IsArray()) {
 			if (myType != JSON_ARRAY || arr == NULL) {
 				m_number = 0;
+				m_places = -1;
 				m_boolean = false;
 				myType = JSON_ARRAY;
 				if (!str.empty())
@@ -1401,6 +1406,7 @@ namespace json
 		} else if (!position.IsArray() && !first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
 			if (myType != JSON_OBJECT || obj == NULL) {
 				m_number = 0;
+				m_places = -1;
 				m_boolean = false;
 				myType = JSON_OBJECT;
 				if (!str.empty())
@@ -1423,6 +1429,7 @@ namespace json
 		if (first.IsArray() && last.IsArray()) {
 			if (myType != JSON_ARRAY) {
 				m_number = 0;
+				m_places = -1;
 				m_boolean = false;
 				myType = JSON_ARRAY;
 				if (!str.empty())
@@ -1441,6 +1448,7 @@ namespace json
 		} else if (!first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
 			if (myType != JSON_OBJECT) {
 				m_number = 0;
+				m_places = -1;
 				m_boolean = false;
 				myType = JSON_OBJECT;
 				if (!str.empty())
@@ -1593,9 +1601,9 @@ namespace json
 		if (debug) {
 			if(myType != V.myType){
 				switch(myType) {
-					case JSON_NULL:
-						debug("json operator= changed type from NULL to %s", typeName(V.myType).c_str());
-						break;
+					// case JSON_NULL:
+					// 	debug("json operator= changed type from NULL to %s", typeName(V.myType).c_str());
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(V.myType).c_str());
@@ -1624,6 +1632,7 @@ namespace json
 		}
 
 		m_number = V.m_number;
+		m_places = V.m_places;
 		m_boolean = V.m_boolean;
 
 		str.assign(V.str);
@@ -1807,9 +1816,9 @@ namespace json
 		if (myType != JSON_VOID) {
 			if (debug) {
 				switch(myType) {
-					case JSON_NULL:
-						debug("json emptyArray() changed type from NULL to Array.");
-						break;
+					// case JSON_NULL:
+					// 	debug("json emptyArray() changed type from NULL to Array.");
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json emptyArray() changed type from Boolean to Array.", m_boolean);
@@ -1836,6 +1845,7 @@ namespace json
 				}
 			}
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			if (!str.empty())
 				str.clear();
@@ -1862,9 +1872,9 @@ namespace json
 		if (myType != JSON_VOID) {
 			if (debug) {
 				switch(myType) {
-					case JSON_NULL:
-						debug("json emptyObject() changed type from NULL to Object.");
-						break;
+					// case JSON_NULL:
+					// 	debug("json emptyObject() changed type from NULL to Object.");
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json emptyObject() changed type from Boolean to Object.", m_boolean);
@@ -1891,6 +1901,7 @@ namespace json
 				}
 			}
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			if (!str.empty())
 				str.clear();
@@ -1919,6 +1930,7 @@ namespace json
 		}
 		value temp = *this;
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 		str.clear();
 		myType = JSON_ARRAY;
@@ -1942,6 +1954,7 @@ namespace json
 		}
 		value temp = *this;
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 		str.clear();
 		myType = JSON_OBJECT;
@@ -2061,6 +2074,7 @@ namespace json
 		}
 		value temp = *this;
 		m_number = 0;
+		m_places = -1;
 		m_boolean = temp.boolean();
 
 		str.clear();
@@ -2082,6 +2096,7 @@ namespace json
 			return *this;
 		}
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 
 		str.clear();
@@ -2122,9 +2137,9 @@ namespace json
 			}
 			if (debug) {
 				switch(myType) {
-					case JSON_NULL:
-						debug("json operator[](size_t) changed type from NULL to Array.");
-						break;
+					// case JSON_NULL:
+					// 	debug("json operator[](size_t) changed type from NULL to Array.");
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json operator[](size_t) changed type from Boolean to Array.", m_boolean);
@@ -2147,6 +2162,7 @@ namespace json
 				}
 			}
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			if (!str.empty())
 				str.clear();
@@ -2178,9 +2194,9 @@ namespace json
 		if (myType != JSON_VOID) {
 			if (debug) {
 				switch(myType) {
-					case JSON_NULL:
-						debug("json operator[](std::string) changed type from NULL to Object.");
-						break;
+					// case JSON_NULL:
+					// 	debug("json operator[](std::string) changed type from NULL to Object.");
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json operator[](std::string) changed type from Boolean to Object.", m_boolean);
@@ -2203,6 +2219,7 @@ namespace json
 				}
 			}
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			if (!str.empty())
 				str.clear();
@@ -2227,9 +2244,9 @@ namespace json
 		if (myType != JSON_ARRAY) {
 			if (debug) {
 				switch(myType) {
-					case JSON_NULL:
-						debug("json push_back(value val) changed type from NULL to Array.");
-						break;
+					// case JSON_NULL:
+					// 	debug("json push_back(value val) changed type from NULL to Array.");
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json push_back(value val) changed type from Boolean to Array.", m_boolean);
@@ -2252,6 +2269,7 @@ namespace json
 				}
 			}
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			myType = JSON_ARRAY;
 			if (!str.empty())
@@ -2278,9 +2296,9 @@ namespace json
 		if (myType != JSON_ARRAY) {
 			if (debug) {
 				switch(myType) {
-					case JSON_NULL:
-						debug("json push_front(value val) changed type from NULL to Array.");
-						break;
+					// case JSON_NULL:
+					// 	debug("json push_front(value val) changed type from NULL to Array.");
+					// 	break;
 
 					case JSON_BOOLEAN:
 						debug("json push_front(value val) changed type from Boolean to Array.", m_boolean);
@@ -2303,6 +2321,7 @@ namespace json
 				}
 			}
 			m_number = 0;
+			m_places = -1;
 			m_boolean = false;
 			myType = JSON_ARRAY;
 			if (!str.empty())
@@ -2385,6 +2404,7 @@ namespace json
 
 			case JSON_NULL:
 				m_number = 0;
+				m_places = -1;
 				m_boolean = false;
 				myType = JSON_VOID;
 				str.clear();
@@ -2393,6 +2413,7 @@ namespace json
 			case JSON_BOOLEAN:
 				if(m_boolean == false){
 					m_number = 0;
+					m_places = -1;
 					myType = JSON_VOID;
 					str.clear();
 					return false;
@@ -2401,6 +2422,7 @@ namespace json
 
 			case JSON_NUMBER:
 				if(m_number == 0.0){
+					m_places = -1;
 					m_boolean = false;
 					myType = JSON_VOID;
 					str.clear();
@@ -2411,6 +2433,7 @@ namespace json
 			case JSON_STRING:
 				if(str.empty()){
 					m_number = 0;
+					m_places = -1;
 					m_boolean = false;
 					myType = JSON_VOID;
 					return false;
@@ -2430,6 +2453,7 @@ namespace json
 				}
 				if(bNotEmpty == false){
 					m_number = 0.0;
+					m_places = -1;
 					m_boolean = false;
 					str.clear();
 					myType = JSON_VOID;
@@ -2454,6 +2478,7 @@ namespace json
 				}
 				if(bNotEmpty == false){
 					m_number = 0.0;
+					m_places = -1;
 					m_boolean = false;
 					str.clear();
 					myType = JSON_VOID;
@@ -2807,6 +2832,7 @@ namespace json
 			str.clear();
 
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 	}
 
@@ -2833,11 +2859,13 @@ namespace json
 			str.clear();
 
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 	}
 
 	void value::destroy() {
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 		str.clear();
 		myType = JSON_VOID;
@@ -2851,6 +2879,7 @@ namespace json
 
 	void value::threadedDestroy() {
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 		str.clear();
 		myType = JSON_VOID;
@@ -3584,6 +3613,7 @@ namespace json
 		obj = NULL;
 		myType = JSON_VOID;
 		m_number = 0;
+		m_places = -1;
 		m_boolean = false;
 		str.clear();
 		std::string sOut;
@@ -3658,7 +3688,7 @@ namespace json
 	std::string document::write(int iDepth, bool bPretty, PREWRITEPTR preWriter) const
 	{
 		if(isA(JSON_VOID)){
-			return "null";
+			return "";
 		} else if (isA(JSON_OBJECT)) {
 			size_t l = obj->psize(iDepth, bPretty);
 			MovingCharPointer ptr(l);
