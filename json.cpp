@@ -2421,7 +2421,7 @@ namespace json
 				return true;
 
 			case JSON_NUMBER:
-				if(m_number == 0.0){
+				if(m_number == 0.0 && m_places < 0){
 					m_places = -1;
 					m_boolean = false;
 					myType = JSON_VOID;

@@ -462,7 +462,7 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 						for (json::value & val2 : val[j]) {
 							std::string subKey = val2.key();
 							if (subKey.size() > 1) {
-								if (subKey[0] == '@') {
+								if (subKey[0] == '@' && !val2.isA(json::JSON_VOID)) {
 									str.push_back(' ');
 									str.append(subKey.substr(1));
 									str.append("=\"");
@@ -503,7 +503,7 @@ void document::writeXML(std::string & str, json::value & ret, int depth, bool bP
 					for (json::value & val2 : val) {
 						std::string subKey = val2.key();
 						if (subKey.size() > 1) {
-							if (subKey[0] == '@') {
+							if (subKey[0] == '@' && !val2.isA(json::JSON_VOID)) {
 								str.push_back(' ');
 								str.append(subKey.substr(1));
 								str.append("=\"");
