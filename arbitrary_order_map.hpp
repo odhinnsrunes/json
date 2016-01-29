@@ -2,43 +2,46 @@
 #define _ARBITRARY_ORDER_MAP_
 
 #include <map>
-#include <deque>
+#include <vector>
 #include <memory>
 
 template<class keyType, class valueType, class A = std::allocator<valueType> >
 class arbitrary_order_map
 {
 public:
-    class pairType
+//    class pairType
+//    {
+//    public:
+//        pairType(const pairType & in) : first(in.first), second(in.second) {}
+//        pairType(const keyType & in) : first(in) {}
+//        pairType(const keyType & in, const valueType & inv) : first(in), second(inv) {}
+//        pairType(const std::pair<keyType, valueType> & pair) : first(pair.first), second(pair.second) {}
+//        keyType first;
+//        valueType second;
+//    };
+    typedef std::pair<keyType, valueType> pairType;
+    typedef std::shared_ptr<pairType> ptrType;
+	typedef typename std::map<keyType, pairType*>::iterator dataIterator;
+	typedef typename std::vector<ptrType>::iterator keyIterator;
+    typedef std::pair<keyType, pairType*> dataType;
+    typedef std::pair<keyType, pairType> data2Type;
+	
+    arbitrary_order_map(){}
+
+	~arbitrary_order_map()
     {
-    public:
-        pairType(const pairType & in) : first(in.first), second(in.second) {}
-        pairType(const keyType & in) : first(in) {}
-        pairType(const keyType & in, const valueType & inv) : first(in), second(inv) {}
-        pairType(const std::pair<keyType, valueType> & pair) : first(pair.first), second(pair.second) {}
-        keyType first;
-        valueType second;
-    };
-//	typedef  std::pair<keyType, valueType> pairType;
-	typedef  std::shared_ptr<pairType> ptrType;
-
-	arbitrary_order_map(){}
-
-	~arbitrary_order_map(){}
+    }
 
 	valueType &operator[](const keyType &key)
 	{
-        typename std::map<keyType, ptrType>::iterator it = data.find(key);
+        dataIterator it = data.find(key);
 		if(it == data.end()){
-			;
-            
-            return (*(*(keys.emplace(keys.end(),
-                                     data.insert(std::pair<keyType, ptrType>(key,
-                                                                             ptrType(new pairType(key)))).first->second)))).second;
-//			data.emplace(key, keys.back());
-//            return t.get()->second;
+            pairType* p = new pairType(key, valueType());
+            keys.emplace_back(ptrType(p));
+            data.emplace_hint(data.end(), dataType(key, p));
+            return p->second;
 		}
-		return (*(*it).second).second;
+		return ((*it).second)->second;
 	}
 
 	valueType &operator[](size_t index)
@@ -69,12 +72,12 @@ public:
 
 	size_t erase(keyType key)
 	{
-        typename std::map<keyType, ptrType>::iterator it = data.find(key);
+        dataIterator it = data.find(key);
 		if(it == data.end()){
 			return 0;
 		}
 		pairType * p = (*it).second.get();
-		for(typename std::deque<ptrType>::iterator it2 = keys.begin(); it2 != keys.end(); ++it2){
+		for(keyIterator it2 = keys.begin(); it2 != keys.end(); ++it2){
 			if((*it2).get() == p){
 				keys.erase(it2);
 				break;
@@ -84,7 +87,7 @@ public:
 		return data.erase(key);
 	}
 
-	class iterator : public std::iterator<std::input_iterator_tag, std::pair<keyType, ptrType>>
+	class iterator : public std::iterator<std::input_iterator_tag, data2Type>
 	{
 	public:
 		friend class reverse_iterator;
@@ -94,7 +97,7 @@ public:
 
 		}
 
-		iterator(const typename std::deque<ptrType>::iterator & in) : it(in)
+		iterator(const keyIterator & in) : it(in)
 		{
 
 		}
@@ -155,16 +158,21 @@ public:
 			return (*it).get();
 		}
 
-		typename std::deque<ptrType>::iterator &real() 
+		keyIterator &real() 
 		{
 			return it;
 		}
 		
 	public:
-		typename std::deque<ptrType>::iterator 	it;
+		keyIterator	it;
 	};
 
-		class const_iterator : public std::iterator<std::input_iterator_tag, std::pair<keyType, ptrType>>
+    typedef iterator fIterator; // Kludge for Microsoft's compiler casting
+                                // const iterator & it to it's parent class
+                                // instead of iterator in
+                                // reverse_iterator(const fIterator& in)...
+
+	class const_iterator : public std::iterator<std::input_iterator_tag, data2Type>
 	{
 	public:
 		friend class reverse_iterator;
@@ -173,12 +181,12 @@ public:
 
 		}
 
-		const_iterator(const typename std::deque<ptrType>::const_iterator & in) : it(in)
+		const_iterator(const typename std::vector<ptrType>::const_iterator & in) : it(in)
 		{
 
 		}
 
-		const_iterator(typename std::deque<ptrType>::iterator & in) : it(in)
+		const_iterator(keyIterator & in) : it(in)
 		{
 
 		}
@@ -188,7 +196,7 @@ public:
 
 		}
 
-		const_iterator(const iterator& in) : it(in.it)
+		const_iterator(const fIterator& in) : it(in.it)
 		{
 
 		}
@@ -244,16 +252,16 @@ public:
 			return (*it).get();
 		}
 
-		const typename std::deque<ptrType>::const_iterator &real() 
+		const typename std::vector<ptrType>::const_iterator &real() 
 		{
 			return it;
 		}
 		
 	public:
-		typename std::deque<ptrType>::const_iterator 	it;
+		typename std::vector<ptrType>::const_iterator 	it;
 	};
 
-	class reverse_iterator : public std::iterator<std::input_iterator_tag, std::pair<keyType, ptrType>>
+	class reverse_iterator : public std::reverse_iterator<iterator>
 	{
 	public:
 		reverse_iterator()
@@ -261,7 +269,7 @@ public:
 
 		}
 
-		reverse_iterator(const typename std::deque<ptrType>::reverse_iterator & in) : it(in)
+		reverse_iterator(const typename std::vector<ptrType>::reverse_iterator & in) : it(in)
 		{
 
 		}
@@ -271,7 +279,7 @@ public:
 
 		}
 
-		reverse_iterator(const iterator& in) : it(typename std::deque<ptrType>::reverse_iterator(in.it))
+		reverse_iterator(const fIterator& in) : it(typename std::vector<ptrType>::reverse_iterator(in.it))
 		{
 
 		}
@@ -327,13 +335,13 @@ public:
 			return (*it).get();
 		}
 
-		typename std::deque<ptrType>::reverse_iterator &real() 
+		typename std::vector<ptrType>::reverse_iterator &real() 
 		{
 			return it;
 		}
 
 	public:
-		typename std::deque<ptrType>::reverse_iterator 	it;
+		typename std::vector<ptrType>::reverse_iterator 	it;
 	};
 
 	iterator begin() 
@@ -368,12 +376,12 @@ public:
 
 	iterator find(keyType key)
 	{
-        typename std::map<keyType, ptrType>::iterator it = data.find(key);
+        dataIterator it = data.find(key);
         if(it == data.end()){
             return keys.end();
         }
-        pairType * p = (*it).second.get();
-		for(typename std::deque<ptrType>::iterator keyIt = keys.begin(); keyIt != keys.end(); ++keyIt){
+        pairType * p = (*it).second;
+		for(keyIterator keyIt = keys.begin(); keyIt != keys.end(); ++keyIt){
 			if((*keyIt).get() == p){
 				return keyIt;
 			}
@@ -389,7 +397,7 @@ public:
 
 	void erase(iterator &start, iterator &finnish)
 	{
-		for(typename std::deque<ptrType>::iterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
+		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
 			data.erase((*keyIt)->first);
 		}
 		
@@ -408,41 +416,41 @@ public:
 
 	bool operator<=(const arbitrary_order_map& rhs) 
 	{
-		return data <= rhs.data;
+		return keys <= rhs.keys;
 	}
 
 	bool operator>=(const arbitrary_order_map& rhs) 
 	{
-		return data >= rhs.data;
+		return keys >= rhs.keys;
 	}
 
 	bool operator>(const arbitrary_order_map& rhs) 
 	{
-		return data > rhs.data;
+		return keys > rhs.keys;
 	}
 
 	bool operator<(const arbitrary_order_map& rhs) 
 	{
-		return data < rhs.data;
+		return keys < rhs.keys;
 	}
 
 	iterator insert(iterator at, pairType  val)
 	{
-		ptrType n(new pairType(val));
-		iterator it = keys.insert(at.real(), n);
+		pairType* n = (new pairType(val));
+		iterator it = keys.insert(at.real(), ptrType(n));
 		data[val.first] = n;
 		return it;
 	}
 
 	void insert(iterator start, iterator finnish)
 	{
-		for(typename std::deque<ptrType>::iterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
+		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
 			insert(end(), *(*keyIt));
 		}
 	}
 protected:
-	std::map<keyType, ptrType>		data;
-	std::deque<ptrType> 			keys;
+	std::map<keyType, pairType*>		data;
+	std::vector<ptrType> 			keys;
 };
 
 #endif
