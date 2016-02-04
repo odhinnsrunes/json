@@ -22,18 +22,30 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
-#ifndef _DATA_HPP
+#if !defined _DATA_HPP || defined _ODATA_HPP_START
+#ifndef _ODATA_HPP_START
 #define _DATA_HPP
+#endif
+
 class TiXmlNode;
 #include "json.hpp"
-namespace data
+
+#ifdef _USE_ADDED_ORDER_
+#define JSON_NAMESPACE ojson
+#define DATA_NAMESPACE odata
+#else 
+#define JSON_NAMESPACE json
+#define DATA_NAMESPACE data
+#endif
+
+namespace DATA_NAMESPACE
 {
 	std::string XMLEscape(const std::string& in, bool bAttribute = false);
 	
-	class document : public json::document
+	class document : public JSON_NAMESPACE::document
 	{
 	public:
-		document() : json::document() { }
+		document() : JSON_NAMESPACE::document() { }
 
 		document(std::string& in) 
 		{
@@ -42,7 +54,7 @@ namespace data
 		document(const char* in) {
 			parseXML(in);
 		}
-		document(const json::value& V) : json::document(V) { }
+		document(const JSON_NAMESPACE::value& V) : JSON_NAMESPACE::document(V) { }
 
 		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
 		typedef std::string& (*PREWRITEPTR)(const std::string& in, std::string& out);
@@ -57,16 +69,19 @@ namespace data
 		std::string rootTag() { return sRootTag; }
 		void rootTag(std::string rootElem) { sRootTag = rootElem; }
 
-		static void stripNameSpaces(json::value & jDoc, json::document jNameSpaces, bool begin = true);
-		static void stripNameSpace(json::value & jDoc, std::string sNameSpace, bool begin = true);
+		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc, JSON_NAMESPACE::document jNameSpaces, bool begin = true);
+		static void stripNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
 
 	private:
-		void parseXMLElement(json::value& ret, const TiXmlNode * elem);
-		void writeXML(std::string & str, json::value & ret, int depth, bool bPretty = true, bool bTabs = true);
+		void parseXMLElement(JSON_NAMESPACE::value& ret, const TiXmlNode * elem);
+		void writeXML(std::string & str, JSON_NAMESPACE::value & ret, int depth, bool bPretty = true, bool bTabs = true);
 
 		std::string sRootTag;
 		
 	};
 }
+
+#undef JSON_NAMESPACE
+#undef DATA_NAMESPACE
 
 #endif //_DATA_HPP

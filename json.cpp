@@ -23,7 +23,6 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 */
 
-
 #include "json.hpp"
 #include <assert.h>
 #include <algorithm>
@@ -35,11 +34,16 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 #include <thread>
 
+#ifdef _USE_ADDED_ORDER_
+#define JSON_NAMESPACE ojson
+#else 
+#define JSON_NAMESPACE json
+#endif
+
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
 #pragma warn - 8026
 #pragma warn - 8027
 #endif
-
 
 #if defined __GNUC__ || __BORLANDC__ >= 0x0600
 #define UNSIGNEDMAX 0xFFFFFFFFFFFFFFFFLL
@@ -54,31 +58,31 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
-void JSONDebug(const char * format, ...) {
-	std::string s;
-	size_t size = 100;
-	bool b = false;
-	va_list marker;
-	while (!b) {
-		size_t n;
-		s.resize(size);
-		va_start(marker, format);
-		n = vsnprintf((char*)s.c_str(), size, format, marker);
-		va_end(marker);
-		b = (n < size);
-		if (n > 0 && n != (size_t)-1 && b) {
-			size = n;
-		} else if (n == (size_t)-1) {
-			size = size * 2; 
-		} else {
-			size = n * 2;
-		}
-	}
-	printf("%s\n", s.c_str());
-}
-
-namespace json
+namespace JSON_NAMESPACE
 {
+	void debug(const char * format, ...) {
+		std::string s;
+		size_t size = 100;
+		bool b = false;
+		va_list marker;
+		while (!b) {
+			size_t n;
+			s.resize(size);
+			va_start(marker, format);
+			n = vsnprintf((char*)s.c_str(), size, format, marker);
+			va_end(marker);
+			b = (n < size);
+			if (n > 0 && n != (size_t)-1 && b) {
+				size = n;
+			} else if (n == (size_t)-1) {
+				size = size * 2; 
+			} else {
+				size = n * 2;
+			}
+		}
+		printf("%s\n", s.c_str());
+	}
+
 	class MovingCharPointer
 	{
 	public:
@@ -1304,7 +1308,7 @@ namespace json
 			if (obj->empty()) {
 				return false;
 			}
-			json::iterator it = obj->find(index);
+			iterator it = obj->find(index);
 			if (it != obj->end()) {
 				switch((*it).isA()){
 					default:
@@ -3062,7 +3066,7 @@ namespace json
 		return std::string(ptr.orig());
 	}
 	
-	bool value::operator==(json::value V) const
+	bool value::operator==(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3099,7 +3103,7 @@ namespace json
 		return !(*this == V);
 	}
 	
-	bool value::operator>(json::value V) const
+	bool value::operator>(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3130,7 +3134,7 @@ namespace json
 		}
 	}
 	
-	bool value::operator<(json::value V) const
+	bool value::operator<(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3161,7 +3165,7 @@ namespace json
 		}
 	}
 	
-	bool value::operator<=(json::value V) const
+	bool value::operator<=(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3192,7 +3196,7 @@ namespace json
 		}
 	}
 	
-	bool value::operator>=(json::value V) const
+	bool value::operator>=(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3223,7 +3227,7 @@ namespace json
 		}
 	}
 	
-	value value::operator+(json::value V) const
+	value value::operator+(value V) const
 	{
 		switch (myType) {
 			default:
@@ -3257,7 +3261,7 @@ namespace json
 		}
 	}
 	
-	value value::operator-(json::value V) const
+	value value::operator-(value V) const
 	{
 		switch (myType) {
 			default:
@@ -3284,7 +3288,7 @@ namespace json
 		}
 	}
 	
-	value value::operator*(json::value V) const
+	value value::operator*(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3300,7 +3304,7 @@ namespace json
 		}
 	}
 	
-	value value::operator/(json::value V) const
+	value value::operator/(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3313,7 +3317,7 @@ namespace json
 		}
 	}
 	
-	value value::operator%(json::value V) const
+	value value::operator%(value V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3326,7 +3330,7 @@ namespace json
 		}
 	}
 	
-	value& value::operator+=(json::value V)
+	value& value::operator+=(value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3359,7 +3363,7 @@ namespace json
 		return *this;
 	}
 	
-	value& value::operator-=(json::value V)
+	value& value::operator-=(value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3385,7 +3389,7 @@ namespace json
 	}
 	
 	
-	value &value::operator*=(json::value V)
+	value &value::operator*=(value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3404,7 +3408,7 @@ namespace json
 		return *this;
 	}
 	
-	value &value::operator/=(json::value V)
+	value &value::operator/=(value V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3423,7 +3427,7 @@ namespace json
 		return *this;
 	}
 	
-	value &value::operator%=(json::value V)
+	value &value::operator%=(value V)
 	{
 		switch (myType) {
 			case JSON_NUMBER:

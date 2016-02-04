@@ -35,7 +35,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
  #include "json.hpp"
  
  int main(int argc, char ** argv) {
- json::document doc;
+ document doc;
  
  for (int i = 0; i < 10; i++) {
  doc["one"][i] = true;
@@ -65,9 +65,10 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
  \endcode
  */
 
-#ifndef JSON_HPP_
+#if !defined JSON_HPP_ || defined OJSON_HPP_START
+#ifndef OJSON_HPP_START
 #define JSON_HPP_
-
+#endif
 #define JSON_DOCUMENT_VERSION "1.0.0"
 
 #ifndef JSON_NUMBER_PRECISION
@@ -95,11 +96,14 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <algorithm>
 #ifdef _USE_ADDED_ORDER_
 #include "arbitrary_order_map.hpp"
+#define JSON_NAMESPACE ojson
+#else 
+#define JSON_NAMESPACE json
 #endif
 
 void JSONDebug(const char *format, ...);
 
-namespace json
+namespace JSON_NAMESPACE
 {
 	enum JSONTypes{
 		JSON_VOID = -1,
@@ -143,7 +147,7 @@ namespace json
 	class reverse_iterator;
 	/*! \brief 	This is the class that does the heavy lifting for the JSON library.
 	 *			However, don't instaitiate this class direcly.  Instead use the
-	 *			json::document class.
+	 *			document class.
 	 */
 	class value
 	{
@@ -423,11 +427,11 @@ namespace json
 		size_t m_size;
 	};
 #ifdef _USE_ADDED_ORDER_
-	typedef arbitrary_order_map<std::string, json::value> myMap;
+	typedef arbitrary_order_map<std::string, value> myMap;
 #else
-	typedef std::map<std::string, json::value> myMap;
+	typedef std::map<std::string, value> myMap;
 #endif
-	typedef std::deque<json::value> myVec;
+	typedef std::deque<value> myVec;
 
 	class object : public myMap
 	{
@@ -513,7 +517,7 @@ namespace json
 	
 	class iterator : public std::iterator<std::input_iterator_tag, value>{
 	public:
-		friend class json::reverse_iterator;
+		friend class reverse_iterator;
 		iterator() {
 			bNone = true;
 			bIsArray = false;
@@ -649,7 +653,8 @@ namespace json
 		bool bSetKey;
 	};
 	
-	class reverse_iterator : public std::iterator<std::input_iterator_tag, value>{
+	class reverse_iterator : public std::reverse_iterator<iterator>
+	{
 	public:
 		reverse_iterator() {
 			bNone = true;
@@ -688,7 +693,7 @@ namespace json
 			bSetKey = false;
 		}
 		
-		reverse_iterator(const json::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)){
+		reverse_iterator(const JSON_NAMESPACE::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)){
 			bNone = it.bNone;
 			// arr_it = myVec::reverse_iterator(it.arr_it);
 			// obj_it = myMap::reverse_iterator(it.obj_it);
@@ -869,5 +874,7 @@ namespace json
 #pragma warn + 8026
 #pragma warn + 8027
 #endif
+
+#undef JSON_NAMESPACE
 
 #endif /* JSON_HPP_ */

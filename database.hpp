@@ -22,9 +22,17 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
+#ifndef _JSON_DATABASE_HPP_
+#define _JSON_DATABASE_HPP_
+
+#ifdef _USE_ADDED_ORDER_
+#define _CANCELLED_ORDER
+#undef _USE_ADDED_ORDER_
+#endif
 
 #include "json.hpp"
 #include <mutex>
+
 
 namespace json
 {
@@ -81,3 +89,10 @@ namespace json
 	
 
 }
+
+#ifdef _CANCELLED_ORDER
+#define _USE_ADDED_ORDER_
+#undef _CANCELLED_ORDER
+#endif
+
+#endif
