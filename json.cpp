@@ -37,9 +37,13 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 #ifdef _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
+#ifndef SUPPORT_ORDERED_JSON
+#define SUPPORT_ORDERED_JSON
+#endif
 #include "json.hpp"
 #define _USE_ADDED_ORDER_
-#include "json.hpp"
+// #undef JSON_HPP_
+// #include "json.hpp"
 #define JSON_NAMESPACE ojson
 #else 
 #include "json.hpp"

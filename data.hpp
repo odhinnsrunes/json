@@ -35,9 +35,14 @@ class TiXmlNode;
 
 #ifdef _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
+#ifndef SUPPORT_ORDERED_JSON
+#define SUPPORT_ORDERED_JSON
+#endif
 #include "json.hpp"
+#include "ojson.hpp"
 #define _USE_ADDED_ORDER_
-#include "json.hpp"
+// #undef JSON_HPP_
+// #include "json.hpp"
 #define JSON_NAMESPACE ojson
 #define DATA_NAMESPACE odata
 #ifndef SUPPORT_ORDERED_JSON
