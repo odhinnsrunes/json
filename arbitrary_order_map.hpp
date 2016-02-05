@@ -28,6 +28,13 @@ public:
 	
     arbitrary_order_map(){}
 
+    arbitrary_order_map(const std::map<keyType, valueType> &map)
+    {
+    	for (auto it = map.begin(); it != map.end(); ++it) {
+    		*this[it->first] = it->second;
+    	}
+    }
+
 	~arbitrary_order_map()
     {
     }
@@ -244,7 +251,7 @@ public:
 
 		const pairType &operator*()
 		{
-			return (*it).get();
+			return **it;
 		}
 
 		const pairType *operator->()

@@ -4,6 +4,13 @@
 #define _USE_ADDED_ORDER_
 
 #define OJSON_HPP_START
+namespace json
+{
+	class value;
+	class document;
+	class object;
+	class array;
+}
 
 #include "json.hpp"
 

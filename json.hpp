@@ -94,9 +94,17 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 #include <list>
 #include <algorithm>
+
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+#include "ojson.hpp"
+#endif
+
 #ifdef _USE_ADDED_ORDER_
 #include "arbitrary_order_map.hpp"
 #define JSON_NAMESPACE ojson
+#ifndef SUPPORT_ORDERED_JSON
+#define SUPPORT_ORDERED_JSON
+#endif
 #else 
 #define JSON_NAMESPACE json
 #endif
@@ -159,7 +167,13 @@ namespace JSON_NAMESPACE
 		friend class query;
 		friend class iterator;
 		friend class reverse_iterator;
-		
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+		friend class ojson::value;
+		friend class ojson::document;
+#elif defined _USE_ADDED_ORDER_
+		friend class json::value;
+		friend class json::document;
+#endif		
 		friend void objectParse(value& ret, instring& inputString, bool* bFailed);
 		
 		friend void arrayParse(value& arr, instring& inputString, bool* bFailed);
@@ -179,10 +193,14 @@ namespace JSON_NAMESPACE
 		
 		value();
 		value(const value& V);
-#ifdef __BORLANDC__
-		value(document& V);
-#else
 		value(const document& V);
+
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+		value(const ojson::value& V);
+		value(const ojson::document& V);
+#elif defined _USE_ADDED_ORDER_
+		value(const json::value& V);
+		value(const json::document& V);
 #endif
 		value(bool V);
 		value(const char* V);
@@ -460,15 +478,36 @@ namespace JSON_NAMESPACE
 			pParentArray = NULL;
 			pParentObject = NULL;
 		}
-		
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+		friend class ojson::object;
+		object(const ojson::object& V)
+		: myMap(V.begin(), V.end()) 
+		{
+			bNotEmpty = V.bNotEmpty;
+			pParentArray = NULL;
+			pParentObject = NULL;
+		}
+		object(const ojson::object* V)
+		: myMap(V->begin(), V->end()) 
+		{
+			bNotEmpty = V->bNotEmpty;
+			pParentArray = NULL;
+			pParentObject = NULL;
+		}
+#elif defined SUPPORT_ORDERED_JSON && defined _USE_ADDED_ORDER_
+		friend class json::object;
+		object(const json::object& V);
+		object(const json::object* V);
+#endif
 		bool empty() const;
 		void setNotEmpty();
         void setParentArray(array * pSetTo);
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		size_t psize(int depth, bool bPretty) const;
-	private:
+	protected:
 		bool bNotEmpty;
+	private:
 		array* pParentArray;
 		object* pParentObject;
 	};
@@ -488,6 +527,25 @@ namespace JSON_NAMESPACE
             pParentArray = NULL;
             pParentObject = NULL;
 		}
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+		friend class ojson::array;
+		array(const ojson::array& V)
+		: myVec(V.begin(), V.end()) {
+			bNotEmpty = V.bNotEmpty;
+            pParentArray = NULL;
+            pParentObject = NULL;
+		}
+		array(const ojson::array* V)
+		: myVec(V->begin(), V->end()) {
+			bNotEmpty = V->bNotEmpty;
+            pParentArray = NULL;
+            pParentObject = NULL;
+		}
+#elif defined SUPPORT_ORDERED_JSON && defined _USE_ADDED_ORDER_
+		friend class json::array;
+		array(const json::array& V);
+		array(const json::array* V);
+#endif
 		array(const array& V)
 		: myVec((myVec)V) {
 			bNotEmpty = V.bNotEmpty;
@@ -509,8 +567,9 @@ namespace JSON_NAMESPACE
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		size_t psize(int depth, bool bPretty) const;
-	private:
+	protected:
 		bool bNotEmpty;
+	private:
 		array* pParentArray;
 		object* pParentObject;
 	};

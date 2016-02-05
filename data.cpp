@@ -22,14 +22,19 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
-#include "data.hpp"
 #include <iomanip>
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/tinystr.h"
+
 #ifdef _USE_ADDED_ORDER_
+#undef _USE_ADDED_ORDER_
+#include "data.hpp"
+#define _USE_ADDED_ORDER_
+#include "data.hpp"
 #define JSON_NAMESPACE ojson
 #define DATA_NAMESPACE odata
 #else 
+#include "data.hpp"
 #define JSON_NAMESPACE json
 #define DATA_NAMESPACE data
 #endif

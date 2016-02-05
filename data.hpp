@@ -28,12 +28,23 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 
 class TiXmlNode;
-#include "json.hpp"
+
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+#include "odata.hpp"
+#endif
 
 #ifdef _USE_ADDED_ORDER_
+#undef _USE_ADDED_ORDER_
+#include "json.hpp"
+#define _USE_ADDED_ORDER_
+#include "json.hpp"
 #define JSON_NAMESPACE ojson
 #define DATA_NAMESPACE odata
+#ifndef SUPPORT_ORDERED_JSON
+#define SUPPORT_ORDERED_JSON
+#endif
 #else 
+#include "json.hpp"
 #define JSON_NAMESPACE json
 #define DATA_NAMESPACE data
 #endif
@@ -56,6 +67,11 @@ namespace DATA_NAMESPACE
 		}
 		document(const JSON_NAMESPACE::value& V) : JSON_NAMESPACE::document(V) { }
 
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+		document(const ojson::value& V) : json::document(V) { }
+#elif defined _USE_ADDED_ORDER_
+		document(const json::value& V) : ojson::document(V) { }
+#endif
 		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
 		typedef std::string& (*PREWRITEPTR)(const std::string& in, std::string& out);
 		bool parseXML(std::string inStr, PREPARSEPTR = NULL, std::string preParseFileName = "");

@@ -23,7 +23,6 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 */
 
-#include "json.hpp"
 #include <assert.h>
 #include <algorithm>
 #include <cmath>
@@ -34,9 +33,16 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #endif
 #include <thread>
 
+
+
 #ifdef _USE_ADDED_ORDER_
+#undef _USE_ADDED_ORDER_
+#include "json.hpp"
+#define _USE_ADDED_ORDER_
+#include "json.hpp"
 #define JSON_NAMESPACE ojson
 #else 
+#include "json.hpp"
 #define JSON_NAMESPACE json
 #endif
 
@@ -1542,11 +1548,8 @@ namespace JSON_NAMESPACE
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
-#ifdef __BORLANDC__
-	value::value(document& V) {
-#else
+
 	value::value(const document& V) {
-#endif
 		m_number = V.m_number;
 		m_places = V.m_places;
 		m_boolean = V.m_boolean;
@@ -1570,6 +1573,149 @@ namespace JSON_NAMESPACE
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
+
+#if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
+	value::value(const ojson::value& V) {
+
+		m_number = V.m_number;
+		m_places = V.m_places;
+		m_boolean = V.m_boolean;
+
+		if (!V.str.empty()) {
+			str.assign(V.str);
+		}
+
+		myType = JSONTypes((int)V.myType);
+
+		obj = NULL;
+		if (V.obj) {
+			obj = new object(V.obj);
+		}
+
+		arr = NULL;
+		if (V.arr) {
+			arr = new array(V.arr);
+		}
+		pParentObject = NULL;
+		pParentArray = NULL;
+		// m_key = V.m_key;
+	}
+	
+	value::value(const ojson::document& V) {
+		m_number = V.m_number;
+		m_places = V.m_places;
+		m_boolean = V.m_boolean;
+
+		if (!V.str.empty()) {
+			str.assign(V.str);
+		}
+
+		myType = JSONTypes((int)V.myType);
+
+		obj = NULL;
+		if (V.obj) {
+			obj = new object(V.obj);
+		}
+
+		arr = NULL;
+		if (V.arr) {
+			arr = new array(V.arr);
+		}
+		pParentObject = NULL;
+		pParentArray = NULL;
+		// m_key = V.m_key;
+	}
+#elif defined _USE_ADDED_ORDER_
+	value::value(const json::value& V) {
+
+		m_number = V.m_number;
+		m_places = V.m_places;
+		m_boolean = V.m_boolean;
+
+		if (!V.str.empty()) {
+			str.assign(V.str);
+		}
+
+		myType = JSONTypes((int)V.myType);
+
+		obj = NULL;
+		if (V.obj) {
+			obj = new object(V.obj);
+		}
+
+		arr = NULL;
+		if (V.arr) {
+			arr = new array(V.arr);
+		}
+		pParentObject = NULL;
+		pParentArray = NULL;
+		// m_key = V.m_key;
+	}
+	
+	value::value(const json::document& V) {
+		m_number = V.m_number;
+		m_places = V.m_places;
+		m_boolean = V.m_boolean;
+
+		if (!V.str.empty()) {
+			str.assign(V.str);
+		}
+
+		myType = JSONTypes((int)V.myType);
+
+		obj = NULL;
+		if (V.obj) {
+			obj = new object(V.obj);
+		}
+
+		arr = NULL;
+		if (V.arr) {
+			arr = new array(V.arr);
+		}
+		pParentObject = NULL;
+		pParentArray = NULL;
+		// m_key = V.m_key;
+	}
+
+	array::array(const json::array& V)
+	: myVec(V.begin(), V.end()) {
+		bNotEmpty = V.bNotEmpty;
+        pParentArray = NULL;
+        pParentObject = NULL;
+	}
+	array::array(const json::array* V)
+	: myVec(V->begin(), V->end()) {
+		bNotEmpty = V->bNotEmpty;
+        pParentArray = NULL;
+        pParentObject = NULL;
+	}
+
+	object::object(const json::object& V)
+	// : myMap((const std::map<std::string, json::value>)V) 
+	{
+		std::map<std::string, json::value> in = (std::map<std::string, json::value>)V;
+		for(auto it = in.begin(); it != in.end(); ++it){
+			(*this).insert(this->end(), *it);
+		}
+
+		bNotEmpty = V.bNotEmpty;
+		pParentArray = NULL;
+		pParentObject = NULL;
+	}
+	object::object(const json::object* V)
+	// : myMap(V) 
+	{
+		std::map<std::string, json::value> in = (std::map<std::string, json::value>)*V;
+		for(auto it = in.begin(); it != in.end(); ++it){
+			(*this).insert(this->end(), *it);
+		}
+
+		bNotEmpty = V->bNotEmpty;
+		pParentArray = NULL;
+		pParentObject = NULL;
+	}
+
+#endif
 
 	std::string value::typeName(JSONTypes type)
 	{
