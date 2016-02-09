@@ -977,7 +977,7 @@ namespace JSON_NAMESPACE
 	std::string & value::makeStringFromNumber(std::string & in, const int &iPlaces, double temp)
 	{
 		if (iPlaces >= 0) {
-			temp = round((double)((i64)(temp * (pow(10, iPlaces))))) / (double)pow(10, iPlaces);
+			temp = round((temp * pow(10, iPlaces))) / pow(10, iPlaces);
 		}
 		std::ostringstream s;
 		s << std::setprecision(JSON_NUMBER_PRECISION) << temp;
@@ -2139,7 +2139,7 @@ namespace JSON_NAMESPACE
 		m_boolean = false;
 
 		if (iDecimalPlaces >= 0 && temp.isA(JSON_NUMBER)) {
-			temp.m_number = round((double)((i64)(temp.m_number * (pow(10, iDecimalPlaces))))) / (double)pow(10, iDecimalPlaces);
+			temp.m_number = round((temp.m_number * pow(10, iDecimalPlaces))) / pow(10, iDecimalPlaces);
 		}
 		str = temp.string();
 		if (iDecimalPlaces >= 0 && temp.isA(JSON_NUMBER)) {
