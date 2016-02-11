@@ -21,15 +21,6 @@
 			<ExpandedItem Condition="second.myType == 5">second.obj</ExpandedItem>
 		</Expand>
 	</Type>
-	<Type Name="json::iterator">
-		<DisplayString Condition="bNone == true">none</DisplayString>
-		<DisplayString Condition="bIsArray == true">array</DisplayString>
-		<DisplayString>object</DisplayString>
-		<Expand>
-			<Item Name="array" Condition="bNone == false &amp;&amp; bIsArray == true">arr_it</Item>
-			<Item Name="object" Condition="bNone == false &amp;&amp; bIsArray == false">obj_it</Item>
-		</Expand>			
-	</Type>
 	<Type Name="json::value">
 		<DisplayString Condition="myType == -1">empty</DisplayString>
 		<DisplayString Condition="myType == 0">null</DisplayString>
@@ -51,6 +42,50 @@
 		</Expand>
 	</Type>
 	<Type Name="json::iterator">
+		<DisplayString Condition="bNone == true">none</DisplayString>
+		<DisplayString Condition="bIsArray == true">array</DisplayString>
+		<DisplayString>object</DisplayString>
+		<Expand>
+			<Item Name="array" Condition="bNone == false &amp;&amp; bIsArray == true">arr_it</Item>
+			<Item Name="object" Condition="bNone == false &amp;&amp; bIsArray == false">obj_it</Item>
+		</Expand>			
+	</Type>
+	<Type Name="ojson::value">
+		<DisplayString Condition="myType == -1">empty</DisplayString>
+		<DisplayString Condition="myType == 0">null</DisplayString>
+		<DisplayString Condition="myType == 1">{m_boolean}</DisplayString>
+		<DisplayString Condition="myType == 3">{str}</DisplayString>
+ 		<DisplayString Condition="myType == 4">array (size={arr-&gt;_Mysize})</DisplayString>
+		<DisplayString Condition="myType == 5">object (size={obj-&gt;data._Mysize})</DisplayString>
+		<DisplayString>{m_number}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="myType == 4">*arr</ExpandedItem>
+			<ExpandedItem Condition="myType == 5">obj-&gt;keys</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="arbitrary_order_map&lt;std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt;, ojson::value &gt;">
+		<DisplayString>keys._Mysize</DisplayString>
+		<Expand>
+			<ExpandedItem>keys</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="std::shared_ptr&lt;std::pair&lt;std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt; const ,ojson::value&gt; &gt;">
+		<DisplayString>{_Ptr-&gt;first}, {_Ptr-&gt;second}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="_Ptr-&gt;second.myType == 4">_Ptr-&gt;second.arr</ExpandedItem>
+			<ExpandedItem Condition="_Ptr-&gt;second.myType == 5">_Ptr-&gt;second.obj-&gt;keys</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="std::vector&lt;std::shared_ptr&lt;std::pair&lt;std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt;,ojson::value&gt; &gt;,std::allocator&lt;std::shared_ptr&lt;std::pair&lt;std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt;,ojson::value&gt; &gt; &gt; &gt;">
+	    <DisplayString>{{ size={_Mylast - _Myfirst} }}</DisplayString>
+	    <Expand>
+	        <ArrayItems>
+	            <Size>_Mylast - _Myfirst</Size>
+	            <ValuePointer>_Myfirst</ValuePointer>
+	        </ArrayItems>
+	    </Expand>
+	</Type>
+	<Type Name="ojson::iterator">
 		<DisplayString Condition="bNone == true">none</DisplayString>
 		<DisplayString Condition="bIsArray == true">array</DisplayString>
 		<DisplayString>object</DisplayString>
