@@ -1391,10 +1391,27 @@ namespace JSON_NAMESPACE
 	}
 	
 	iterator value::insert(iterator position, value V) {
-		if (!position.IsArray() || myType != JSON_ARRAY)
+		if (position.IsArray() && myType == JSON_ARRAY) {
+			return iterator(arr->insert(position.arr(), V));
+#ifdef _USE_ADDED_ORDER_
+		} else if (!position.IsArray() && !position.None() && myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
+			return iterator(obj->insert(position.obj(), V.begin().obj(), V.end().obj()));
+#else
+		} else if (myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
+			obj->insert(V.begin().obj(), V.end().obj());
+			return obj->find(V.begin().key().string());
+#endif
+		} else {
 			return iterator();
-		
-		return iterator(arr->insert(position.arr(), V));
+		}		
+	}
+	
+	iterator value::insert(iterator position, std::string key, value V) {
+		if(!position.IsArray() && !position.None() && myType == JSON_OBJECT) {
+			return iterator(obj->insert(position.obj(), std::pair<std::string, value>(key, V)));
+		} else {
+			return iterator();
+		}		
 	}
 	
 	void value::insert(iterator position, iterator first, iterator last) {
@@ -1417,7 +1434,11 @@ namespace JSON_NAMESPACE
 				obj = NULL;
 			}
 			arr->insert(position.arr(), first.arr(), last.arr());
-		} else if (!position.IsArray() && !first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
+#ifdef _USE_ADDED_ORDER_
+		} else if (!position.IsArray() && !position.None() && !first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
+#else
+		} else if (!first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
+#endif
 			if (myType != JSON_OBJECT || obj == NULL) {
 				m_number = 0;
 				m_places = -1;
@@ -1435,7 +1456,11 @@ namespace JSON_NAMESPACE
 					delete arr;
 				arr = NULL;
 			}
+#ifdef _USE_ADDED_ORDER_
+			obj->insert(position.obj(), first.obj(), last.obj());
+#else
 			obj->insert(first.obj(), last.obj());
+#endif
 		}
 	}
 	

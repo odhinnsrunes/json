@@ -299,8 +299,9 @@ namespace JSON_NAMESPACE
 		
 		iterator insert(size_t index, value V);							  // Array
 		iterator insert(std::string index, value V);						 // Object
-		iterator insert(iterator position, value V);						 // Array / Object
-		void insert(iterator position, iterator first, iterator last);  // Array / Object (position ignored)
+		iterator insert(iterator position, std::string key, value V);						 // Object
+		iterator insert(iterator position, value V);						 // Array 
+		void insert(iterator position, iterator first, iterator last);  // Array / Object (position ignored unless ojson)
 		void insert(iterator first, iterator last);					 // Array (append) / Object
 		
 		void resize(size_t iCount);

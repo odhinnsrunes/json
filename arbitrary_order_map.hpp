@@ -443,17 +443,37 @@ public:
 
 	iterator insert(iterator at, pairType  val)
 	{
+		if (data.find(val.first) != data.end()) {
+			for (auto it = keys.begin(); it != keys.end(); ++it) {
+				if ((*it)->first == val.first) {
+					(*it)->second = val.second;
+					return it;
+				}
+			}
+		}
 		pairType* n = (new pairType(val));
 		iterator it = keys.insert(at.real(), ptrType(n));
 		data[val.first] = n;
 		return it;
 	}
 
-	void insert(iterator start, iterator finnish)
+	iterator insert(iterator start, iterator finnish)
 	{
+		iterator insIt = end();
 		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
-			insert(end(), *(*keyIt));
+			insIt = insert(end(), *(*keyIt));
 		}
+		return insIt;
+	}
+
+	iterator insert(iterator at, iterator start, iterator finnish)
+	{
+		iterator insIt = at;
+		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
+			insIt = insert(insIt, *(*keyIt));
+			++insIt;
+		}
+		return insIt;
 	}
 protected:
 	std::map<keyType, pairType*>		data;
