@@ -83,9 +83,31 @@ namespace DATA_NAMESPACE
 
 		bool parseXMLFile(std::string inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
 
-		std::string writeXML(std::string rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+		std::string writeXML(const char * in, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
+		{ 
+			return writeXML(std::string(in), bPretty, bTabs, pre); 
+		}
 
-		bool writeXMLFile(std::string inStr, std::string rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);	
+		std::string writeXML(std::string rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+		std::string writeXML(bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+
+		bool writeXMLFile(std::string inStr, std::string rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);		
+		bool writeXMLFile(const char * in, const char * root, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
+		{
+			return writeXMLFile(std::string(in), std::string(root), bPretty, bTabs, pre); 
+		}
+
+		bool writeXMLFile(std::string in, const char * root, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
+		{
+			return writeXMLFile(in, std::string(root), bPretty, bTabs, pre); 
+		}
+
+		bool writeXMLFile(const char * in, std::string root, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
+		{
+			return writeXMLFile(std::string(in), root, bPretty, bTabs, pre); 
+		}
+
+		bool writeXMLFile(std::string inStr, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);	
 	
 		std::string rootTag() { return sRootTag; }
 		void rootTag(std::string rootElem) { sRootTag = rootElem; }

@@ -575,10 +575,15 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 
 std::string document::writeXML(std::string rootElem, bool bPretty, bool bTabs, PREWRITEPTR preWriter)
 {
-	std::string ret;
 	if (rootElem.size()) {
 		sRootTag = rootElem;
 	}
+	return writeXML(bPretty, bTabs, preWriter);
+}
+
+std::string document::writeXML(bool bPretty, bool bTabs, PREWRITEPTR preWriter)
+{
+	std::string ret;
 	int iStartDepth = 0;
 	if (sRootTag.size()) {
 		ret = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
@@ -640,6 +645,18 @@ bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPrett
 	FILE* fd = fopen(inStr.c_str(), "wb");
 	if (fd) {
 		std::string w = writeXML(rootElem, bPretty, bTabs, preWriter);
+		fwrite(w.data(), 1, w.size(), fd);
+		fclose(fd);
+		return true;
+	}
+	return false;
+}
+
+bool document::writeXMLFile(std::string inStr, bool bPretty, bool bTabs, PREWRITEPTR preWriter)
+{
+	FILE* fd = fopen(inStr.c_str(), "wb");
+	if (fd) {
+		std::string w = writeXML(bPretty, bTabs, preWriter);
 		fwrite(w.data(), 1, w.size(), fd);
 		fclose(fd);
 		return true;
