@@ -290,9 +290,9 @@ namespace JSON_NAMESPACE
 		value pop_front();											   // Array
 		
 		void erase(size_t index);									   // Array
-		void erase(std::string index);								  // Object
-		void erase(iterator it);										// Array / Object
-		void erase(iterator first, iterator last);					  // Array / Object
+		size_t erase(std::string index);								  // Object
+		iterator erase(iterator it);										// Array / Object
+		iterator erase(iterator first, iterator last);					  // Array / Object
 
 		bool exists(size_t index);
 		bool exists(std::string index);

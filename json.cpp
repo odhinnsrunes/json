@@ -1270,30 +1270,35 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	void value::erase(std::string index) {
+	size_t value::erase(std::string index) {
 		if (obj) {
 			myMap::iterator it;
 			it = obj->find(index);
-			if (it != obj->end())
+			if (it != obj->end()){
 				obj->erase(it);
+				return 1;
+			}
 		}
+		return 0;
 	}
 	
-	void value::erase(iterator it) {
+	iterator value::erase(iterator it) {
 		if (it.IsArray() && arr) {
-			arr->erase(it.arr());
-		} else if (!it.None() && obj) {
-			obj->erase(it.obj());
+			return arr->erase(it.arr());
+		} else if (!it.IsArray() && !it.None() && obj) {
+			return obj->erase(it.obj());
 		}
+		return iterator();
 	}
 
-	void value::erase(iterator first, iterator last)
+	iterator value::erase(iterator first, iterator last)
 	{
-		if (first.IsArray()  && last.IsArray() && arr) {
+		if (first.IsArray() && last.IsArray() && arr) {
 			arr->erase(first.arr(), last.arr());
-		} else if (!first.None() && !last.None() && obj) {
+		} else if (!first.IsArray() && !last.IsArray() && !first.None() && !last.None() && obj) {
 			obj->erase(first.obj(), last.obj());
 		}
+		return iterator();
 	}
 
 	bool value::exists(size_t index) {

@@ -396,19 +396,19 @@ public:
 		return keys.end();
 	}
 
-	void erase(iterator it)
+	iterator erase(iterator it)
 	{
 		data.erase((*it).first);
-		keys.erase(it.real());
+		return keys.erase(it.real());
 	}
 
-	void erase(iterator &start, iterator &finnish)
+	iterator erase(iterator &start, iterator &finnish)
 	{
 		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
 			data.erase((*keyIt)->first);
 		}
 		
-		keys.erase(start.real(), finnish.real());
+		return keys.erase(start.real(), finnish.real());
 	}
 
 	bool operator==(const arbitrary_order_map& rhs) 
