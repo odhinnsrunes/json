@@ -26,7 +26,7 @@ public:
     typedef std::pair<keyType, pairType*> dataType;
     typedef std::pair<keyType, pairType> data2Type;
 	
-    arbitrary_order_map(){}
+    arbitrary_order_map() {}
 
     arbitrary_order_map(const std::map<keyType, valueType> &map)
     {
@@ -42,7 +42,7 @@ public:
 	valueType &operator[](const keyType &key)
 	{
         dataIterator it = data.find(key);
-		if(it == data.end()){
+		if (it == data.end()) {
             pairType* p = new pairType(key, valueType());
             keys.emplace_back(ptrType(p));
             data.emplace_hint(data.end(), dataType(key, p));
@@ -80,12 +80,12 @@ public:
 	size_t erase(keyType key)
 	{
         dataIterator it = data.find(key);
-		if(it == data.end()){
+		if (it == data.end()) {
 			return 0;
 		}
 		pairType * p = (*it).second.get();
-		for(keyIterator it2 = keys.begin(); it2 != keys.end(); ++it2){
-			if((*it2).get() == p){
+		for (keyIterator it2 = keys.begin(); it2 != keys.end(); ++it2) {
+			if ((*it2).get() == p) {
 				keys.erase(it2);
 				break;
 			}
@@ -384,12 +384,12 @@ public:
 	iterator find(keyType key)
 	{
         dataIterator it = data.find(key);
-        if(it == data.end()){
+        if (it == data.end()) {
             return keys.end();
         }
         pairType * p = (*it).second;
-		for(keyIterator keyIt = keys.begin(); keyIt != keys.end(); ++keyIt){
-			if((*keyIt).get() == p){
+		for (keyIterator keyIt = keys.begin(); keyIt != keys.end(); ++keyIt) {
+			if ((*keyIt).get() == p) {
 				return keyIt;
 			}
 		}
@@ -404,7 +404,7 @@ public:
 
 	iterator erase(iterator &start, iterator &finnish)
 	{
-		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
+		for (keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt) {
 			data.erase((*keyIt)->first);
 		}
 		
@@ -460,7 +460,7 @@ public:
 	iterator insert(iterator start, iterator finnish)
 	{
 		iterator insIt = end();
-		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
+		for (keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt) {
 			insIt = insert(end(), *(*keyIt));
 		}
 		return insIt;
@@ -469,7 +469,7 @@ public:
 	iterator insert(iterator at, iterator start, iterator finnish)
 	{
 		iterator insIt = at;
-		for(keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt){
+		for (keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt) {
 			insIt = insert(insIt, *(*keyIt));
 			++insIt;
 		}

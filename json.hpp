@@ -683,7 +683,7 @@ namespace JSON_NAMESPACE
 			bIsArray = false;
 			bSetKey = false;
 		}
-		iterator(const myMap::iterator & it) : obj_it(it){
+		iterator(const myMap::iterator & it) : obj_it(it) {
 			bNone = false;
 			// obj_it = it;
 			bIsArray = false;
@@ -704,7 +704,7 @@ namespace JSON_NAMESPACE
 			bSetKey = false;
 		}
 		~iterator() {
-			if(bSetKey){
+			if (bSetKey) {
 				obj_it->second.m_key.clear();
 			}
 		}
@@ -714,7 +714,7 @@ namespace JSON_NAMESPACE
 				if (bIsArray) {
 					++arr_it;
 				} else {
-					if(bSetKey){
+					if (bSetKey) {
 						obj_it->second.m_key.clear();
 						bSetKey = false;
 					}
@@ -735,7 +735,7 @@ namespace JSON_NAMESPACE
 				if (bIsArray) {
 					--arr_it;
 				} else {
-					if(bSetKey){
+					if (bSetKey) {
 						obj_it->second.m_key.clear();
 						bSetKey = false;
 					}
@@ -776,7 +776,7 @@ namespace JSON_NAMESPACE
 				if (bIsArray) {
 					return *arr_it;
 				} else {
-					if(!bSetKey){
+					if (!bSetKey) {
 						obj_it->second.m_key.assign(obj_it->first);
 						bSetKey = true;
 					}
@@ -853,7 +853,7 @@ namespace JSON_NAMESPACE
 			bSetKey = false;
 		}
 		
-		reverse_iterator(const JSON_NAMESPACE::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)){
+		reverse_iterator(const JSON_NAMESPACE::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)) {
 			bNone = it.bNone;
 			// arr_it = myVec::reverse_iterator(it.arr_it);
 			// obj_it = myMap::reverse_iterator(it.obj_it);
@@ -862,7 +862,7 @@ namespace JSON_NAMESPACE
 		}
 		~reverse_iterator() 
 		{
-			if(bSetKey){
+			if (bSetKey) {
 				obj_it->second.m_key.clear();
 			}
 		}
@@ -872,7 +872,7 @@ namespace JSON_NAMESPACE
 				if (bIsArray) {
 					++arr_it;
 				} else {
-					if(bSetKey){
+					if (bSetKey) {
 						obj_it->second.m_key.clear();
 						bSetKey = false;
 					}
@@ -893,7 +893,7 @@ namespace JSON_NAMESPACE
 				if (bIsArray) {
 					--arr_it;
 				} else {
-					if(bSetKey){
+					if (bSetKey) {
 						obj_it->second.m_key.clear();
 						bSetKey = false;
 					}
@@ -934,7 +934,7 @@ namespace JSON_NAMESPACE
 				if (bIsArray) {
 					return *arr_it;
 				} else {
-					if(!bSetKey){
+					if (!bSetKey) {
 						(obj_it->second).m_key.assign(obj_it->first);
 						bSetKey = true;
 					}
