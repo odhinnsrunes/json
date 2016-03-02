@@ -411,32 +411,32 @@ public:
 		return keys.erase(start.real(), finnish.real());
 	}
 
-	bool operator==(const arbitrary_order_map& rhs) 
+	bool operator==(const arbitrary_order_map& rhs) const
 	{
 		return data == rhs.data;
 	}
 
-	bool operator!=(const arbitrary_order_map& rhs) 
+	bool operator!=(const arbitrary_order_map& rhs) const
 	{
 		return data != rhs.data;
 	}
 
-	bool operator<=(const arbitrary_order_map& rhs) 
+	bool operator<=(const arbitrary_order_map& rhs) const
 	{
 		return keys <= rhs.keys;
 	}
 
-	bool operator>=(const arbitrary_order_map& rhs) 
+	bool operator>=(const arbitrary_order_map& rhs) const
 	{
 		return keys >= rhs.keys;
 	}
 
-	bool operator>(const arbitrary_order_map& rhs) 
+	bool operator>(const arbitrary_order_map& rhs) const
 	{
 		return keys > rhs.keys;
 	}
 
-	bool operator<(const arbitrary_order_map& rhs) 
+	bool operator<(const arbitrary_order_map& rhs) const
 	{
 		return keys < rhs.keys;
 	}

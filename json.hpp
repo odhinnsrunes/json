@@ -109,10 +109,11 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #define JSON_NAMESPACE json
 #endif
 
-void JSONDebug(const char *format, ...);
 
 namespace JSON_NAMESPACE
 {
+	void debug(const char *format, ...);
+	
 	enum JSONTypes{
 		JSON_VOID = -1,
 		JSON_NULL,
@@ -452,7 +453,7 @@ namespace JSON_NAMESPACE
 #endif
 	typedef std::deque<value> myVec;
 
-	class object : public myMap
+	class object : private myMap
 	{
 	public:
 		object()
@@ -500,6 +501,54 @@ namespace JSON_NAMESPACE
 		object(const json::object& V);
 		object(const json::object* V);
 #endif
+
+		using myMap::size;
+		using myMap::find;
+		using myMap::begin;
+		using myMap::end;
+		using myMap::rbegin;
+		using myMap::rend;
+		using myMap::insert;
+		using myMap::erase;
+		using myMap::iterator;
+		using myMap::reverse_iterator;
+		using myMap::const_iterator;
+
+		bool operator==(const object & rhs) const
+		{
+			return static_cast<const myMap&>(*this) == static_cast<const myMap&>(rhs);
+		}
+
+		bool operator>(const object & rhs) const
+		{
+			return static_cast<const myMap&>(*this) > static_cast<const myMap&>(rhs);
+		}
+
+		bool operator<(const object & rhs) const
+		{
+			return static_cast<const myMap&>(*this) < static_cast<const myMap&>(rhs);
+		}
+
+		bool operator>=(const object & rhs) const
+		{
+			return static_cast<const myMap&>(*this) >= static_cast<const myMap&>(rhs);
+		}
+
+		bool operator<=(const object & rhs) const
+		{
+			return static_cast<const myMap&>(*this) <= static_cast<const myMap&>(rhs);
+		}
+
+		bool operator!=(const object & rhs) const
+		{
+			return static_cast<const myMap&>(*this) != static_cast<const myMap&>(rhs);
+		}
+
+		value & operator[](const std::string & key)
+		{
+			return static_cast<myMap&>(*this)[key];
+		}
+
 		bool empty() const;
 		void setNotEmpty();
         void setParentArray(array * pSetTo);
@@ -513,7 +562,7 @@ namespace JSON_NAMESPACE
 		object* pParentObject;
 	};
 	
-	class array : public myVec
+	class array : private myVec
 	{
 	public:
 		array()
@@ -562,6 +611,57 @@ namespace JSON_NAMESPACE
 		~array() {
 		}
 		
+		using myVec::size;
+		using myVec::resize;
+		using myVec::at;
+		using myVec::begin;
+		using myVec::end;
+		using myVec::rbegin;
+		using myVec::rend;
+		using myVec::insert;
+		using myVec::erase;
+		using myVec::iterator;
+		using myVec::reverse_iterator;
+		using myVec::const_iterator;
+		using myVec::pop_front;
+		using myVec::pop_back;
+		using myVec::push_front;
+		using myVec::push_back;
+		using myVec::emplace_front;
+		using myVec::emplace_back;
+		using myVec::front;
+		using myVec::back;
+
+		bool operator==(const array & rhs) const
+		{
+			return static_cast<const myVec&>(*this) == static_cast<const myVec&>(rhs);
+		}
+
+		bool operator>(const array & rhs) const
+		{
+			return static_cast<const myVec&>(*this) > static_cast<const myVec&>(rhs);
+		}
+
+		bool operator<(const array & rhs) const
+		{
+			return static_cast<const myVec&>(*this) < static_cast<const myVec&>(rhs);
+		}
+
+		bool operator>=(const array & rhs) const
+		{
+			return static_cast<const myVec&>(*this) >= static_cast<const myVec&>(rhs);
+		}
+
+		bool operator<=(const array & rhs) const
+		{
+			return static_cast<const myVec&>(*this) <= static_cast<const myVec&>(rhs);
+		}
+
+		bool operator!=(const array & rhs) const
+		{
+			return static_cast<const myVec&>(*this) != static_cast<const myVec&>(rhs);
+		}
+
 		bool empty() const;
 		void setNotEmpty();
         void setParentArray(array * pSetTo);
