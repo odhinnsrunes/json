@@ -1288,6 +1288,11 @@ namespace JSON_NAMESPACE
 		} else if (!it.IsArray() && !it.None() && obj) {
 			return obj->erase(it.obj());
 		}
+        if (arr != NULL) {
+            return arr->end();
+        } else if (obj != NULL) {
+            return obj->end();
+        }
 		return iterator();
 	}
 
@@ -3289,7 +3294,7 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return false;
+                return false;
 				
 			case JSON_BOOLEAN:
 				return m_boolean != V.boolean();
@@ -3320,7 +3325,11 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return false;
+                if (V.myType > JSON_NULL) {
+                    return true;
+                } else {
+                    return false;
+                }
 				
 			case JSON_BOOLEAN:
 				return m_boolean != V.boolean();
@@ -3351,8 +3360,12 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return true;
-				
+                if (V.myType > JSON_NULL) {
+                    return true;
+                } else {
+                    return false;
+                }
+                
 			case JSON_BOOLEAN:
 				return true;
 				
@@ -3382,7 +3395,11 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-				return true;
+                if (V.myType > JSON_NULL) {
+                    return false;
+                } else {
+                    return true;
+                }
 				
 			case JSON_BOOLEAN:
 				return true;
