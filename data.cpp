@@ -369,8 +369,16 @@ std::string XMLEscape(const std::string& in, bool bAttribute) {
 	for (std::string::const_iterator it = in.begin(); it != in.end(); ++it) {
 		switch (*it) {
 			default:
-				out.push_back(*it);
+			{
+				if (*it < ' ') {
+					std::stringstream stream;
+					stream << "&#x" << std::hex << int(*it) << ";";
+					out.append(stream.str());
+				} else {
+					out.push_back(*it);
+				}
 				break;
+			}
 			case '&':
 				out.append("&amp;");
 				break;
