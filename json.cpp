@@ -2132,6 +2132,8 @@ namespace JSON_NAMESPACE
         } else if (pParentArray) {
             arr->setParentArray(pParentArray);
         }
+		temp.setParentArray(arr);
+		temp.setParentObject(NULL);
 		(*this)[0] = temp;
 		return *this;
 	}
@@ -2783,6 +2785,26 @@ namespace JSON_NAMESPACE
 			pParentArray->setNotEmpty();
 		} else if (pParentObject) {
 			pParentObject->setNotEmpty();
+		}
+	}
+
+	void value::setParentObject(object* pSetTo)
+	{
+		pParentObject = pSetTo;
+		if (arr) {
+			arr->setParentObject(pSetTo);
+		} else if (obj) {
+			obj->setParentObject(pSetTo);
+		}
+	}
+
+	void value::setParentArray(array* pSetTo)
+	{
+		pParentArray = pSetTo;
+		if (arr) {
+			arr->setParentArray(pSetTo);
+		} else if (obj) {
+			obj->setParentArray(pSetTo);
 		}
 	}
 

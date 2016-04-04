@@ -224,15 +224,9 @@ namespace JSON_NAMESPACE
 		
 		~value();
 		
-		void setParentObject(object* pSetTo)
-		{
-			pParentObject = pSetTo;
-		}
+		void setParentObject(object* pSetTo);
 
-		void setParentArray(array* pSetTo)
-		{
-			pParentArray = pSetTo;
-		}
+		void setParentArray(array* pSetTo);
 
 		value& operator=(const value& V);
 		// value& operator=(const bool &V);
