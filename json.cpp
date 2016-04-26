@@ -2132,6 +2132,8 @@ namespace JSON_NAMESPACE
         } else if (pParentArray) {
             arr->setParentArray(pParentArray);
         }
+		temp.setParentArray(arr);
+		temp.setParentObject(NULL);
 		(*this)[0] = temp;
 		return *this;
 	}
@@ -2168,8 +2170,11 @@ namespace JSON_NAMESPACE
 		m_places = iDecimalPlaces;
 		if (myType == JSON_STRING) {
 			return *this;
-		}
+        } else if(myType == JSON_NUMBER) {
+            str.clear();
+        }
 		value temp = *this;
+		temp.str.clear();
 		m_number = 0;
 		m_boolean = false;
 
@@ -2226,14 +2231,13 @@ namespace JSON_NAMESPACE
 
 	value & value::toNumber()
 	{
+        str.clear();
 		if (myType == JSON_NUMBER) {
 			return *this;
 		}
 		value temp = *this;
 		m_number = temp.number();
 		m_boolean = false;
-
-		str.clear();
 		
 		myType = JSON_NUMBER;
 		if (arr)
@@ -2251,6 +2255,7 @@ namespace JSON_NAMESPACE
 		if (iPlaces > JSON_NUMBER_PRECISION) {
 			iPlaces = JSON_NUMBER_PRECISION;
 		}
+		toNumber();
 		m_places = iPlaces;
 
 		return *this;
@@ -2783,6 +2788,26 @@ namespace JSON_NAMESPACE
 			pParentArray->setNotEmpty();
 		} else if (pParentObject) {
 			pParentObject->setNotEmpty();
+		}
+	}
+
+	void value::setParentObject(object* pSetTo)
+	{
+		pParentObject = pSetTo;
+		if (arr) {
+			arr->setParentObject(pSetTo);
+		} else if (obj) {
+			obj->setParentObject(pSetTo);
+		}
+	}
+
+	void value::setParentArray(array* pSetTo)
+	{
+		pParentArray = pSetTo;
+		if (arr) {
+			arr->setParentArray(pSetTo);
+		} else if (obj) {
+			obj->setParentArray(pSetTo);
 		}
 	}
 
