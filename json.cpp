@@ -3360,11 +3360,7 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-                if (V.myType > JSON_NULL) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return true;
                 
 			case JSON_BOOLEAN:
 				return true;
