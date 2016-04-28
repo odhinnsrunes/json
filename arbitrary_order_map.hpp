@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 #include <memory>
-
+#include <iostream>
 template<class keyType, class valueType, class A = std::allocator<valueType> >
 class arbitrary_order_map
 {
@@ -37,6 +37,13 @@ public:
 
 	~arbitrary_order_map()
     {
+    }
+
+    arbitrary_order_map(const arbitrary_order_map & V)
+    {
+    	for (auto it = V.keys.begin(); it != V.keys.end(); ++it) {
+    		(*this)[(*it)->first] = ((*it)->second);
+    	}
     }
 
 	valueType &operator[](const keyType &key)
