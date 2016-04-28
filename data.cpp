@@ -345,8 +345,10 @@ bool document::parseXMLFile(std::string inStr, PREPARSEPTR preParser, bool bReWr
 		char* buffer = new char[l + 1];
 
 		buffer[l] = 0;
-		fread(buffer, 1, l, fd);
-
+		size_t br = fread(buffer, 1, l, fd);
+		if (debug && br != l) {
+			debug("File size mismatch in %s.", inStr.c_str());
+		}
 		fclose(fd);
 		bool bRetVal;
 		std::string sDat(buffer, l);
