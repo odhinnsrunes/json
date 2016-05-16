@@ -19,41 +19,54 @@ public:
 //        keyType first;
 //        valueType second;
 //    };
-    typedef std::pair<keyType, valueType> pairType;
-    typedef std::shared_ptr<pairType> ptrType;
+	typedef std::pair<keyType, valueType> pairType;
+	typedef std::shared_ptr<pairType> ptrType;
 	typedef typename std::map<keyType, pairType*>::iterator dataIterator;
 	typedef typename std::vector<ptrType>::iterator keyIterator;
-    typedef std::pair<keyType, pairType*> dataType;
-    typedef std::pair<keyType, pairType> data2Type;
+	typedef std::pair<keyType, pairType*> dataType;
+	typedef std::pair<keyType, pairType> data2Type;
 	
-    arbitrary_order_map() {}
+	arbitrary_order_map() {}
 
-    arbitrary_order_map(const std::map<keyType, valueType> &map)
-    {
-    	for (auto it = map.begin(); it != map.end(); ++it) {
-    		*this[it->first] = it->second;
-    	}
-    }
+	arbitrary_order_map(const std::map<keyType, valueType> &map)
+	{
+		for (auto it = map.begin(); it != map.end(); ++it) {
+			*this[it->first] = it->second;
+		}
+	}
 
 	~arbitrary_order_map()
-    {
-    }
+	{
+	}
 
-    arbitrary_order_map(const arbitrary_order_map & V)
-    {
-    	for (auto it = V.keys.begin(); it != V.keys.end(); ++it) {
-    		(*this)[(*it)->first] = ((*it)->second);
-    	}
-    }
+	arbitrary_order_map(const arbitrary_order_map & V)
+	{
+		for (auto it = V.keys.begin(); it != V.keys.end(); ++it) {
+			(*this)[(*it)->first] = ((*it)->second);
+		}
+	}
+
+	arbitrary_order_map& operator=(const arbitrary_order_map& V)
+	{
+		if(this == &V) {
+			return *this;
+		}
+
+		for (auto it = V.keys.begin(); it != V.keys.end(); ++it) {
+			(*this)[(*it)->first] = ((*it)->second);
+		}
+
+		return *this;
+	}
 
 	valueType &operator[](const keyType &key)
 	{
-        dataIterator it = data.find(key);
+		dataIterator it = data.find(key);
 		if (it == data.end()) {
-            pairType* p = new pairType(key, valueType());
-            keys.emplace_back(ptrType(p));
-            data.emplace_hint(data.end(), dataType(key, p));
-            return p->second;
+			pairType* p = new pairType(key, valueType());
+			keys.emplace_back(ptrType(p));
+			data.emplace_hint(data.end(), dataType(key, p));
+			return p->second;
 		}
 		return ((*it).second)->second;
 	}
@@ -86,7 +99,7 @@ public:
 
 	size_t erase(keyType key)
 	{
-        dataIterator it = data.find(key);
+		dataIterator it = data.find(key);
 		if (it == data.end()) {
 			return 0;
 		}
@@ -181,10 +194,10 @@ public:
 		keyIterator	it;
 	};
 
-    typedef iterator fIterator; // Kludge for Microsoft's compiler casting
-                                // const iterator & it to it's parent class
-                                // instead of iterator in
-                                // reverse_iterator(const fIterator& in)...
+	typedef iterator fIterator; // Kludge for Microsoft's compiler casting
+								// const iterator & it to it's parent class
+								// instead of iterator in
+								// reverse_iterator(const fIterator& in)...
 
 	class const_iterator : public std::iterator<std::input_iterator_tag, data2Type>
 	{
@@ -390,11 +403,11 @@ public:
 
 	iterator find(keyType key)
 	{
-        dataIterator it = data.find(key);
-        if (it == data.end()) {
-            return keys.end();
-        }
-        pairType * p = (*it).second;
+		dataIterator it = data.find(key);
+		if (it == data.end()) {
+			return keys.end();
+		}
+		pairType * p = (*it).second;
 		for (keyIterator keyIt = keys.begin(); keyIt != keys.end(); ++keyIt) {
 			if ((*keyIt).get() == p) {
 				return keyIt;
