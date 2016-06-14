@@ -34,3 +34,30 @@ add_library(json STATIC $<TARGET_OBJECTS:ajson> ${OJSON_OBJECTS} ${ODATA_OBJECTS
 target_compile_definitions(json PUBLIC SUPPORT_ORDERED_JSON)
 set_property(TARGET json PROPERTY CXX_STANDARD 11)
 
+if(DATA_DOCUMENT)
+if(ORDERED_JSON)
+if(SAMPLES)
+
+add_executable(json2xml json2xml.cpp)
+target_compile_definitions(json2xml PRIVATE SUPPORT_ORDERED_JSON)
+set_property(TARGET json2xml PROPERTY CXX_STANDARD 11)
+target_link_libraries(json2xml PRIVATE json)
+
+add_executable(xml2json json2xml.cpp)
+target_compile_definitions(xml2json PRIVATE SUPPORT_ORDERED_JSON)
+set_property(TARGET xml2json PROPERTY CXX_STANDARD 11)
+target_link_libraries(xml2json PRIVATE json)
+
+add_executable(jsonpretty json2xml.cpp)
+target_compile_definitions(jsonpretty PRIVATE SUPPORT_ORDERED_JSON)
+set_property(TARGET jsonpretty PROPERTY CXX_STANDARD 11)
+target_link_libraries(jsonpretty PRIVATE json)
+
+add_executable(xmlpretty json2xml.cpp)
+target_compile_definitions(xmlpretty PRIVATE SUPPORT_ORDERED_JSON)
+set_property(TARGET xmlpretty PROPERTY CXX_STANDARD 11)
+target_link_libraries(xmlpretty PRIVATE json)
+
+endif(SAMPLES)
+endif(ORDERED_JSON)
+endif(DATA_DOCUMENT)
