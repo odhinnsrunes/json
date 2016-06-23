@@ -61,24 +61,69 @@ namespace DATA_NAMESPACE
 	class document : public JSON_NAMESPACE::document
 	{
 	public:
-		document() : JSON_NAMESPACE::document() { }
+		document() : JSON_NAMESPACE::document() 
+		{
+			bForceXMLHeader = false;
+			bNoXMLHeader = false;
+			bStandAlone = true;
+		}
 
 		document(std::string& in) 
 		{
+			bForceXMLHeader = false;
+			bNoXMLHeader = false;
+			bStandAlone = true;
 			parseXML(in);
 		}
 		document(const char* in) {
+			bForceXMLHeader = false;
+			bNoXMLHeader = false;
+			bStandAlone = true;
 			parseXML(in);
 		}
-		document(const JSON_NAMESPACE::value& V) : JSON_NAMESPACE::document(V) { }
+		document(const JSON_NAMESPACE::value& V) : JSON_NAMESPACE::document(V)
+		{
+			bForceXMLHeader = false;
+			bNoXMLHeader = false;
+			bStandAlone = true;
+		}
 
 #if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
-		document(const ojson::value& V) : json::document(V) { }
+		document(const ojson::value& V) : json::document(V)
+		{
+			bForceXMLHeader = false;
+			bNoXMLHeader = false;
+			bStandAlone = true;
+		}
 #elif defined _USE_ADDED_ORDER_
-		document(const json::value& V) : ojson::document(V) { }
+		document(const json::value& V) : ojson::document(V)
+		{
+			bForceXMLHeader = false;
+			bNoXMLHeader = false;
+			bStandAlone = true;
+		}
 #endif
+
+		void standAlone(bool bSetTo) { 
+			bStandAlone = bSetTo; 
+		}
+		bool standAlone() { 
+			return bStandAlone; 
+		}
 		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
 		typedef std::string& (*PREWRITEPTR)(const std::string& in, std::string& out);
+		void forceXMLHeader(bool bSetTo) {
+			bForceXMLHeader = bSetTo;
+		}
+		bool forceXMLHeader() {
+			return bForceXMLHeader;
+		}
+		void noXMLHeader(bool bSetTo) {
+			bNoXMLHeader = bSetTo;
+		}
+		bool noXMLHeader() {
+			return bNoXMLHeader;
+		}
 		bool parseXML(std::string inStr, PREPARSEPTR = NULL, std::string preParseFileName = "");
 
 		bool parseXMLFile(std::string inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
@@ -120,7 +165,9 @@ namespace DATA_NAMESPACE
 		void writeXML(std::string & str, JSON_NAMESPACE::value & ret, int depth, bool bPretty = true, bool bTabs = true);
 
 		std::string sRootTag;
-		
+		bool bForceXMLHeader;
+		bool bNoXMLHeader;
+		bool bStandAlone;
 	};
 }
 

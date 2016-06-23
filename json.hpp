@@ -99,6 +99,8 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include "ojson.hpp"
 #endif
 
+#include <set>
+
 #ifdef _USE_ADDED_ORDER_
 #include "arbitrary_order_map.hpp"
 #define JSON_NAMESPACE ojson
@@ -544,7 +546,7 @@ namespace JSON_NAMESPACE
 		}
 
 		bool empty() const;
-		void setNotEmpty();
+		void setNotEmpty(std::set<void *>&parentList);
         void setParentArray(array * pSetTo);
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
@@ -657,7 +659,7 @@ namespace JSON_NAMESPACE
 		}
 
 		bool empty() const;
-		void setNotEmpty();
+		void setNotEmpty(std::set<void *>&parentList);
         void setParentArray(array * pSetTo);
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;

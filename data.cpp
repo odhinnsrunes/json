@@ -486,6 +486,7 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 							str.append("_");
 						}
 						str.append(key);
+						size_t attCount = 0;
 						for (JSON_NAMESPACE::value & val2 : val[j]) {
 							std::string subKey = val2.key();
 							if (subKey.size() > 1) {
@@ -495,10 +496,11 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 									str.append("=\"");
 									str.append(XMLEscape(val2.string(), true));
 									str.push_back('\"');
+									attCount++;
 								}
 							}
 						}
-						if (val[j].empty() || val[j].size() == 0) {
+						if (val[j].empty() || val[j].size() == 0/* || val[j].size() <= attCount*/) {
 							str.append(" />");
 							if (bPretty)
 								str.append("\n");
@@ -527,6 +529,7 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 						str.append("_");
 					}
 					str.append(key);
+					size_t attCount = 0;
 					for (JSON_NAMESPACE::value & val2 : val) {
 						std::string subKey = val2.key();
 						if (subKey.size() > 1) {
@@ -536,10 +539,11 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 								str.append("=\"");
 								str.append(XMLEscape(val2.string(), true));
 								str.push_back('\"');
+								attCount++;
 							}
 						}
 					}
-					if (val.empty() || val.size() == 0) {
+					if (val.empty() || val.size() == 0 /*|| val.size() <= attCount*/) {
 						str.append(" />");
 						if (bPretty)
 							str.append("\n");
@@ -595,12 +599,16 @@ std::string document::writeXML(bool bPretty, bool bTabs, PREWRITEPTR preWriter)
 {
 	std::string ret;
 	int iStartDepth = 0;
-	if (sRootTag.size()) {
-		ret = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-		iStartDepth = 1;
+	if (!bNoXMLHeader && (sRootTag.size() || bForceXMLHeader)) {
+		if (bStandAlone) {
+			ret = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>";
+		} else {
+			ret = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+		}
 		if (bPretty) {
 			ret.append("\n");
 		}
+		iStartDepth = 1;
 	}
 	if (sRootTag.size()) {
 		ret.append("<");
@@ -718,9 +726,15 @@ void document::stripNameSpace(JSON_NAMESPACE::value & a, std::string sNameSpace,
 		for (JSON_NAMESPACE::iterator it = a.begin(); it != a.end(); ++it) {
 			std::string sKey = it.key().string();
             if (sKey.size() > sNameSpace.size()) {
-                if (sKey.substr(0, sNameSpace.size()) == sNameSpace) {
-                    sKey = sKey.substr(sNameSpace.size());
-                }
+            	if (sKey[0] == '@') {
+	                if (sKey.substr(1, sNameSpace.size()) == sNameSpace) {
+	                    sKey = std::string("@") + sKey.substr(sNameSpace.size() + 1);
+	                }
+            	} else {
+	                if (sKey.substr(0, sNameSpace.size()) == sNameSpace) {
+	                    sKey = sKey.substr(sNameSpace.size());
+	                }
+            	}
             }
 			temp[sKey] = (*it);
 			stripNameSpace(temp[sKey], sNameSpace, false);
