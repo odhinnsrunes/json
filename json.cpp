@@ -453,13 +453,13 @@ namespace JSON_NAMESPACE
 			if (ret.arr)
 				delete ret.arr;
 			ret.arr = NULL;
-			std::set<void *> parentList;
-            ret.obj->setNotEmpty(parentList);
-            if (ret.pParentArray) {
-                ret.obj->setParentArray(ret.pParentArray);
-            } else if (ret.pParentObject) {
-                ret.obj->setParentObject(ret.pParentObject);
-            }
+
+			ret.obj->setNotEmpty();
+			if (ret.pParentArray) {
+				ret.obj->setParentArray(ret.pParentArray);
+			} else if (ret.pParentObject) {
+				ret.obj->setParentObject(ret.pParentObject);
+			}
 		}
 		if (inputString.peek() == '}') {
 			inputString.take();
@@ -490,8 +490,8 @@ namespace JSON_NAMESPACE
 				return;
 			}
 			SkipWhitespace(inputString);
-            value &temp = (*ret.obj)[key];
-            temp.setParentObject(ret.obj);
+			value &temp = (*ret.obj)[key];
+			temp.setParentObject(ret.obj);
 			valueParse(temp, inputString, bFailed);
 			if (*bFailed) {
 				ret = value();
@@ -532,13 +532,13 @@ namespace JSON_NAMESPACE
 			if (arr.obj)
 				delete arr.obj;
 			arr.obj = NULL;
-            if (arr.pParentArray) {
-                arr.arr->setParentArray(arr.pParentArray);
-            } else if (arr.pParentObject) {
-                arr.arr->setParentObject(arr.pParentObject);
-            }
-            std::set<void *> parentList;
-            arr.arr->setNotEmpty(parentList);
+			if (arr.pParentArray) {
+				arr.arr->setParentArray(arr.pParentArray);
+			} else if (arr.pParentObject) {
+				arr.arr->setParentObject(arr.pParentObject);
+			}
+
+			arr.arr->setNotEmpty();
 		}
 
 		if (inputString.peek() == ']') {
@@ -550,8 +550,8 @@ namespace JSON_NAMESPACE
 
 			size_t l = arr.arr->size();
 			arr.arr->resize(l + 1);
-            value & temp = arr.arr->at(l);
-            temp.setParentArray(arr.arr);
+			value & temp = arr.arr->at(l);
+			temp.setParentArray(arr.arr);
 			valueParse(temp, inputString, bFailed);
 			if (*bFailed) {
 				arr = value();
@@ -1290,11 +1290,11 @@ namespace JSON_NAMESPACE
 		} else if (!it.IsArray() && !it.None() && obj) {
 			return obj->erase(it.obj());
 		}
-        if (arr != NULL) {
-            return arr->end();
-        } else if (obj != NULL) {
-            return obj->end();
-        }
+		if (arr != NULL) {
+			return arr->end();
+		} else if (obj != NULL) {
+			return obj->end();
+		}
 		return iterator();
 	}
 
@@ -1365,16 +1365,16 @@ namespace JSON_NAMESPACE
 			if (!str.empty())
 				str.clear();
 			arr = new array();
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 			if (obj)
 				delete obj;
 			obj = NULL;
 		}
-        if (index <= arr->size()) {
+		if (index <= arr->size()) {
 			return iterator(arr->insert(arr->begin() + index, V));
 		}
 		return iterator();
@@ -1390,11 +1390,11 @@ namespace JSON_NAMESPACE
 			if (!str.empty())
 				str.clear();
 			obj = new object();
-            if (pParentObject) {
-                obj->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                obj->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				obj->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				obj->setParentArray(pParentArray);
+			}
 			if (arr)
 				delete arr;
 			arr = NULL;
@@ -1436,11 +1436,11 @@ namespace JSON_NAMESPACE
 				if (!str.empty())
 					str.clear();
 				arr = new array();
-                if (pParentObject) {
-                    arr->setParentObject(pParentObject);
-                } else if (pParentArray) {
-                    arr->setParentArray(pParentArray);
-                }
+				if (pParentObject) {
+					arr->setParentObject(pParentObject);
+				} else if (pParentArray) {
+					arr->setParentArray(pParentArray);
+				}
 				if (obj)
 					delete obj;
 				obj = NULL;
@@ -1459,11 +1459,11 @@ namespace JSON_NAMESPACE
 				if (!str.empty())
 					str.clear();
 				obj = new object();
-                if (pParentObject) {
-                    obj->setParentObject(pParentObject);
-                } else if (pParentArray) {
-                    obj->setParentArray(pParentArray);
-                }
+				if (pParentObject) {
+					obj->setParentObject(pParentObject);
+				} else if (pParentArray) {
+					obj->setParentArray(pParentArray);
+				}
 				if (arr)
 					delete arr;
 				arr = NULL;
@@ -1486,11 +1486,11 @@ namespace JSON_NAMESPACE
 				if (!str.empty())
 					str.clear();
 				arr = new array();
-                if (pParentObject) {
-                    arr->setParentObject(pParentObject);
-                } else if (pParentArray) {
-                    arr->setParentArray(pParentArray);
-                }
+				if (pParentObject) {
+					arr->setParentObject(pParentObject);
+				} else if (pParentArray) {
+					arr->setParentArray(pParentArray);
+				}
 				if (obj)
 					delete obj;
 				obj = NULL;
@@ -1505,11 +1505,11 @@ namespace JSON_NAMESPACE
 				if (!str.empty())
 					str.clear();
 				obj = new object();
-                if (pParentObject) {
-                    obj->setParentObject(pParentObject);
-                } else if (pParentArray) {
-                    obj->setParentArray(pParentArray);
-                }
+				if (pParentObject) {
+					obj->setParentObject(pParentObject);
+				} else if (pParentArray) {
+					obj->setParentArray(pParentArray);
+				}
 				if (arr)
 					delete arr;
 				arr = NULL;
@@ -1529,11 +1529,11 @@ namespace JSON_NAMESPACE
 		if (isA() == JSON_OBJECT) {
 			if (obj == NULL) {
 				obj = new object();
-                if (pParentObject) {
-                    obj->setParentObject(pParentObject);
-                } else if (pParentArray) {
-                    obj->setParentArray(pParentArray);
-                }
+				if (pParentObject) {
+					obj->setParentObject(pParentObject);
+				} else if (pParentArray) {
+					obj->setParentArray(pParentArray);
+				}
 				if (arr)
 					delete arr;
 				arr = NULL;
@@ -1721,14 +1721,14 @@ namespace JSON_NAMESPACE
 	array::array(const json::array& V)
 	: myVec(V.begin(), V.end()) {
 		bNotEmpty = V.bNotEmpty;
-        pParentArray = NULL;
-        pParentObject = NULL;
+		pParentArray = NULL;
+		pParentObject = NULL;
 	}
 	array::array(const json::array* V)
 	: myVec(V->begin(), V->end()) {
 		bNotEmpty = V->bNotEmpty;
-        pParentArray = NULL;
-        pParentObject = NULL;
+		pParentArray = NULL;
+		pParentObject = NULL;
 	}
 
 	object::object(const json::object& V)
@@ -1851,16 +1851,14 @@ namespace JSON_NAMESPACE
 		}
 		if (myType != JSON_VOID) {
 			if (pParentObject) {
-				std::set<void *> parentList;
-				pParentObject->setNotEmpty(parentList);
+				pParentObject->setNotEmpty();
 				if (arr) {
 					arr->setParentObject(pParentObject);
 				} else if (obj) {
 					obj->setParentObject(pParentObject);
 				}
 			} else if (pParentArray) {
-				std::set<void *> parentList;
-				pParentArray->setNotEmpty(parentList);
+				pParentArray->setNotEmpty();
 				if (arr) {
 					arr->setParentArray(pParentArray);
 				} else if (obj) {
@@ -2056,8 +2054,7 @@ namespace JSON_NAMESPACE
 		} else if (pParentArray) {
 			arr->setParentArray(pParentArray);
 		}
-		std::set<void *> parentList;
-		arr->setNotEmpty(parentList);
+		arr->setNotEmpty();
 		return *this;
 	}
 
@@ -2113,8 +2110,7 @@ namespace JSON_NAMESPACE
 		} else if (pParentArray) {
 			obj->setParentArray(pParentArray);
 		}
-		std::set<void *> parentList;
-		obj->setNotEmpty(parentList);
+		obj->setNotEmpty();
 		return *this;
 	}
 
@@ -2133,11 +2129,11 @@ namespace JSON_NAMESPACE
 			delete obj;
 		obj = NULL;
 		arr = new array();
-        if (pParentObject) {
-            arr->setParentObject(pParentObject);
-        } else if (pParentArray) {
-            arr->setParentArray(pParentArray);
-        }
+		if (pParentObject) {
+			arr->setParentObject(pParentObject);
+		} else if (pParentArray) {
+			arr->setParentArray(pParentArray);
+		}
 		temp.setParentArray(arr);
 		temp.setParentObject(NULL);
 		(*this)[0] = temp;
@@ -2159,11 +2155,11 @@ namespace JSON_NAMESPACE
 			delete arr;
 		arr = NULL;
 		obj = new object();
-        if (pParentObject) {
-            obj->setParentObject(pParentObject);
-        } else if (pParentArray) {
-            obj->setParentArray(pParentArray);
-        }
+		if (pParentObject) {
+			obj->setParentObject(pParentObject);
+		} else if (pParentArray) {
+			obj->setParentArray(pParentArray);
+		}
 		(*this)[key] = temp;
 		return *this;
 	}
@@ -2176,9 +2172,9 @@ namespace JSON_NAMESPACE
 		m_places = iDecimalPlaces;
 		if (myType == JSON_STRING) {
 			return *this;
-        } else if(myType == JSON_NUMBER) {
-            str.clear();
-        }
+		} else if(myType == JSON_NUMBER) {
+			str.clear();
+		}
 		value temp = *this;
 		temp.str.clear();
 		m_number = 0;
@@ -2237,7 +2233,7 @@ namespace JSON_NAMESPACE
 
 	value & value::toNumber()
 	{
-        str.clear();
+		str.clear();
 		if (myType == JSON_NUMBER) {
 			return *this;
 		}
@@ -2373,11 +2369,11 @@ namespace JSON_NAMESPACE
 
 		myType = JSON_ARRAY;
 		arr = new array();
-        if (pParentObject) {
-            arr->setParentObject(pParentObject);
-        } else if (pParentArray) {
-            arr->setParentArray(pParentArray);
-        }
+		if (pParentObject) {
+			arr->setParentObject(pParentObject);
+		} else if (pParentArray) {
+			arr->setParentArray(pParentArray);
+		}
 		arr->resize(index + 1);
 		value & ret = arr->at(index);
 		ret.setParentArray(arr);
@@ -2429,11 +2425,11 @@ namespace JSON_NAMESPACE
 		}
 		myType = JSON_OBJECT;
 		obj = new object();
-        if (pParentObject) {
-            obj->setParentObject(pParentObject);
-        } else if (pParentArray) {
-            obj->setParentArray(pParentArray);
-        }
+		if (pParentObject) {
+			obj->setParentObject(pParentObject);
+		} else if (pParentArray) {
+			obj->setParentArray(pParentArray);
+		}
 		value & ret = obj->operator[](index);
 		ret.setParentObject(obj);
 		// ret.m_key.assign(index);
@@ -2478,18 +2474,17 @@ namespace JSON_NAMESPACE
 			if (obj)
 				delete obj;
 			obj = NULL;
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 		}
 		arr->emplace_back(val);
 		arr->back().setParentArray(arr);
 
 		if (val.myType != JSON_VOID) {
-			std::set<void *> parentList;
-			arr->setNotEmpty(parentList);
+			arr->setNotEmpty();
 		}
 	}
 	
@@ -2531,17 +2526,16 @@ namespace JSON_NAMESPACE
 			if (obj)
 				delete obj;
 			obj = NULL;
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 		}
 		arr->emplace_front(val);
 		arr->front().setParentArray(arr);
 		if (val.myType != JSON_VOID) {
-			std::set<void *> parentList;
-			arr->setNotEmpty(parentList);
+			arr->setNotEmpty();
 		}
 	}
 	
@@ -2572,11 +2566,11 @@ namespace JSON_NAMESPACE
 	void value::resize(size_t iCount) {
 		if (myType == JSON_VOID) {
 			arr = new array();
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 		}
 		if (arr) {
 			arr->resize(iCount);
@@ -2586,11 +2580,11 @@ namespace JSON_NAMESPACE
 	void value::resize(size_t iCount, value val) {
 		if (myType == JSON_VOID) {
 			arr = new array();
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 		}
 		if (arr) {
 			arr->resize(iCount, val);
@@ -2732,79 +2726,55 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	void array::setNotEmpty(std::set<void *>&parentList) 
+	void array::setNotEmpty() 
 	{
 		bNotEmpty = true;
 
 		if (pParentArray && pParentArray != this) {
-			if (parentList.find((void*)pParentArray) != parentList.end()) {
-				size_t l = psize(0, true);
-				MovingCharPointer ptr(l);
-				cprint(ptr, 0, true);
-				std::string t(ptr.orig());
-
-				debug("Cyclic setNotEmpty for array in array.\n%s", t.c_str());
-				return;
-			}
-			parentList.insert((void*)pParentArray);
-			pParentArray->setNotEmpty(parentList);
+			pParentArray->setNotEmpty();
 		} else if (pParentObject) {
-			if (parentList.find((void*)pParentObject) != parentList.end()) {
-				size_t l = psize(0, true);
-				MovingCharPointer ptr(l);
-				cprint(ptr, 0, true);
-				std::string t(ptr.orig());
-
-				debug("Cyclic setNotEmpty for object in array.\n%s", t.c_str());
-				return;
-			}
-			parentList.insert((void*)pParentObject);
-			pParentObject->setNotEmpty(parentList);
+			pParentObject->setNotEmpty();
 		}
 	}
 
-    void object::setParentArray(array * pSetTo)
-    {
-        pParentArray = pSetTo;
-        if (bNotEmpty && pParentArray) {
-        	std::set<void *> parentList;
-            pParentArray->setNotEmpty(parentList);
-        }
-    }
-    
-    void object::setParentObject(object * pSetTo)
-    {
-    	if (pSetTo == this) {
-    		return;
-    	}
-        pParentObject = pSetTo;
-        if (bNotEmpty && pParentObject) {
-        	std::set<void *> parentList;
-            pParentObject->setNotEmpty(parentList);
-        }
-    }
-    
-    void array::setParentArray(array * pSetTo)
-    {
-    	if (pSetTo == this) {
-    		return;
-    	}
-        pParentArray = pSetTo;
-        if (bNotEmpty && pParentArray) {
-        	std::set<void *> parentList;
-            pParentArray->setNotEmpty(parentList);
-        }
-    }
-    
-    void array::setParentObject(object * pSetTo)
-    {
-        pParentObject = pSetTo;
-        if (bNotEmpty && pParentObject) {
-        	std::set<void *> parentList;
-            pParentObject->setNotEmpty(parentList);
-        }
-    }
-        
+	void object::setParentArray(array * pSetTo)
+	{
+		pParentArray = pSetTo;
+		if (bNotEmpty && pParentArray) {
+			pParentArray->setNotEmpty();
+		}
+	}
+	
+	void object::setParentObject(object * pSetTo)
+	{
+		if (pSetTo == this) {
+			return;
+		}
+		pParentObject = pSetTo;
+		if (bNotEmpty && pParentObject) {
+			pParentObject->setNotEmpty();
+		}
+	}
+	
+	void array::setParentArray(array * pSetTo)
+	{
+		if (pSetTo == this) {
+			return;
+		}
+		pParentArray = pSetTo;
+		if (bNotEmpty && pParentArray) {
+			pParentArray->setNotEmpty();
+		}
+	}
+	
+	void array::setParentObject(object * pSetTo)
+	{
+		pParentObject = pSetTo;
+		if (bNotEmpty && pParentObject) {
+			pParentObject->setNotEmpty();
+		}
+	}
+		
 	bool object::empty() const
 	{
 		// for (const std::pair<std::string, value> &pair: *this) {
@@ -2818,35 +2788,15 @@ namespace JSON_NAMESPACE
 		} else {
 			return !bNotEmpty;
 		}
-        // return myMap::empty() && !bNotEmpty;
+		// return myMap::empty() && !bNotEmpty;
 	}
-	void object::setNotEmpty(std::set<void *>&parentList) 
+	void object::setNotEmpty() 
 	{
 		bNotEmpty = true;
 		if (pParentArray) {
-			if (parentList.find((void*)pParentArray) != parentList.end()) {
-				size_t l = psize(0, true);
-				MovingCharPointer ptr(l);
-				cprint(ptr, 0, true);
-				std::string t(ptr.orig());
-
-				debug("Cyclic setNotEmpty for array in object.\n%s", t.c_str());
-				return;
-			}
-			parentList.insert((void*)pParentArray);
-			pParentArray->setNotEmpty(parentList);
+			pParentArray->setNotEmpty();
 		} else if (pParentObject && pParentObject != this) {
-			if (parentList.find((void*)pParentObject) != parentList.end()) {
-				size_t l = psize(0, true);
-				MovingCharPointer ptr(l);
-				cprint(ptr, 0, true);
-				std::string t(ptr.orig());
-
-				debug("Cyclic setNotEmpty for object in object.\n%s", t.c_str());
-				return;
-			}
-			parentList.insert((void*)pParentObject);
-			pParentObject->setNotEmpty(parentList);
+			pParentObject->setNotEmpty();
 		}
 	}
 
@@ -3086,20 +3036,20 @@ namespace JSON_NAMESPACE
 		if (arr) {
 			delete arr;
 			arr = new array();
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 		}
 		if (obj) {
 			delete obj;
 			obj = new object();
-            if (pParentObject) {
-                obj->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                obj->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				obj->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				obj->setParentArray(pParentArray);
+			}
 		}
 		if (!str.empty())
 			str.clear();
@@ -3113,20 +3063,20 @@ namespace JSON_NAMESPACE
 		if (arr) {
 			threadDelete(arr);
 			arr = new array();
-            if (pParentObject) {
-                arr->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                arr->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				arr->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				arr->setParentArray(pParentArray);
+			}
 		}
 		if (obj) {
 			threadDelete(obj);
 			obj = new object();
-            if (pParentObject) {
-                obj->setParentObject(pParentObject);
-            } else if (pParentArray) {
-                obj->setParentArray(pParentArray);
-            }
+			if (pParentObject) {
+				obj->setParentObject(pParentObject);
+			} else if (pParentArray) {
+				obj->setParentArray(pParentArray);
+			}
 		}
 		if (!str.empty())
 			str.clear();
@@ -3165,25 +3115,25 @@ namespace JSON_NAMESPACE
 	}
 
 #ifdef __GNUC__
-    void value::sort(bool (*compareFunc)(const value&, const value&)) {
-        if (arr) {
-            DEBUGPTR oldDebug = debug;
-            debug = NULL;
-            std::sort(arr->begin(), arr->end(), compareFunc);
-            debug = oldDebug;
-        }
-    }
+	void value::sort(bool (*compareFunc)(const value&, const value&)) {
+		if (arr) {
+			DEBUGPTR oldDebug = debug;
+			debug = NULL;
+			std::sort(arr->begin(), arr->end(), compareFunc);
+			debug = oldDebug;
+		}
+	}
 #else
-    void value::sort(bool (*compareFunc)(value&, value&)) {
-        if (arr) {
-            DEBUGPTR oldDebug = debug;
-            debug = NULL;
-            std::sort(arr->begin(), arr->end(), compareFunc);
-            debug = oldDebug;
-        }
-    }
+	void value::sort(bool (*compareFunc)(value&, value&)) {
+		if (arr) {
+			DEBUGPTR oldDebug = debug;
+			debug = NULL;
+			std::sort(arr->begin(), arr->end(), compareFunc);
+			debug = oldDebug;
+		}
+	}
 #endif
-    double value::number() {
+	double value::number() {
 		switch (myType) {
 		case JSON_NUMBER:
 			return m_number;
@@ -3229,23 +3179,23 @@ namespace JSON_NAMESPACE
 		return (long)number();
 	}
 
-    double value::_double() {
-        return number();
-    }
+	double value::_double() {
+		return number();
+	}
 
-    int value::_int() {
-        return (int)number();
-    }
+	int value::_int() {
+		return (int)number();
+	}
 
-    i64 value::_integer64() {
-        return (i64)number();
-    }
+	i64 value::_integer64() {
+		return (i64)number();
+	}
 
-    size_t value::_size_t() {
-        return (size_t)number();
-    }
+	size_t value::_size_t() {
+		return (size_t)number();
+	}
 
-    short value::_short() {
+	short value::_short() {
 		return (short)number();
 	}
 
@@ -3378,7 +3328,7 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-                return false;
+				return false;
 				
 			case JSON_BOOLEAN:
 				return m_boolean != V.boolean();
@@ -3409,11 +3359,11 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-                if (V.myType > JSON_NULL) {
-                    return true;
-                } else {
-                    return false;
-                }
+				if (V.myType > JSON_NULL) {
+					return true;
+				} else {
+					return false;
+				}
 				
 			case JSON_BOOLEAN:
 				return m_boolean != V.boolean();
@@ -3444,8 +3394,8 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-                return true;
-                
+				return true;
+				
 			case JSON_BOOLEAN:
 				return true;
 				
@@ -3475,11 +3425,11 @@ namespace JSON_NAMESPACE
 			case JSON_VOID:
 			case JSON_NULL:
 			default:
-                if (V.myType > JSON_NULL) {
-                    return false;
-                } else {
-                    return true;
-                }
+				if (V.myType > JSON_NULL) {
+					return false;
+				} else {
+					return true;
+				}
 				
 			case JSON_BOOLEAN:
 				return true;
@@ -3529,11 +3479,9 @@ namespace JSON_NAMESPACE
 				value ret = *this;
 				ret.insert(ret.end(), V.begin(), V.end());
 				if (ret.obj) {
-					std::set<void *> parentList;
-					ret.obj->setNotEmpty(parentList);
+					ret.obj->setNotEmpty();
 				} else if (arr) {
-					std::set<void *> parentList;
-					ret.arr->setNotEmpty(parentList);
+					ret.arr->setNotEmpty();
 				}
 				return ret;
 			}
@@ -3630,11 +3578,9 @@ namespace JSON_NAMESPACE
 			case JSON_OBJECT:
 				insert(end(), V.begin(), V.end());
 				if (obj) {
-					std::set<void *> parentList;
-					obj->setNotEmpty(parentList);
+					obj->setNotEmpty();
 				} else if (arr) {
-					std::set<void *> parentList;
-					arr->setNotEmpty(parentList);
+					arr->setNotEmpty();
 				}
 				break;
 
@@ -3859,7 +3805,7 @@ namespace JSON_NAMESPACE
 		return S;
 	}
 	
-    document::document(const document& V) : value((const value &)V), strParseResult(V.strParseResult)
+	document::document(const document& V) : value((const value &)V), strParseResult(V.strParseResult)
 	{
 		bParseSuccessful = V.bParseSuccessful;
 		strParseResult = V.strParseResult;

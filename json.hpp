@@ -546,7 +546,7 @@ namespace JSON_NAMESPACE
 		}
 
 		bool empty() const;
-		void setNotEmpty(std::set<void *>&parentList);
+		void setNotEmpty();
         void setParentArray(array * pSetTo);
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
@@ -659,7 +659,7 @@ namespace JSON_NAMESPACE
 		}
 
 		bool empty() const;
-		void setNotEmpty(std::set<void *>&parentList);
+		void setNotEmpty();
         void setParentArray(array * pSetTo);
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
