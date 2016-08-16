@@ -108,15 +108,15 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 						childName.append(att->Name());
 						int iValType = isNumeric(att->Value());
 						if (iValType != 0) {
-	                        std::string sValue = att->Value();
-	                        
-	                        JSON_NAMESPACE::instring in(sValue);
-	                        bool bFailed = false;
-	                        if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
-	                        	JSON_NAMESPACE::numberParse(ret[childName]["#value"], in, &bFailed);
-	                        } else {
-	                        	JSON_NAMESPACE::numberParse(ret[childName], in, &bFailed);
-	                        }
+							std::string sValue = att->Value();
+							
+							JSON_NAMESPACE::instring in(sValue);
+							bool bFailed = false;
+							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
+								JSON_NAMESPACE::numberParse(ret[childName]["#value"], in, &bFailed);
+							} else {
+								JSON_NAMESPACE::numberParse(ret[childName], in, &bFailed);
+							}
 						} else {
 							std::string val = att->Value();
 							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
@@ -179,15 +179,15 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 						childName.append(att->Name());
 						int iValType = isNumeric(att->Value());
 						if (iValType != 0) {
-	                        std::string sValue = att->Value();
-	                        
-	                        JSON_NAMESPACE::instring in(sValue);
-	                        bool bFailed = false;
-	                        if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
-	                        	JSON_NAMESPACE::numberParse(ret[childName]["#value"], in, &bFailed);
-	                        } else {
-	                        	JSON_NAMESPACE::numberParse(ret[childName], in, &bFailed);
-	                        }
+							std::string sValue = att->Value();
+							
+							JSON_NAMESPACE::instring in(sValue);
+							bool bFailed = false;
+							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
+								JSON_NAMESPACE::numberParse(ret[childName]["#value"], in, &bFailed);
+							} else {
+								JSON_NAMESPACE::numberParse(ret[childName], in, &bFailed);
+							}
 						} else {
 							std::string val = att->Value();
 							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
@@ -212,11 +212,11 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 					}
 					if (elem->Value()) {
 						const TiXmlNode *child = NULL;
-                        bool bEmpty = true;
+						bool bEmpty = true;
 						do {
 							child = elem->IterateChildren(child);
 							if (child) {
-	                            bEmpty = false;
+								bEmpty = false;
 								switch (child->Type()) {
 									case TiXmlNode::TINYXML_ELEMENT:
 										{
@@ -243,11 +243,11 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 								}
 							}
 						} while (child);
-                        if (bEmpty) {
-                            if (!ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
-                                ret = "";
-                            }
-                        }
+						if (bEmpty) {
+							if (!ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
+								ret = "";
+							}
+						}
 					}
 					break;
 				}
@@ -256,15 +256,15 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 				if (elem->Value()) {
 					int iValType = isNumeric(elem->Value());
 					if (iValType != 0) {
-                        std::string sValue = elem->Value();
-                        
-                        JSON_NAMESPACE::instring in(sValue);
-                        bool bFailed = false;
-                        if (ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
-                        	JSON_NAMESPACE::numberParse(ret["#value"], in, &bFailed);
-                        } else {
-                        	JSON_NAMESPACE::numberParse(ret, in, &bFailed);
-                        }
+						std::string sValue = elem->Value();
+						
+						JSON_NAMESPACE::instring in(sValue);
+						bool bFailed = false;
+						if (ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
+							JSON_NAMESPACE::numberParse(ret["#value"], in, &bFailed);
+						} else {
+							JSON_NAMESPACE::numberParse(ret, in, &bFailed);
+						}
 					} else {
 						std::string val = elem->Value();
 						if (ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
@@ -436,7 +436,7 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 
 		case JSON_NAMESPACE::JSON_NUMBER:
 		{
-            str.append(XMLEscape(ret.string()));
+			str.append(XMLEscape(ret.string()));
 			break;
 		}
 		case JSON_NAMESPACE::JSON_STRING:
@@ -698,11 +698,11 @@ void document::stripNameSpaces(JSON_NAMESPACE::value & a, JSON_NAMESPACE::docume
 		for (JSON_NAMESPACE::iterator it = a.begin(); it != a.end(); ++it) {
 			std::string sKey = it.key().string();
 			for (JSON_NAMESPACE::iterator nit = jNameSpaces.begin(); nit != jNameSpaces.end(); ++nit) {
-                if (sKey.size() > (*nit).string().size()) {
-                    if (sKey.substr(0, (*nit).string().size()) == (*nit).string()) {
-                        sKey = sKey.substr((*nit).string().size());
-                    }
-                }
+				if (sKey.size() > (*nit).string().size()) {
+					if (sKey.substr(0, (*nit).string().size()) == (*nit).string()) {
+						sKey = sKey.substr((*nit).string().size());
+					}
+				}
 			}
 			temp[sKey] = (*it);
 			stripNameSpaces(temp[sKey], jNameSpaces);
@@ -725,17 +725,17 @@ void document::stripNameSpace(JSON_NAMESPACE::value & a, std::string sNameSpace,
 		JSON_NAMESPACE::value temp;
 		for (JSON_NAMESPACE::iterator it = a.begin(); it != a.end(); ++it) {
 			std::string sKey = it.key().string();
-            if (sKey.size() > sNameSpace.size()) {
-            	if (sKey[0] == '@') {
-	                if (sKey.substr(1, sNameSpace.size()) == sNameSpace) {
-	                    sKey = std::string("@") + sKey.substr(sNameSpace.size() + 1);
-	                }
-            	} else {
-	                if (sKey.substr(0, sNameSpace.size()) == sNameSpace) {
-	                    sKey = sKey.substr(sNameSpace.size());
-	                }
-            	}
-            }
+			if (sKey.size() > sNameSpace.size()) {
+				if (sKey[0] == '@') {
+					if (sKey.substr(1, sNameSpace.size()) == sNameSpace) {
+						sKey = std::string("@") + sKey.substr(sNameSpace.size() + 1);
+					}
+				} else {
+					if (sKey.substr(0, sNameSpace.size()) == sNameSpace) {
+						sKey = sKey.substr(sNameSpace.size());
+					}
+				}
+			}
 			temp[sKey] = (*it);
 			stripNameSpace(temp[sKey], sNameSpace, false);
 		}
@@ -743,6 +743,31 @@ void document::stripNameSpace(JSON_NAMESPACE::value & a, std::string sNameSpace,
 	} else if (a.isA(JSON_NAMESPACE::JSON_ARRAY)) {
 		for (JSON_NAMESPACE::iterator it = a.begin(); it != a.end(); ++it) {
 			stripNameSpace((*it), sNameSpace, false);
+		}
+	}
+}
+
+void document::addNameSpace(JSON_NAMESPACE::value & a, std::string sNameSpace, bool begin)
+{
+	if (begin)
+		if (sNameSpace[sNameSpace.size() - 1] != ':')
+			sNameSpace.append(":");
+	if (a.isA(JSON_NAMESPACE::JSON_OBJECT)) {
+		JSON_NAMESPACE::value temp;
+		for (JSON_NAMESPACE::iterator it = a.begin(); it != a.end(); ++it) {
+			std::string sKey = it.key().string();
+			if (sKey[0] == '@') {
+				sKey.insert(1, sNameSpace);
+			} else {
+				sKey.insert(0, sNameSpace);
+			}
+			temp[sKey] = (*it);
+			addNameSpace(temp[sKey], sNameSpace, false);
+		}
+		JSON_NAMESPACE::value::swap(a, temp);
+	} else if (a.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+		for (JSON_NAMESPACE::iterator it = a.begin(); it != a.end(); ++it) {
+			addNameSpace((*it), sNameSpace, false);
 		}
 	}
 }

@@ -159,6 +159,7 @@ namespace DATA_NAMESPACE
 
 		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc, JSON_NAMESPACE::document jNameSpaces, bool begin = true);
 		static void stripNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
+		static void addNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
 
 	private:
 		void parseXMLElement(JSON_NAMESPACE::value& ret, const TiXmlNode * elem);
