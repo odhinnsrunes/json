@@ -365,16 +365,18 @@ bool document::parseXMLFile(std::string inStr, PREPARSEPTR preParser, bool bReWr
 	bParseSuccessful = false;
 	return false;
 }
-	
+
 std::string XMLEscape(const std::string& in, bool bAttribute) {
 	std::string out;
 	for (std::string::const_iterator it = in.begin(); it != in.end(); ++it) {
 		switch (*it) {
 			default:
 			{
-				if (*it < ' ') {
+				if (*it < ' ' && *it > 0) {
 					std::stringstream stream;
-					stream << "&#x" << std::hex << int(*it) << ";";
+					char szByte[6];
+					sprintf(szByte, "%.2x", char(*it) & 0xFF);
+					stream << "&#x" << szByte << ";";
 					out.append(stream.str());
 				} else {
 					out.push_back(*it);
