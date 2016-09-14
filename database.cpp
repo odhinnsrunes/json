@@ -51,13 +51,13 @@ namespace json
 		mtx.lock();
 		sPath = sSetPath;
 		data.parseFile(sPath);
-		if(!data.exists("config")){
+		if (!data.exists("config")){
 			data["config"]["autoSave"] = true;
 			data["config"]["pretty"] = false;
 			data["config"]["maxRevisions"] = 0;
 
 		}
-		if(!data.exists("sequence")){
+		if (!data.exists("sequence")){
 			data["sequence"] = 0;
 		}
 		mtx.unlock();
@@ -65,7 +65,7 @@ namespace json
 
 	database::~database()
 	{
-		if(data["config"]["autoSave"].boolean())
+		if (data["config"]["autoSave"].boolean())
             save();
 	}
 	
@@ -113,7 +113,7 @@ namespace json
 		mtx.lock();
 		document ret;
 		data["config"] = jSetConfig;
-		if(data["config"]["autoSave"].boolean()){
+		if (data["config"]["autoSave"].boolean()){
 			ret = save();
 		}
 		mtx.unlock();
@@ -133,7 +133,7 @@ namespace json
 		mtx.lock();
 		document ret;
 		data["config"][sKey] = aValue;
-		if(data["config"]["autoSave"].boolean()){
+		if (data["config"]["autoSave"].boolean()){
 			ret = save();
 		}
 		mtx.unlock();
@@ -145,21 +145,21 @@ namespace json
 		mtx.lock();
 		document ret;
 		iterator it = data["data"].find(id);
-		if(it != data["data"].end()){
-             if(!rev.empty()){
-                 if(data["data"][id]["deleted"][rev] == true){
+		if (it != data["data"].end()){
+             if (!rev.empty()){
+                 if (data["data"][id]["deleted"][rev] == true){
                      ret["_id"] = id;
                      ret["_rev"] = rev;
                      ret["_deleted"] = true;
                  } else {
                      ret = (*it)["docs"][rev];
                  }
-             } else if(data["data"][id].exists("deleted")) {
+             } else if (data["data"][id].exists("deleted")) {
                  ret["error"] = "not_found";
                  ret["reason"] = "deleted";
              } else {
 				iterator rit = (*it)["revs"].begin();
-				if(rit != (*it)["revs"].end()){
+				if (rit != (*it)["revs"].end()){
 					ret = (*it)["docs"][(*rit).string()];
                 } else {
                     ret["error"] = "not_found";
@@ -181,20 +181,20 @@ namespace json
 		bool bOk = true;
 		std::string id;
 
-		if(doc.exists("_id")){
+		if (doc.exists("_id")){
 			id.assign(doc["_id"].string());
-			if(!doc.exists("_rev") && data["data"].exists(id)){
+			if (!doc.exists("_rev") && data["data"].exists(id)){
 				ret["error"] = "conflict";
                 ret["reason"] = "Document update conflict.";
 				bOk = false;
 			} else {
-				if(data["data"].exists(id)){			
+				if (data["data"].exists(id)){			
 					std::string oldRev;
 					iterator it = data["data"][id]["revs"].begin();
-					if(it != data["data"][id]["revs"].end()){
+					if (it != data["data"][id]["revs"].end()){
 						oldRev = (*it).string();
 					}		
-					if(doc["_rev"] != oldRev){
+					if (doc["_rev"] != oldRev){
                         ret["error"] = "conflict";
                         ret["reason"] = "Document update conflict.";
 						bOk = false;
@@ -205,7 +205,7 @@ namespace json
 			id.assign(generateUUID());
 			doc["_id"] = id;
 		}
-		if(bOk){
+		if (bOk){
             size_t lRevs = data["data"][id]["revs"].size();
             i64 revIndex = data["data"][id]["revindex"].integer() + 1;
             data["data"][id]["revindex"] = revIndex;
@@ -220,14 +220,14 @@ namespace json
             data["sequenceIndex"][data["sequence"]._size_t()]["_rev"] = newRev;
 			data["sequence"] = data["sequence"] + 1;
 			size_t lMax = (size_t)data["config"]["maxRevisions"].integer();
-			if(lMax > 0){
+			if (lMax > 0){
 				for(size_t lIndex = lMax; lIndex < lRevs; lIndex++){
 					data["data"][id]["docs"].erase(data["data"][id]["revs"].pop_back().string());
 				}
 			}
 			ret["_id"] = doc["_id"];
 			ret["_rev"] = doc["_rev"];
-			if(data["config"]["autoSave"].boolean() && !bDontSave){
+			if (data["config"]["autoSave"].boolean() && !bDontSave){
 				ret["save"] = save();
 			}
 		}
@@ -241,16 +241,16 @@ namespace json
 		document ret;
         
         json::document doc = getDocument(id);
-        if(doc.exists("error")){
+        if (doc.exists("error")){
             ret = doc;
         } else {
-            if(data["data"][id]["deleted"][doc["_rev"].string()].boolean()) {
+            if (data["data"][id]["deleted"][doc["_rev"].string()].boolean()) {
                 ret["error"] = "not_found";
                 ret["reason"] = "deleted";
-            } else if(doc["_rev"] == rev){
+            } else if (doc["_rev"] == rev){
                 json::document res = setDocument(doc, true);
                 data["data"][id]["deleted"][res["_rev"].string()] = true;
-                if(data["config"]["autoSave"].boolean()){
+                if (data["config"]["autoSave"].boolean()){
                     ret["save"] = save();
                 }
                 ret["ok"] = true;
@@ -270,16 +270,16 @@ namespace json
 	{
 		mtx.lock();
 		bool bReIndex = false;
-		if(data["views"][sSetName]["version"] != sSetVersion){
+		if (data["views"][sSetName]["version"] != sSetVersion){
 			bReIndex = true;
 		}
 		views[sSetName].map = setMap;
 		views[sSetName].reduce = setReduce;
 		data["views"][sSetName]["version"] = sSetVersion;
 		document ret;
-		if(bReIndex){
+		if (bReIndex){
 			data["indeces"].erase(sSetName);
-			if(data["config"]["autoSave"].boolean()){
+			if (data["config"]["autoSave"].boolean()){
 				ret["save"] = save();
 			}
 		}
@@ -298,16 +298,16 @@ namespace json
 
 	size_t database::matchLevel(value& keys, value& mappedResult)
 	{
-		if(keys.isA(JSON_ARRAY) && mappedResult["key"].isA(JSON_ARRAY)){
+		if (keys.isA(JSON_ARRAY) && mappedResult["key"].isA(JSON_ARRAY)){
 			size_t l = keys.size();
 			size_t ret = 0;
 			for(; ret < l; ret++){
-				if(keys[ret] != mappedResult["key"][ret]){
+				if (keys[ret] != mappedResult["key"][ret]){
 					break;
 				}
 			}
 			return ret;
-		} else if(keys == mappedResult["key"]){
+		} else if (keys == mappedResult["key"]){
 			return 1;
 		} else {
 			return 0;
@@ -318,32 +318,32 @@ namespace json
 	{
 		mtx.lock();
 		std::string mmName = sName;
-		if(views.find(mmName) == views.end()){
+		if (views.find(mmName) == views.end()){
 			ret["error"] = "not_found";
             ret["reason"] = "missing_named_view";
             mtx.unlock();
             return ret;
 		}
-		if(bReduce && views[mmName].reduce == NULL){
+		if (bReduce && views[mmName].reduce == NULL){
             ret["error"] = "query_parse_error";
             ret["reason"] = "Reduce is invalid for map-only views.";
             mtx.unlock();
             return ret;
         }
 		ret.clear();
-		if(keys.exists("key")){
+		if (keys.exists("key")){
 			getViewWorker(ret, mmName, keys["key"], bReduce);
-			if(offset && ret["rows"].isA(JSON_ARRAY)){
+			if (offset && ret["rows"].isA(JSON_ARRAY)){
 				myVec::iterator it = ret["rows"].begin().arr();
 				it += offset;
-				if(it != ret["rows"].end().arr()){
+				if (it != ret["rows"].end().arr()){
 					ret["rows"].erase(ret["rows"].begin(), it);
 				}
 			}
-			if(limit){
+			if (limit){
 				ret["rows"].resize(limit);
 			}
-		} else if(keys.exists("keys")){
+		} else if (keys.exists("keys")){
 			size_t i = 0;
 			document temp;
 			ret["total_rows"] = 0;
@@ -354,17 +354,17 @@ namespace json
 				ret["total_rows"] += val["total_rows"];
 				ret["rows"] += val["rows"];
 			}
-			if(offset && ret["rows"].isA(JSON_ARRAY)){
+			if (offset && ret["rows"].isA(JSON_ARRAY)){
 				myVec::iterator it = ret["rows"].begin().arr();
 				it += offset;
-				if(it != ret["rows"].end().arr()){
+				if (it != ret["rows"].end().arr()){
 					ret["rows"].erase(ret["rows"].begin(), it);
 				}
 			}
-			if(limit){
+			if (limit){
 				ret["rows"].resize(limit);
 			}
-			if(bReduce && views[mmName].reduce){
+			if (bReduce && views[mmName].reduce){
 				value rere; 
 				// this is where grouping needs to happen.
 				for(value & val : ret["rows"]){
@@ -378,14 +378,14 @@ namespace json
 			}
 		} else {
 			getViewWorker(ret, mmName, keys, bReduce);
-            if(offset && ret["rows"].isA(JSON_ARRAY)){
+            if (offset && ret["rows"].isA(JSON_ARRAY)){
                 myVec::iterator it = ret["rows"].begin().arr();
                 it += offset;
-                if(it != ret["rows"].end().arr()){
+                if (it != ret["rows"].end().arr()){
                     ret["rows"].erase(ret["rows"].begin(), it);
                 }
             }
-            if(limit){
+            if (limit){
                 ret["rows"].resize(limit);
             }
 		}
@@ -402,7 +402,7 @@ namespace json
 		ret["total_rows"] = data["indeces"][sName][sKeys]["data"].size();
 		ret["rows"] = data["indeces"][sName][sKeys]["data"];
 
-		if(bReduce && views[sName].reduce){
+		if (bReduce && views[sName].reduce){
 			document values;
 			values.emptyArray();
 			for(value & val : ret["rows"]){
@@ -423,8 +423,8 @@ namespace json
 	{
 		mtx.lock();
 		document ret;
-		if(views.find(sName) != views.end()){
-			if(views[sName].map){
+		if (views.find(sName) != views.end()){
+			if (views[sName].map){
 				data["indeces"][sName][sKeys]["data"];
 				iterator itIndex = data["indeces"][sName][sKeys].find("data");
 				bool bEmpty = (*itIndex).empty();
@@ -436,24 +436,24 @@ namespace json
 				for(size_t i = sequence; i < latest; i++){
 					std::string id = data["sequenceIndex"][i]["_id"].string();
 					std::string rev = data["sequenceIndex"][i]["_rev"].string();
-					if(data["data"][id]["sequence"] == i){ // skip out of date documents
+					if (data["data"][id]["sequence"] == i){ // skip out of date documents
 						document ret2 = views[sName].map(data["data"][id]["docs"][rev]);
 						bool bDeleted = false;
-						if(data["data"][id]["deleted"][rev].boolean() == true){
+						if (data["data"][id]["deleted"][rev].boolean() == true){
 							bDeleted = true;
 						}
-						if(!ret2.empty() && !(bEmpty && bDeleted)){
-							if(ret2.isA(JSON_ARRAY)){
+						if (!ret2.empty() && !(bEmpty && bDeleted)){
+							if (ret2.isA(JSON_ARRAY)){
 								for(value & val : ret2){
-									if(val.isA(JSON_OBJECT)){
-										if(!val["key"].isA(JSON_OBJECT)){
-											if(matchLevel(keys, val) >= keysSize){
+									if (val.isA(JSON_OBJECT)){
+										if (!val["key"].isA(JSON_OBJECT)){
+											if (matchLevel(keys, val) >= keysSize){
 												document index;
 												index["id"] = id;
 												
 												index["key"] = val["key"];
 												index["value"] = val["value"];
-												if(bDeleted){
+												if (bDeleted){
 													index["deleted"] = true;
 												}
 												newChanges.push_back(index);
@@ -462,14 +462,14 @@ namespace json
 									}
 								}
 							} else if (ret2.isA(JSON_OBJECT)) {
-								if(!ret2["key"].isA(JSON_OBJECT)){
-									if(matchLevel(keys, ret2) >= keysSize){
+								if (!ret2["key"].isA(JSON_OBJECT)){
+									if (matchLevel(keys, ret2) >= keysSize){
 										document index;
 										index["id"] = id;
 										
 										index["key"] = ret2["key"];
 										index["value"] = ret2["value"];
-										if(bDeleted){
+										if (bDeleted){
 											index["deleted"] = true;
 										}
 										newChanges.push_back(index);
@@ -479,16 +479,16 @@ namespace json
 						}
 					}
 				}
-				if(newChanges.empty()){
+				if (newChanges.empty()){
 					mtx.unlock();
 					return ret;
 				}
 
 				newChanges.sort(&viewSort);
 
-				if(bEmpty){
+				if (bEmpty){
 					(*itIndex) = newChanges;
-					if(data["config"]["autoSave"].boolean()){
+					if (data["config"]["autoSave"].boolean()){
 						ret["save"] = save();
 					}
 					mtx.unlock();
@@ -496,39 +496,39 @@ namespace json
 				}
 
 				iterator itNew = newChanges.begin();
-				if(itNew != newChanges.end()){
+				if (itNew != newChanges.end()){
 					size_t l = (*itIndex).size();
 					for(size_t i = 0; i < l; i++){
-						if((*itIndex)[i]["id"] == (*itNew)["id"]){
+						if ((*itIndex)[i]["id"] == (*itNew)["id"]){
 							(*itIndex).erase(i);
 							l--;
 							++itNew;
-							if(itNew == newChanges.end()){
+							if (itNew == newChanges.end()){
 								break;
 							}
 						}
 					}
 					itNew = newChanges.begin();
 					for(size_t i = 0; i < l; i++){
-						if((*itNew)["deleted"].boolean()){
+						if ((*itNew)["deleted"].boolean()){
 							++itNew;
-							if(itNew == newChanges.end()){
+							if (itNew == newChanges.end()){
 								break;
 							}
-						} else if((*itIndex)[i]["key"] > (*itNew)["key"]){
+						} else if ((*itIndex)[i]["key"] > (*itNew)["key"]){
 							(*itIndex).insert(i, (*itNew));
 							l++;
 							++itNew;
-							if(itNew == newChanges.end()){
+							if (itNew == newChanges.end()){
 								break;
 							}
 						}
 					}
 					for(;itNew != newChanges.end(); ++itNew){
-						if(!(*itNew)["deleted"].boolean())
+						if (!(*itNew)["deleted"].boolean())
 							(*itIndex).push_back((*itNew));
 					}
-					if(data["config"]["autoSave"].boolean()){
+					if (data["config"]["autoSave"].boolean()){
 						ret["save"] = save();
 					}
 				}				
@@ -543,7 +543,7 @@ namespace json
 		mtx.lock();
 		data["indeces"].clear();
 		document ret;
-		if(data["config"]["autoSave"].boolean()){
+		if (data["config"]["autoSave"].boolean()){
 			ret["save"] = save();
 		}
 		mtx.unlock();
