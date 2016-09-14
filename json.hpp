@@ -114,6 +114,8 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 namespace JSON_NAMESPACE
 {
+	bool fileExists(const char * szName);
+
 	void debug(const char *format, ...);
 	
 	enum JSONTypes{
@@ -340,6 +342,7 @@ namespace JSON_NAMESPACE
 		
 		size_t size() const;
 		size_t arraySize();
+		size_t length();
 		void clear();
 		void threadedClear();
 		void destroy();

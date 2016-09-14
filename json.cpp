@@ -32,8 +32,8 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #define __uncaught_exception std::uncaught_exception
 #endif
 #include <thread>
-
-
+#include <sys/types.h> 
+#include <sys/stat.h> 
 
 #ifdef _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
@@ -2856,6 +2856,11 @@ namespace JSON_NAMESPACE
 		}
 	}
 
+	size_t value::length()
+	{
+		return string().size();
+	}
+
 	size_t value::arraySize()
 	{
 		if (!isA(JSON_ARRAY))
@@ -3883,6 +3888,22 @@ namespace JSON_NAMESPACE
 
 	bool document::parseFile(std::string inStr, PREPARSEPTR preParser, bool bReWriteFile) {
 		FILE* fd = fopen(inStr.c_str(), "rb");
+#if defined _JSON_TEMP_FILES_ && defined _JSON_RESTORE_TEMP_FILES_
+		if (fd == NULL) {
+			if (fileExists((inStr + ".bak").c_str())) {
+				fd = fopen((inStr + ".bak").c_str(), "rb");
+				if (fd) {
+					debug("File opened from backup %s.", (inStr + ".bak").c_str());
+				}
+			}
+		} else {
+			if (fd && fileExists((inStr + ".bak").c_str())) {
+				if (remove((inStr + ".bak").c_str()) != 0) {
+					debug("Failed remove backup of %s.", inStr.c_str());
+				}
+			}
+		}
+#endif
 		if (fd) {
 			fseek(fd, 0, SEEK_END);
 			size_t l = ftell(fd);
@@ -3960,17 +3981,67 @@ namespace JSON_NAMESPACE
 		}
 	}
 
+	bool fileExists(const char * szName)
+	{
+		if (szName == NULL) {
+			return false;
+		}
+		struct stat buffer;
+		return (stat(szName, &buffer) == 0);
+	}
+
 	bool document::writeFile(std::string inStr, bool bPretty, PREWRITEPTR preWriter) const
 	{
-		FILE* fd = fopen(inStr.c_str(), "wb");
+#ifdef _JSON_TEMP_FILES_
+		char szTempFile[L_tmpnam + 1];
+		if (tmpnam(szTempFile) == NULL) {
+			debug("Failed creating temp file name for %s.", inStr.c_str());
+			return false;
+		}
+		FILE* fd = fopen(szTempFile, "wb");
 		if (fd) {
 			std::string w = write(bPretty, preWriter);
 			if (fwrite(w.data(), 1, w.size(), fd) != w.size()) {
 				debug("Failed Writing to %s.", inStr.c_str());
+				fclose(fd);
+				return false;
+			} else {
+				fclose(fd);
+				if (fileExists((inStr + ".bak").c_str())) {
+					remove((inStr + ".bak").c_str());
+				}
+				if (fileExists(inStr.c_str())) {
+					if (rename(inStr.c_str(), (inStr + ".bak").c_str()) != 0) {
+						debug("Failed to backup %s.", inStr.c_str());
+						return false;
+					}
+				}
+				if (rename(szTempFile, inStr.c_str()) != 0) {
+					debug("Failed rename temp file to %s.", inStr.c_str());
+					if (rename((inStr + ".bak").c_str(), inStr.c_str()) != 0) {
+						debug("Failed restore backup of %s.", inStr.c_str());
+					}
+					return false;
+				}
+
+				if (fileExists((inStr + ".bak").c_str())) {
+					if (remove((inStr + ".bak").c_str()) != 0) {
+						debug("Failed remove backup of %s.", inStr.c_str());
+					}
+				}
+
+				return true;
 			}
+		}
+#else
+		FILE* fd = fopen(inStr.c_str(), "wb");
+		if (fd) {
+			std::string w = write(bPretty, preWriter);
+			fwrite(w.data(), 1, w.size(), fd);
 			fclose(fd);
 			return true;
 		}
+#endif
 		return false;
 	}
 
