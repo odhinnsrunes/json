@@ -1,6 +1,7 @@
 #ifndef _ARBITRARY_ORDER_MAP_
 #define _ARBITRARY_ORDER_MAP_
 
+#include <unordered_map>
 #include <map>
 #include <vector>
 #include <memory>
@@ -9,39 +10,42 @@ template<class keyType, class valueType, class A = std::allocator<valueType> >
 class arbitrary_order_map
 {
 public:
-//    class pairType
-//    {
-//    public:
-//        pairType(const pairType & in) : first(in.first), second(in.second) {}
-//        pairType(const keyType & in) : first(in) {}
-//        pairType(const keyType & in, const valueType & inv) : first(in), second(inv) {}
-//        pairType(const std::pair<keyType, valueType> & pair) : first(pair.first), second(pair.second) {}
-//        keyType first;
-//        valueType second;
-//    };
 	typedef std::pair<keyType, valueType> pairType;
-	typedef std::shared_ptr<pairType> ptrType;
-	typedef typename std::map<keyType, pairType*>::iterator dataIterator;
+	typedef std::unique_ptr<pairType> ptrType;
+	typedef typename std::unordered_map<keyType, pairType*>::iterator dataIterator;
 	typedef typename std::vector<ptrType>::iterator keyIterator;
 	typedef std::pair<keyType, pairType*> dataType;
 	typedef std::pair<keyType, pairType> data2Type;
 	
 	arbitrary_order_map() {}
 
-	arbitrary_order_map(const std::map<keyType, valueType> &map)
-	{
-		for (auto it = map.begin(); it != map.end(); ++it) {
-			*this[it->first] = it->second;
-		}
-	}
-
+    arbitrary_order_map(const std::unordered_map<keyType, valueType> &map)
+    {
+        reserve(map.size());
+        auto e = map.end();
+        for (auto it = map.begin(); it != e; ++it) {
+           *this[it->first] = it->second;
+        }
+    }
+    
+    arbitrary_order_map(const std::map<keyType, valueType> &map)
+    {
+        reserve(map.size());
+        auto e = map.end();
+        for (auto it = map.begin(); it != e; ++it) {
+            *this[it->first] = it->second;
+        }
+    }
+    
 	~arbitrary_order_map()
 	{
 	}
 
 	arbitrary_order_map(const arbitrary_order_map & V)
 	{
-		for (auto it = V.keys.begin(); it != V.keys.end(); ++it) {
+        reserve(V.size());
+        auto e = V.keys.end();
+		for (auto it = V.keys.begin(); it != e; ++it) {
 			(*this)[(*it)->first] = ((*it)->second);
 		}
 	}
@@ -51,21 +55,29 @@ public:
 		if(this == &V) {
 			return *this;
 		}
-
-		for (auto it = V.keys.begin(); it != V.keys.end(); ++it) {
+        this->clear();
+        reserve(V.size());
+        auto e = V.keys.end();
+		for (auto it = V.keys.begin(); it != e; ++it) {
 			(*this)[(*it)->first] = ((*it)->second);
 		}
 
 		return *this;
 	}
 
+    void reserve(size_t n)
+    {
+        data.reserve(n);
+        keys.reserve(n);
+    }
+    
 	valueType &operator[](const keyType &key)
 	{
 		dataIterator it = data.find(key);
 		if (it == data.end()) {
 			pairType* p = new pairType(key, valueType());
-			keys.emplace_back(ptrType(p));
-			data.emplace_hint(data.end(), dataType(key, p));
+            keys.emplace_back(std::move(ptrType(p)));
+            data.emplace_hint(it, std::move(dataType(key, p)));
 			return p->second;
 		}
 		return ((*it).second)->second;
@@ -104,7 +116,8 @@ public:
 			return 0;
 		}
 		pairType * p = (*it).second.get();
-		for (keyIterator it2 = keys.begin(); it2 != keys.end(); ++it2) {
+        auto e = keys.end();
+		for (keyIterator it2 = keys.begin(); it2 != e; ++it2) {
 			if ((*it2).get() == p) {
 				keys.erase(it2);
 				break;
@@ -408,12 +421,13 @@ public:
 			return keys.end();
 		}
 		pairType * p = (*it).second;
-		for (keyIterator keyIt = keys.begin(); keyIt != keys.end(); ++keyIt) {
+        auto e = keys.end();
+		for (keyIterator keyIt = keys.begin(); keyIt != e; ++keyIt) {
 			if ((*keyIt).get() == p) {
 				return keyIt;
 			}
 		}
-		return keys.end();
+		return e;
 	}
 
 	iterator erase(iterator it)
@@ -424,8 +438,9 @@ public:
 
 	iterator erase(iterator &start, iterator &finnish)
 	{
-		for (keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt) {
-			data.erase((*keyIt)->first);
+        auto e = finnish.real();
+		for (keyIterator keyIt = start.real(); keyIt != e;) {
+			data.erase((*keyIt++)->first);
 		}
 		
 		return keys.erase(start.real(), finnish.real());
@@ -463,25 +478,24 @@ public:
 
 	iterator insert(iterator at, pairType  val)
 	{
-		if (data.find(val.first) != data.end()) {
-			for (auto it = keys.begin(); it != keys.end(); ++it) {
-				if ((*it)->first == val.first) {
-					(*it)->second = val.second;
-					return it;
-				}
-			}
-		}
-		pairType* n = (new pairType(val));
-		iterator it = keys.insert(at.real(), ptrType(n));
-		data[val.first] = n;
-		return it;
+        auto dit = find(val.first);
+		if (dit != end()) {
+            return dit;
+        } else {
+            pairType* n = (new pairType(val));
+            iterator it = keys.emplace(at.real(), std::move(ptrType(n)));
+            data.emplace_hint(data.end(), std::move(dataType(val.first, n)));
+            return it;
+        }
 	}
 
 	iterator insert(iterator start, iterator finnish)
 	{
 		iterator insIt = end();
-		for (keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt) {
-			insIt = insert(end(), *(*keyIt));
+        reserve(std::distance(start, finnish));
+        auto e = finnish.real();
+		for (keyIterator keyIt = start.real(); keyIt != e;) {
+			insIt = insert(end(), *(*keyIt++));
 		}
 		return insIt;
 	}
@@ -489,14 +503,16 @@ public:
 	iterator insert(iterator at, iterator start, iterator finnish)
 	{
 		iterator insIt = at;
-		for (keyIterator keyIt = start.real(); keyIt != finnish.real(); ++keyIt) {
-			insIt = insert(insIt, *(*keyIt));
+        reserve(std::distance(start, finnish));
+        auto e = finnish.real();
+		for (keyIterator keyIt = start.real(); keyIt != e;) {
+			insIt = insert(insIt, *(*keyIt++));
 			++insIt;
 		}
 		return insIt;
 	}
 protected:
-	std::map<keyType, pairType*>		data;
+	std::unordered_map<keyType, pairType*>		data;
 	std::vector<ptrType> 			keys;
 };
 
