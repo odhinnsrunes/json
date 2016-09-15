@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+project(json_document)
+
 option(ORDERED_JSON "Is the ordered json (ojson::document) class required" ON)
 option(DATA_DOCUMENT "Is the xml functionality (data/odata::document) class(es) required" ON)
 
@@ -57,6 +59,10 @@ add_executable(xmlpretty json2xml.cpp)
 target_compile_definitions(xmlpretty PRIVATE SUPPORT_ORDERED_JSON _CRT_SECURE_NO_WARNINGS)
 set_property(TARGET xmlpretty PROPERTY CXX_STANDARD 11)
 target_link_libraries(xmlpretty PRIVATE json)
+
+install(TARGETS json2xml xml2json jsonpretty xmlpretty RUNTIME DESTINATION bin)
+install(TARGETS json ARCHIVE DESTINATION lib)
+install(FILES json.hpp data.hpp ojson.hpp odata.hpp DESTINATION include)
 
 endif(SAMPLES)
 endif(ORDERED_JSON)
