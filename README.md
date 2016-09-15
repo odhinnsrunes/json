@@ -35,7 +35,7 @@ The following instructions should work on all systems, but you can tailor to tas
 
 3. Update Submodules:
 
-        git submodule update --init --remote -- recursive
+        git submodule update --init --remote --recursive
 
 4. Create bukld folder:
 
@@ -52,7 +52,7 @@ The following instructions should work on all systems, but you can tailor to tas
 7. Build:
 
         make
-    
+
 8. Install the library, header files and sample tools:
 
         make install
