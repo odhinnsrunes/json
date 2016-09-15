@@ -61,9 +61,18 @@ set_property(TARGET xmlpretty PROPERTY CXX_STANDARD 11)
 target_link_libraries(xmlpretty PRIVATE json)
 
 install(TARGETS json2xml xml2json jsonpretty xmlpretty RUNTIME DESTINATION bin)
-install(TARGETS json ARCHIVE DESTINATION lib)
-install(FILES json.hpp data.hpp ojson.hpp odata.hpp DESTINATION include)
 
 endif(SAMPLES)
+install(FILES odata.hpp DESTINATION include)
 endif(ORDERED_JSON)
+install(FILES data.hpp DESTINATION include)
 endif(DATA_DOCUMENT)
+
+if(ORDERED_JSON)
+install(FILES ojson.hpp DESTINATION include)
+endif(ORDERED_JSON)
+
+install(FILES json.hpp DESTINATION include)
+
+install(TARGETS json ARCHIVE DESTINATION lib)
+
