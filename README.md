@@ -28,23 +28,31 @@ The following instructions should work on all systems, but you can tailor to tas
 1. Clone the repository:
 
     git clone https://github.com/odhinnsrunes/json.git json
+
 2. Enter the local repository folder:
 
     cd json
+
 3. Update Submodules:
+
     git submodule update --init --remote -- recursive
+
 4. Create bukld folder:
 
     mkdir build
+
 5. Enter build folder:
 
     cd build
+
 6. Run CMake (the -D optins are not required, but turn on certain features described below.):
 
     cmake ../ -DORDERED_JSON -DDATA_DOCUMENT -DSAMPLES
+
 7. Build:
 
     make
+    
 8. Install the library, header files and sample tools:
 
     make install
