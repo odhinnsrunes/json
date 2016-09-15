@@ -19,6 +19,35 @@ jsonquery.?pp is an experimental query language in JSON that is designed to get 
 
 This document is incomplete, but gets most of the information across.
 
+Building json::document
+-----------------------
+The easiest way to build json::document is with CMake.
+
+The following instructions should work on all systems, but you can tailor to taste:
+
+1. Clone the repository:
+    git clone https://github.com/odhinnsrunes/json.git json
+2. Enter the local repository folder:
+    cd json
+3. Update Submodules:
+    git submodule update --init --remote -- recursive
+4. Create bukld folder:
+    mkdir build
+5. Enter build folder:
+    cd build
+6. Run CMake (the -D optins are not required, but turn on certain features described below.):
+    cmake ../ -DORDERED_JSON -DDATA_DOCUMENT -DSAMPLES
+7. Build:
+    make
+8. Install the library, header files and sample tools:
+    make install
+
+The build options are as follows:
+
+- ORDERED_JSON - also create ojson::document, which instead of always outputting json with object keys in alphabetical order, it will output in the order the values were added.  This also includes the ability to insert key/value pairs anywhere in an object.
+- DATA_DOCUMENT - also create data::document (and odata::document if ORDERED_JSON is selected).  This class can not only read and write json like json::document, but can also read and write a subset of XML (Where sub tags are not surrounded by multuple CDATA blocks) and can convert between JSON and XML.  Attributes will be stored in objects with '@' prepended to the attribute name and if there are attributes for a tag containing CDATA, the CDATA will be in a key value pair with the key "#value".
+- SAMPLES - this will create some useful command line tools for conversion back and forth between JSON and XML and to make JSON and XML prettier by adding newlines and tabs to format the document.
+
 Using json::document
 --------------------
 
