@@ -344,9 +344,9 @@ namespace JSON_NAMESPACE
 		size_t arraySize();
 		size_t length();
 		void clear();
-		void threadedClear();
+		// void threadedClear();
 		void destroy();
-		void threadedDestroy();
+		// void threadedDestroy();
 
 #ifdef __GNUC__
         void sort(bool (*compareFunc)(const value&, const value&));
@@ -374,10 +374,10 @@ namespace JSON_NAMESPACE
 		const std::string & key() { return m_key; }
 	protected:
 		
-        static void threadDelete(object *);
-        static void threadDelete(array *);
-        static void threadDeleteObjectWorker(object *);
-        static void threadDeleteArrayWorker(array *);
+        // static void threadDelete(object *);
+        // static void threadDelete(array *);
+        // static void threadDeleteObjectWorker(object *);
+        // static void threadDeleteArrayWorker(array *);
 
 		void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		std::string print(int depth = 0, bool bPretty = false) const;

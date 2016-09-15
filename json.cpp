@@ -31,7 +31,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #if defined _WIN32 && defined __clang__
 #define __uncaught_exception std::uncaught_exception
 #endif
-#include <thread>
+// #include <thread>
 #include <sys/types.h> 
 #include <sys/stat.h> 
 
@@ -3007,34 +3007,34 @@ namespace JSON_NAMESPACE
 		return retVal;
 	}
 
-	inline void value::threadDelete(object * obj)
-	{
-		// if (obj) {
-			std::thread t(value::threadDeleteObjectWorker, obj);
-			t.detach();
-		// }
-	}
+// 	inline void value::threadDelete(object * obj)
+// 	{
+// 		// if (obj) {
+// 			std::thread t(value::threadDeleteObjectWorker, obj);
+// 			t.detach();
+// 		// }
+// 	}
 	
-	inline void value::threadDelete(array * arr)
-	{
-		// if (arr) {
-			std::thread t(value::threadDeleteArrayWorker, arr);
-			t.detach();
-		// }
-	}
+// 	inline void value::threadDelete(array * arr)
+// 	{
+// 		// if (arr) {
+// 			std::thread t(value::threadDeleteArrayWorker, arr);
+// 			t.detach();
+// 		// }
+// 	}
 	
-	void value::threadDeleteObjectWorker(object* obj)
-	{
-//		if (obj) {
-			delete obj;
-//		}
-	}
+// 	void value::threadDeleteObjectWorker(object* obj)
+// 	{
+// //		if (obj) {
+// 			delete obj;
+// //		}
+// 	}
 	
-	void value::threadDeleteArrayWorker(array* arr) {
-//		if (arr) {
-			delete arr;
-//		}
-	}
+// 	void value::threadDeleteArrayWorker(array* arr) {
+// //		if (arr) {
+// 			delete arr;
+// //		}
+// 	}
 		
 
 	void value::clear() {
@@ -3064,32 +3064,32 @@ namespace JSON_NAMESPACE
 		m_boolean = false;
 	}
 
-	void value::threadedClear() {
-		if (arr) {
-			threadDelete(arr);
-			arr = new array();
-			if (pParentObject) {
-				arr->setParentObject(pParentObject);
-			} else if (pParentArray) {
-				arr->setParentArray(pParentArray);
-			}
-		}
-		if (obj) {
-			threadDelete(obj);
-			obj = new object();
-			if (pParentObject) {
-				obj->setParentObject(pParentObject);
-			} else if (pParentArray) {
-				obj->setParentArray(pParentArray);
-			}
-		}
-		if (!str.empty())
-			str.clear();
+	// void value::threadedClear() {
+	// 	if (arr) {
+	// 		threadDelete(arr);
+	// 		arr = new array();
+	// 		if (pParentObject) {
+	// 			arr->setParentObject(pParentObject);
+	// 		} else if (pParentArray) {
+	// 			arr->setParentArray(pParentArray);
+	// 		}
+	// 	}
+	// 	if (obj) {
+	// 		threadDelete(obj);
+	// 		obj = new object();
+	// 		if (pParentObject) {
+	// 			obj->setParentObject(pParentObject);
+	// 		} else if (pParentArray) {
+	// 			obj->setParentArray(pParentArray);
+	// 		}
+	// 	}
+	// 	if (!str.empty())
+	// 		str.clear();
 
-		m_number = 0;
-		m_places = -1;
-		m_boolean = false;
-	}
+	// 	m_number = 0;
+	// 	m_places = -1;
+	// 	m_boolean = false;
+	// }
 
 	void value::destroy() {
 		m_number = 0;
@@ -3105,19 +3105,19 @@ namespace JSON_NAMESPACE
 		arr = NULL;
 	}
 
-	void value::threadedDestroy() {
-		m_number = 0;
-		m_places = -1;
-		m_boolean = false;
-		str.clear();
-		myType = JSON_VOID;
-		if (obj)
-			threadDelete(obj);
-		obj = NULL;
-		if (arr)
-			threadDelete(arr);
-		arr = NULL;
-	}
+	// void value::threadedDestroy() {
+	// 	m_number = 0;
+	// 	m_places = -1;
+	// 	m_boolean = false;
+	// 	str.clear();
+	// 	myType = JSON_VOID;
+	// 	if (obj)
+	// 		threadDelete(obj);
+	// 	obj = NULL;
+	// 	if (arr)
+	// 		threadDelete(arr);
+	// 	arr = NULL;
+	// }
 
 #ifdef __GNUC__
 	void value::sort(bool (*compareFunc)(const value&, const value&)) {
