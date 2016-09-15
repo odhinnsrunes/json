@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640">
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen">
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>Json by odhinnsrunes</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/odhinnsrunes/json">View on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Json</h1>
+            <h2>JSON for C++ as simple as in Javascript, but with the speed of C++.</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/odhinnsrunes/json/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/odhinnsrunes/json/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+
+      <span class="banner-fix"></span>
+
+
+      <section id="main_content">
+        <h1>
+<a id="jsondocument" class="anchor" href="#jsondocument" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>json::document</h1>
+
+<p>The official repository for this library is at <a href="https://github.com/odhinnsrunes/json">https://github.com/odhinnsrunes/json</a></p>
+
+<p>The purpose of this library is to allow JSON to be used in C++ with a very simple interface similar to how you would use it in other languages that support it natively.  It is also designed to be fast.  It can parse and write megabytes in milliseconds.  It's been tested in Linux, Windows and MacOS using g++, clang++, Visual C++ and even Borland C++.</p>
+
+<p>More information regarding the JSON standard can be found here: <a href="http://json.org/">http://json.org/</a></p>
+
+<p>The json::document library is licensed under the MIT License.  <a href="http://opensource.org/licenses/MIT">http://opensource.org/licenses/MIT</a></p>
+
+<p>To use JSON in a c++ project, just include json.hpp and compile json.cpp with your own modules.</p>
+
+<p>Included along side the json library are some extras that aren't required for normal use.  These are the data.?pp and jsonquery.?pp files.</p>
+
+<p>data.?pp is an extension to json.?pp that allows a certain subset of XML to be parsed or written using the same syntax for accessing the data as the json library.</p>
+
+<p>jsonquery.?pp is an experimental query language in JSON that is designed to get data from a JSON document much like an SQL statement would get it from a database.</p>
+
+<p>This document is incomplete, but gets most of the information across.</p>
+
+<h2>
+<a id="building-jsondocument" class="anchor" href="#building-jsondocument" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building json::document</h2>
+
+<p>The easiest way to build json::document is with CMake.</p>
+
+<p>The following instructions should work on all systems, but you can tailor to taste:</p>
+
+<ol>
+<li>
+<p>Clone the repository:</p>
+
+<pre><code>git clone https://github.com/odhinnsrunes/json.git json
+</code></pre>
+</li>
+<li>
+<p>Enter the local repository folder:</p>
+
+<pre><code>cd json
+</code></pre>
+</li>
+<li>
+<p>Update Submodules:</p>
+
+<pre><code>git submodule update --init --remote --recursive
+</code></pre>
+</li>
+<li>
+<p>Create bukld folder:</p>
+
+<pre><code>mkdir build
+</code></pre>
+</li>
+<li>
+<p>Enter build folder:</p>
+
+<pre><code>cd build
+</code></pre>
+</li>
+<li>
+<p>Run CMake (the -D optins are not required, but turn on certain features described below.):</p>
+
+<pre><code>cmake ../ -DORDERED_JSON -DDATA_DOCUMENT -DSAMPLES
+</code></pre>
+</li>
+<li>
+<p>Build:</p>
+
+<pre><code>make
+</code></pre>
+</li>
+<li>
+<p>Install the library, header files and sample tools:</p>
+
+<pre><code>make install
+</code></pre>
+</li>
+</ol>
+
+<p>The build options are as follows:</p>
+
+<ul>
+<li>ORDERED_JSON - also create ojson::document, which instead of always outputting json with object keys in alphabetical order, it will output in the order the values were added.  This also includes the ability to insert key/value pairs anywhere in an object.</li>
+<li>DATA_DOCUMENT - also create data::document (and odata::document if ORDERED_JSON is selected).  This class can not only read and write json like json::document, but can also read and write a subset of XML (Where sub tags are not surrounded by multuple CDATA blocks) and can convert between JSON and XML.  Attributes will be stored in objects with '@' prepended to the attribute name and if there are attributes for a tag containing CDATA, the CDATA will be in a key value pair with the key "#value".</li>
+<li>SAMPLES - this will create some useful command line tools for conversion back and forth between JSON and XML and to make JSON and XML prettier by adding newlines and tabs to format the document.</li>
+</ul>
+
+<h2>
+<a id="using-jsondocument" class="anchor" href="#using-jsondocument" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using json::document</h2>
+
+<p>There are two ways to parse and two ways to write JSON documents:</p>
+
+<ul>
+<li>parse(string) - pass a JSON string and it will parse it.  This returns true if parsing was successful.  parseResult() will contain error information if parsing failed.</li>
+<li>parseFile(string) - will parse a file with the name given.  This returns true if parsing was successful.  parseResult() will contain error information if parsing failed.</li>
+<li>write(pretty) - will return a std::string containing the JSON document.  Pass true for pretty if you want the JSON formatted with indentation and line feeds or omit pretty or pass false to have the JSON without tabs or line feeds.</li>
+<li>writeFile(string, pretty) - will write the JSON document to the file passed as string.  Pretty works the same as above.  Will return true if the file could be opened and saved or false if the file could not be written.</li>
+</ul>
+
+<p>Here is an example of reading and updating a simple JSON file with json::document:</p>
+
+<pre><code>json::document jDoc;
+if(jDoc.parseFile("sample.json")){
+    // read was successful
+    printf("foo = %s\n", jDoc["bar"].c_str());
+} else {
+    printf("Error reading JSON file: %s\n", jDoc.parseResult().c_str());
+}
+jDoc["bar"] = "baz";
+jDoc.writeFile("sample.json", true); // true is optional and tells the writer to output "pretty" JSON.
+</code></pre>
+
+<p>You can access arrays using a number as the index in the square brackets:</p>
+
+<pre><code>for(size_t i = 0; i &lt; jDoc.size(); i++){
+    jDoc[i] = i * 2;
+}
+</code></pre>
+
+<p>You can access objects using a string or char array as the index in teh square brackets:</p>
+
+<pre><code>jDoc["foo"] = 8;
+</code></pre>
+
+<p>Any numeric value, boolean, char array / string, object or array can be assigned to any JSON value:</p>
+
+<pre><code>jDoc["null"] = (char*)NULL;
+jDoc["true"] = true;
+jDoc["false"] = false;
+jDoc["number"] = 1.234;
+jDoc["string"] = "Hello, world!";
+jDoc["object"] = jDoc["other_object"];
+jDoc["array"] = jDoc["oterh_array"];
+</code></pre>
+
+<p>You can retrive values from a json::document with several conversion functions:</p>
+
+<ul>
+<li>boolean() - returns a bool.</li>
+<li>number() - returns a double. (Converts from strings as appropriate.)</li>
+<li>integer() - returns a 64bit integer.  (Converts from strings as appropriate.)</li>
+<li>c_str() - returns a const char *.  Guaranteed to not be NULL.  (Converts from numbers as appropriate)</li>
+<li>string() - returns a std::string &amp; (Converts from numbers as appropriate)</li>
+<li>cString() - returns a char *.  NULL if it doesn't exist or the JSON value is null. (Converts from numbers as appropriate)</li>
+</ul>
+
+<p>Here are some examples:</p>
+
+<pre><code>int i = (int)jDoc["integer"].integer();
+double d = jDoc["double"].number();
+std::string str = jDoc["string"].string();
+const char * szChar = jDoc["char"].c_str();
+</code></pre>
+
+<p>You can get other information with the following functions:</p>
+
+<ul>
+<li>size() - returns the number of elements in arrays or objects.  Numbers, strings and booleans return 1 and nulls and non-existant values return 0.</li>
+<li>exists(string or number) - returns true if the object or array contains the index value.  False otherwise.</li>
+<li>isA() - returns the type of value.  Can be:
+
+<ul>
+<li>json::JSON_VOID - value does not exist.</li>
+<li>json::JSON_NULL - value is NULL.</li>
+<li>json::JSON_BOOLEAN - value is a boolean.</li>
+<li>json::JSON_NUMBER - value is a number.</li>
+<li>json::JSON_STRING - value is a string.</li>
+<li>json::JSON_ARRAY - value is an array.</li>
+<li>json::JSON_OBJECT - value is an object.</li>
+</ul>
+</li>
+<li>isA(json type) - returns true if the value's type is the same as that passed in the argument.  The types are the same as those returned from the isA() function above.</li>
+<li>empty() - returns false if an object or an array have items in them or if the value is a string, number or boolean.  Returns true if the value doesn't exist, if it's a NULL or if it is an empty object or array.</li>
+</ul>
+
+<p>Some other functions for working with JSON are:</p>
+
+<ul>
+<li>emptyArray() - creates an empty array [] at the location specified.</li>
+<li>emptyObject() - creates an empty object {} at the location specified.</li>
+<li>push_back(value) - pushes the value to the end of an array.  Creates the array if it doesn't exist.</li>
+<li>push_front(value) - pushes the value to the start of an array.  Creates the array if it doesn't exist.</li>
+<li>pop_back() - returns a json value (json::value) that is the last item in an array and removes it from the array.  Returns an value with an isA() type of json::JSON_VOID if the array is empty.</li>
+<li>pop_front() - returns a json value (json::value) that is the first item in an array and removes it from the array.  Returns an value with an isA() type of json::JSON_VOID if the array is empty.</li>
+<li>insert(number, string or iterators and a value) - will insert a new value into an existing array or object at the point indicated.  This will invalidate any iterators referencing the array or object in question.  For an object, this is the same as just adding the value the normal way.</li>
+</ul>
+
+<p>Some Examples of these are:</p>
+
+<pre><code>jDoc["empty"].emptyArray();
+jDoc["empty"].emptyObject();
+jDoc["array"].push_back(6);
+jDoc["array"].push_front("Test");
+int i = (int)jDoc["array"].pop_back().integer();
+std::string s = jDoc["array"].pop_front().string();
+jDoc["array"].insert(0, "new value");
+</code></pre>
+
+<p>There are three functions for removing data from a json::document:</p>
+
+<ul>
+<li>clear() - this removes the contents of the value it is used on.</li>
+<li>erase(index, iterator or 2 iterators) - this finds the specified value or range of values and removes it.  The arguments can be either a number for removing an item from an array, a string for removing an item from an object, an iterator that will remove an item from an array or an object or tow iterators, one for the range start and one for the range end that will remove all items from an array or object that fall between the iterators.  Any iterator for the array or object will be invalidated by erase.</li>
+<li>destroy() - similar to erase, but removes the item it is called from.</li>
+</ul>
+
+<p>For example:</p>
+
+<pre><code>jDoc.clear(); // completely clears the json::document.
+jDoc["array"].clear(); // empties the array "array" but leaves it in the document as [].
+jDoc["array"].erase(6); // removes item 6 from "array".
+jDoc.erase("array"); //removes "array" completely from the document.
+jDoc["array"].destroy(); // the same as jDoc.erase("array");
+</code></pre>
+
+<p>json::document also has a full set of operators:</p>
+
+<ul>
+<li>+, - , *, /, %, +=, -=, *=, /=, %=  work on numbers, some work on booleans and + and += append strings like in std::string.</li>
+<li>==, !=, &lt;, &gt;, &lt;=, &gt;= work on all value types.</li>
+<li>++, -- and - work on numbers and booleans only.</li>
+</ul>
+
+<p>For example:</p>
+
+<pre><code>if(jDoc["number"] == 6){} // works
+if(6 == jDoc["number"]) {} // INVALID! Use this instead: 
+if(6 == jDoc["number"].number()) {}
+jDoc["string"] += ", world!";
+jDoc["number"]++;
+</code></pre>
+
+<p>Although you can use size() and an index to ierate through a json::document array, it will not work for objects.  For both, it is better to use iterators.  Iterators are extremely fast.  The functions for using them are the same as many of the standard container classes:</p>
+
+<ul>
+<li>begin() - returns an iterator pointing to the beginning od an array or object.  If a value is not an array or object it will return end().</li>
+<li>end() - returns an iterator pointint to the end of the array or object (technically it represents one past the end.)</li>
+<li>rbegin() - returns a reverse iterator pointing to the last item in an array or object.  If a value is not an array or object it will return rend().</li>
+<li>find(string or number index) - will return an iterator pointing to the given member of an array or object.  Will return end() if it isn't found or the value is not an array or object.</li>
+<li>rfind(string or number index) - will return a reverse_iterator pointing to the given member of an array or object.  Will return rend() if it isn't found or the value is not an array or object.</li>
+</ul>
+
+<p>For normal iterators:</p>
+
+<pre><code>json::iterator itObject= jDoc["some_object"].find("some_sub_value");
+for(json::iterator it = (*itObject).begin(); it != (*itObject).end(); ++it){
+    std::string sKey = it.key().string(); // this will work for arrays as well, but the key will always return 0.
+                                          // key() returns a JSON value (value).
+    std::cout &lt;&lt; "key = " &lt;&lt; sKey &lt;&lt; ", value = " &lt;&lt; (*it).number() &lt;&lt; "\n";
+}
+</code></pre>
+
+<p>For reverse_iterators:</p>
+
+<pre><code>json::iterator itObject= jDoc["some_object"].find("some_sub_value");
+for(json::reverse_iterator rit = (*itObject).rbegin(); rit != (*itObject).rend(); ++rit){
+    std::string sKey = rit.key().string(); // this will work for arrays as well, but the key will always return 0.
+                                          // key() returns a JSON value (value).
+    std::cout &lt;&lt; "key = " &lt;&lt; sKey &lt;&lt; ", value = " &lt;&lt; (*rit).number() &lt;&lt; "\n";
+}
+</code></pre>
+
+<h2>
+<a id="real-world-example" class="anchor" href="#real-world-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Real World Example</h2>
+
+<p>The following program will open a JSON file and resave it in a "pretty" format with indentation and line feeds.</p>
+
+<pre><code>#include "json.hpp"
+#include &lt;iostream&gt;
+
+int main(int argc, char ** argv) {
+    for(int i = 1; i &lt; argc; i++){
+        json::document jDoc;
+        if(jDoc.parseFile(argv[i])){
+            jDoc.writeFile(argv[i], true);
+        } else {
+            std::cout &lt;&lt; "Failed to open file " &lt;&lt; argv[i] &lt;&lt; ": " &lt; jDoc.parseResult() &lt;&lt; "\n";
+        }
+    }
+    return 0;
+}
+</code></pre>
+
+<h2>
+<a id="licence" class="anchor" href="#licence" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LICENCE</h2>
+
+<p>Copyright (c) 2012-2016 James Baker</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
+
+<p>The official repository for this library is at <a href="https://github.com/odhinnsrunes/json">https://github.com/odhinnsrunes/json</a></p>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/odhinnsrunes">odhinnsrunes</a> can be found on <a href="https://github.com/odhinnsrunes/json">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="https://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
