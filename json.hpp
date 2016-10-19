@@ -554,6 +554,7 @@ namespace JSON_NAMESPACE
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		size_t psize(int depth, bool bPretty) const;
+		bool notEmpty() { return bNotEmpty; }
 	protected:
 		bool bNotEmpty;
 	private:
@@ -667,6 +668,7 @@ namespace JSON_NAMESPACE
         void setParentObject(object * pSetTo);
         void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		size_t psize(int depth, bool bPretty) const;
+		bool notEmpty() { return bNotEmpty; }
 	protected:
 		bool bNotEmpty;
 	private:

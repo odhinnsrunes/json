@@ -1098,7 +1098,7 @@ namespace JSON_NAMESPACE
 		int ret = 0;
 		static int count = 0;
 		count++;
-		if (bPretty)
+		if (bPretty && !myVec::empty())
 			ret += 2;
 		else
 			ret++;
@@ -1119,7 +1119,7 @@ namespace JSON_NAMESPACE
 				ret += it->psize(depth, bPretty);
 			}
 		}
-		if (bPretty) {
+		if (bPretty && !myVec::empty()) {
 			ret++;
 			ret += depth - 1;
 		}
@@ -1129,7 +1129,7 @@ namespace JSON_NAMESPACE
 
 	void array::cprint(MovingCharPointer& ptr, int depth, bool bPretty) const 
 	{
-		if (bPretty) {
+		if (bPretty && !myVec::empty()) {
 			ptr.set("[\n", 2);
 		} else {
 			ptr.set('[');
@@ -1152,7 +1152,7 @@ namespace JSON_NAMESPACE
 				it->cprint(ptr, depth, bPretty);
 			}
 		}
-		if (bPretty) {
+		if (bPretty && !myVec::empty()) {
 			ptr.set('\n');
 			makeDepth(ptr, depth - 1);
 		}
@@ -1165,7 +1165,7 @@ namespace JSON_NAMESPACE
 		static int count = 0;
 		count++;
 
-		if (bPretty)
+		if (bPretty && !myMap::empty())
 			ret += 2;
 		else
 			ret++;
@@ -1185,7 +1185,7 @@ namespace JSON_NAMESPACE
 				ret += it->second.psize(depth, bPretty);
 			}
 		}
-		if (bPretty) {
+		if (bPretty && !myMap::empty()) {
 			ret += depth;
 		}
 		ret++;
@@ -1195,7 +1195,7 @@ namespace JSON_NAMESPACE
 
 	void object::cprint(MovingCharPointer& ptr, int depth, bool bPretty) const 
 	{
-		if (bPretty) {
+		if (bPretty && !myMap::empty()) {
 			ptr.set("{\n", 2);
 		} else {
 			ptr.set('{');
@@ -1226,7 +1226,7 @@ namespace JSON_NAMESPACE
 				it->second.cprint(ptr, depth, bPretty);
 			}
 		}
-		if (bPretty) {
+		if (bPretty && !myMap::empty()) {
 			ptr.set('\n');
 			makeDepth(ptr, depth - 1);
 		}
@@ -1955,14 +1955,14 @@ namespace JSON_NAMESPACE
 		switch(myType) {
 			case JSON_ARRAY:
 			{
-				if (arr->empty()) {
+				if (!arr->notEmpty() && arr->empty()) {
 					return JSON_VOID;
 				}
 				break;
 			}
 			case JSON_OBJECT:
 			{
-				if (obj->empty()) {
+				if (!obj->notEmpty() && obj->empty()) {
 					return JSON_VOID;
 				}
 				break;
@@ -2136,7 +2136,9 @@ namespace JSON_NAMESPACE
 		}
 		temp.setParentArray(arr);
 		temp.setParentObject(NULL);
-		(*this)[0] = temp;
+		if (!temp.isA(JSON_VOID)) {
+			(*this)[0] = temp;
+		}
 		return *this;
 	}
 
@@ -2160,7 +2162,9 @@ namespace JSON_NAMESPACE
 		} else if (pParentArray) {
 			obj->setParentArray(pParentArray);
 		}
-		(*this)[key] = temp;
+		if (!temp.isA(JSON_VOID)) {
+			(*this)[key] = temp;
+		}
 		return *this;
 	}
 
@@ -2718,7 +2722,7 @@ namespace JSON_NAMESPACE
 	
 	bool array::empty() const
 	{
-		if (!bNotEmpty && myVec::empty()) {
+		if (/*!bNotEmpty && */myVec::empty()) {
 			// bNotEmpty = false;
 			return true;
 		} else {
@@ -2782,7 +2786,7 @@ namespace JSON_NAMESPACE
 		// 		return false;
 		// 	}
 		// }
-		if (!bNotEmpty && myMap::empty()) {
+		if (/*!bNotEmpty && */myMap::empty()) {
 			// bNotEmpty = false;
 			return true;
 		} else {
