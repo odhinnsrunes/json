@@ -1,6 +1,6 @@
-#include "json.hpp"
-#include <iostream>
-std::string & csvEscape(std::string & in) 
+#include "json2csv.hpp"
+
+static std::string & csvEscape(std::string & in) 
 {
 	for (size_t i = 0; i < in.size(); i++) {
 		if (in[i] == '"') {
@@ -101,6 +101,7 @@ std::string & json2csv(std::string & sOut, ojson::value & data, bool bDoKeys)
 }
 
 #ifdef __STANDALONE_CSV__
+#include <iostream>
 
 int main(int argc, char** argv)
 {
