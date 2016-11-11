@@ -1,6 +1,6 @@
 #include "json.hpp"
 #include <iostream>
-std::string & escape(std::string & in) 
+std::string & csvEscape(std::string & in) 
 {
 	for (size_t i = 0; i < in.size(); i++) {
 		if (in[i] == '"') {
@@ -62,7 +62,7 @@ std::string & json2csv(std::string & sOut, ojson::value & data, bool bDoKeys)
 			if (bIsObject) {
 				sOut.append("\"");
 				std::string sEscaped(object_keys[i].string());
-				sOut.append(escape(sEscaped));
+				sOut.append(csvEscape(sEscaped));
 				sOut.append("\"");
 				bFirst = false;
 			}
@@ -78,7 +78,7 @@ std::string & json2csv(std::string & sOut, ojson::value & data, bool bDoKeys)
 					{
 						sOut.append("\"");
 						std::string sEscaped(field.string());
-						sOut.append(escape(sEscaped));
+						sOut.append(csvEscape(sEscaped));
 						sOut.append("\"");
 						break;
 					}
@@ -99,6 +99,8 @@ std::string & json2csv(std::string & sOut, ojson::value & data, bool bDoKeys)
 	}
 	return sOut;
 }
+
+#ifdef __STANDALONE_CSV__
 
 int main(int argc, char** argv)
 {
@@ -141,3 +143,5 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
+#endif
