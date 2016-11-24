@@ -64,6 +64,14 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
  }
  \endcode
  */
+#ifdef __GNUC__
+#define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+#define DEPRECATED(func) __declspec(deprecated) func
+#else
+#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#define DEPRECATED(func) func
+#endif
 
 #if !defined JSON_HPP_ || defined OJSON_HPP_START
 #ifndef OJSON_HPP_START
@@ -275,7 +283,7 @@ namespace JSON_NAMESPACE
 
 		bool boolean();
 		std::string& string();
-		const char* safeCString();
+		DEPRECATED (const char* safeCString());
 		const char* c_str();
 		const char* cString();
 		
