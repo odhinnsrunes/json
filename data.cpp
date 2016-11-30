@@ -663,12 +663,10 @@ std::string document::writeXML(bool bPretty, bool bTabs, PREWRITEPTR preWriter)
 bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPretty, bool bTabs, PREWRITEPTR preWriter)
 {
 #ifdef _JSON_TEMP_FILES_
-	char szTempFile[L_tmpnam + 1];
-	if (tmpnam(szTempFile) == NULL) {
-		debug("Failed creating temp file name for %s.", inStr.c_str());
-		return false;
-	}
-	FILE* fd = fopen(szTempFile, "wb");
+	std::string sTempFile(inStr);
+	sTempFile.append(".tmp");
+	
+	FILE* fd = fopen(sTempFile.c_str(), "wb");
 	if (fd) {
 		std::string w = writeXML(rootElem, bPretty, bTabs, preWriter);
 		if (fwrite(w.data(), 1, w.size(), fd) != w.size()) {
@@ -686,7 +684,7 @@ bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPrett
 					return false;
 				}
 			}
-			if (rename(szTempFile, inStr.c_str()) != 0) {
+			if (rename(sTempFile.c_str(), inStr.c_str()) != 0) {
 				debug("Failed rename temp file to %s.", inStr.c_str());
 				if (rename((inStr + ".bak").c_str(), inStr.c_str()) != 0) {
 					debug("Failed restore backup of %s.", inStr.c_str());

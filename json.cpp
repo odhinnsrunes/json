@@ -4003,12 +4003,10 @@ namespace JSON_NAMESPACE
 	bool document::writeFile(std::string inStr, bool bPretty, PREWRITEPTR preWriter) const
 	{
 #ifdef _JSON_TEMP_FILES_
-		char szTempFile[L_tmpnam + 1];
-		if (tmpnam(szTempFile) == NULL) {
-			debug("Failed creating temp file name for %s.", inStr.c_str());
-			return false;
-		}
-		FILE* fd = fopen(szTempFile, "wb");
+		std::string sTempFile(inStr);
+		sTempFile.append(".tmp");
+		
+		FILE* fd = fopen(sTempFile.c_str(), "wb");
 		if (fd) {
 			std::string w = write(bPretty, preWriter);
 			if (fwrite(w.data(), 1, w.size(), fd) != w.size()) {
@@ -4026,7 +4024,7 @@ namespace JSON_NAMESPACE
 						return false;
 					}
 				}
-				if (rename(szTempFile, inStr.c_str()) != 0) {
+				if (rename(sTempFile.c_str(), inStr.c_str()) != 0) {
 					debug("Failed rename temp file to %s.", inStr.c_str());
 					if (rename((inStr + ".bak").c_str(), inStr.c_str()) != 0) {
 						debug("Failed restore backup of %s.", inStr.c_str());
