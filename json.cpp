@@ -1797,15 +1797,21 @@ namespace JSON_NAMESPACE
 					// 	break;
 
 					case JSON_BOOLEAN:
-						debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(V.myType).c_str());
+						if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+							debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(V.myType).c_str());
+						}
 						break;
 
 					case JSON_NUMBER:
-						debug("json operator= changed type from Number %f to %s", m_number, typeName(V.myType).c_str());
+						if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+							debug("json operator= changed type from Number %f to %s", m_number, typeName(V.myType).c_str());
+						}
 						break;
 
 					case JSON_STRING:
-						debug("json operator= changed type from String '%s' to %s", str.c_str(), typeName(V.myType).c_str());
+						if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+							debug("json operator= changed type from String '%s' to %s", str.c_str(), typeName(V.myType).c_str());
+						}
 						break;
 
 					case JSON_ARRAY:
