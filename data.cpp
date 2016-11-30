@@ -675,25 +675,27 @@ bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPrett
 			return false;
 		} else {
 			fclose(fd);
-			if (json::fileExists((inStr + ".bak").c_str())) {
+			std::string sInstrPlusBak(inStr);
+			sInstrPlusBak.append(".bak");
+			if (json::fileExists(sInstrPlusBak.c_str())) {
 				remove((inStr + ".bak").c_str());
 			}
 			if (json::fileExists(inStr.c_str())) {
-				if (rename(inStr.c_str(), (inStr + ".bak").c_str()) != 0) {
+				if (rename(inStr.c_str(), sInstrPlusBak.c_str()) != 0) {
 					debug("Failed to backup %s.", inStr.c_str());
 					return false;
 				}
 			}
 			if (rename(sTempFile.c_str(), inStr.c_str()) != 0) {
 				debug("Failed rename temp file to %s.", inStr.c_str());
-				if (rename((inStr + ".bak").c_str(), inStr.c_str()) != 0) {
+				if (rename(sInstrPlusBak.c_str(), inStr.c_str()) != 0) {
 					debug("Failed restore backup of %s.", inStr.c_str());
 				}
 				return false;
 			}
 
-			if (json::fileExists((inStr + ".bak").c_str())) {
-				if (remove((inStr + ".bak").c_str()) != 0) {
+			if (json::fileExists(sInstrPlusBak.c_str())) {
+				if (remove(sInstrPlusBak.c_str()) != 0) {
 					debug("Failed remove backup of %s.", inStr.c_str());
 				}
 			}

@@ -3899,16 +3899,19 @@ namespace JSON_NAMESPACE
 	bool document::parseFile(std::string inStr, PREPARSEPTR preParser, bool bReWriteFile) {
 		FILE* fd = fopen(inStr.c_str(), "rb");
 #if defined _JSON_TEMP_FILES_ && defined _JSON_RESTORE_TEMP_FILES_
+		std::string sInstrPlusBak(inStr);
+		sInstrPlusBak.append(".bak");
+		
 		if (fd == NULL) {
-			if (fileExists((inStr + ".bak").c_str())) {
-				fd = fopen((inStr + ".bak").c_str(), "rb");
+			if (fileExists(sInstrPlusBak.c_str())) {
+				fd = fopen(sInstrPlusBak.c_str(), "rb");
 				if (fd) {
-					debug("File opened from backup %s.", (inStr + ".bak").c_str());
+					debug("File opened from backup %s.", sInstrPlusBak.c_str());
 				}
 			}
 		} else {
-			if (fd && fileExists((inStr + ".bak").c_str())) {
-				if (remove((inStr + ".bak").c_str()) != 0) {
+			if (fd && fileExists(sInstrPlusBak.c_str())) {
+				if (remove(sInstrPlusBak.c_str()) != 0) {
 					debug("Failed remove backup of %s.", inStr.c_str());
 				}
 			}
@@ -4009,31 +4012,34 @@ namespace JSON_NAMESPACE
 		FILE* fd = fopen(sTempFile.c_str(), "wb");
 		if (fd) {
 			std::string w = write(bPretty, preWriter);
+
 			if (fwrite(w.data(), 1, w.size(), fd) != w.size()) {
 				debug("Failed Writing to %s.", inStr.c_str());
 				fclose(fd);
 				return false;
 			} else {
+				std::string sInstrPlusBak(inStr);
+				sInstrPlusBak.append(".bak");
 				fclose(fd);
-				if (fileExists((inStr + ".bak").c_str())) {
-					remove((inStr + ".bak").c_str());
+				if (fileExists(sInstrPlusBak.c_str())) {
+					remove(sInstrPlusBak.c_str());
 				}
 				if (fileExists(inStr.c_str())) {
-					if (rename(inStr.c_str(), (inStr + ".bak").c_str()) != 0) {
+					if (rename(inStr.c_str(), sInstrPlusBak.c_str()) != 0) {
 						debug("Failed to backup %s.", inStr.c_str());
 						return false;
 					}
 				}
 				if (rename(sTempFile.c_str(), inStr.c_str()) != 0) {
 					debug("Failed rename temp file to %s.", inStr.c_str());
-					if (rename((inStr + ".bak").c_str(), inStr.c_str()) != 0) {
+					if (rename(sInstrPlusBak.c_str(), inStr.c_str()) != 0) {
 						debug("Failed restore backup of %s.", inStr.c_str());
 					}
 					return false;
 				}
 
-				if (fileExists((inStr + ".bak").c_str())) {
-					if (remove((inStr + ".bak").c_str()) != 0) {
+				if (fileExists(sInstrPlusBak.c_str())) {
+					if (remove(sInstrPlusBak.c_str()) != 0) {
 						debug("Failed remove backup of %s.", inStr.c_str());
 					}
 				}
