@@ -954,7 +954,11 @@ namespace JSON_NAMESPACE
 	}
 	
 	reverse_iterator value::rfind(std::string index) const {
-		return reverse_iterator(find(index));
+		iterator it = find(index);
+		if (it == end()) {
+			return reverse_iterator();
+		}
+		return reverse_iterator(++it);
 	}
 	
 	bool value::boolean() {
