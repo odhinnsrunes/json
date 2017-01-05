@@ -25,6 +25,25 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include "data.hpp"
 #include <iostream>
 
+void toCSV(std::string sKey, ojson::value & ret, int &iCount, ojson::value & val) {
+	if (val.isA(ojson::JSON_ARRAY)) {
+		int iCount = 0;
+		for (ojson::value & subVal : val) {
+			if (sKey.empty()) {
+				toCSV("", ret, iCount++, subVal);
+			} else {
+				toCSV(sKey + "_" + std::toString(i), ret, iCount, subVal);
+			}
+		}
+	} else if (val.isA(ojson::JSON_OBJECT)) {
+		for (ojson::value & subVal) {
+			toCSV(sKey + "_" + subVal.key(), iCount, subVal);
+		}
+	} else {
+		ret[sKey][iCount] = val;
+	}
+}
+
 bool ends_with(std::string value, std::string ending)
 {
     if (ending.size() > value.size()) return false;

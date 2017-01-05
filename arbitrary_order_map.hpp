@@ -43,35 +43,41 @@ public:
 	
 	arbitrary_order_map() {}
 
-    arbitrary_order_map(const std::unordered_map<keyType, valueType> &map)
-    {
-        reserve(map.size());
-        auto e = map.end();
-        for (auto it = map.begin(); it != e; ++it) {
-           *this[it->first] = it->second;
-        }
-    }
-    
-    arbitrary_order_map(const std::map<keyType, valueType> &map)
-    {
-        reserve(map.size());
-        auto e = map.end();
-        for (auto it = map.begin(); it != e; ++it) {
-            *this[it->first] = it->second;
-        }
-    }
-    
+	arbitrary_order_map(const std::unordered_map<keyType, valueType> &map)
+	{
+		reserve(map.size());
+		auto e = map.end();
+		for (auto it = map.begin(); it != e; ++it) {
+		   *this[it->first] = it->second;
+		}
+	}
+	
+	arbitrary_order_map(const std::map<keyType, valueType> &map)
+	{
+		reserve(map.size());
+		auto e = map.end();
+		for (auto it = map.begin(); it != e; ++it) {
+			*this[it->first] = it->second;
+		}
+	}
+	
 	~arbitrary_order_map()
 	{
 	}
 
 	arbitrary_order_map(const arbitrary_order_map & V)
 	{
-        reserve(V.size());
-        auto e = V.keys.end();
+		reserve(V.size());
+		auto e = V.keys.end();
 		for (auto it = V.keys.begin(); it != e; ++it) {
 			(*this)[(*it)->first] = ((*it)->second);
 		}
+	}
+
+	arbitrary_order_map(arbitrary_order_map&& V)
+	{
+		keys = std::move(V.keys);
+		data = std::move(V.data);
 	}
 
 	arbitrary_order_map& operator=(const arbitrary_order_map& V)
@@ -79,9 +85,9 @@ public:
 		if(this == &V) {
 			return *this;
 		}
-        this->clear();
-        reserve(V.size());
-        auto e = V.keys.end();
+		this->clear();
+		reserve(V.size());
+		auto e = V.keys.end();
 		for (auto it = V.keys.begin(); it != e; ++it) {
 			(*this)[(*it)->first] = ((*it)->second);
 		}
@@ -89,19 +95,31 @@ public:
 		return *this;
 	}
 
-    void reserve(size_t n)
-    {
-        data.reserve(n);
-        keys.reserve(n);
-    }
-    
+	arbitrary_order_map& operator=(arbitrary_order_map&& V)
+	{
+		if(this == &V) {
+			return *this;
+		}
+		
+		keys = std::move(V.keys);
+		data = std::move(V.data);
+
+		return *this;
+	}
+
+	void reserve(size_t n)
+	{
+		data.reserve(n);
+		keys.reserve(n);
+	}
+	
 	valueType &operator[](const keyType &key)
 	{
 		dataIterator it = data.find(key);
 		if (it == data.end()) {
 			pairType* p = new pairType(key, valueType());
-            keys.emplace_back(std::move(ptrType(p)));
-            data.emplace_hint(it, std::move(dataType(key, p)));
+			keys.emplace_back(ptrType(p));
+			data.emplace_hint(it, dataType(key, p));
 			return p->second;
 		}
 		return ((*it).second)->second;
@@ -140,7 +158,7 @@ public:
 			return 0;
 		}
 		pairType * p = (*it).second.get();
-        auto e = keys.end();
+		auto e = keys.end();
 		for (keyIterator it2 = keys.begin(); it2 != e; ++it2) {
 			if ((*it2).get() == p) {
 				keys.erase(it2);
@@ -445,7 +463,7 @@ public:
 			return keys.end();
 		}
 		pairType * p = (*it).second;
-        auto e = keys.end();
+		auto e = keys.end();
 		for (keyIterator keyIt = keys.begin(); keyIt != e; ++keyIt) {
 			if ((*keyIt).get() == p) {
 				return keyIt;
@@ -462,7 +480,7 @@ public:
 
 	iterator erase(iterator &start, iterator &finnish)
 	{
-        auto e = finnish.real();
+		auto e = finnish.real();
 		for (keyIterator keyIt = start.real(); keyIt != e;) {
 			data.erase((*keyIt++)->first);
 		}
@@ -502,22 +520,22 @@ public:
 
 	iterator insert(iterator at, pairType  val)
 	{
-        auto dit = find(val.first);
+		auto dit = find(val.first);
 		if (dit != end()) {
-            return dit;
-        } else {
-            pairType* n = (new pairType(val));
-            iterator it = keys.emplace(at.real(), std::move(ptrType(n)));
-            data.emplace_hint(data.end(), std::move(dataType(val.first, n)));
-            return it;
-        }
+			return dit;
+		} else {
+			pairType* n = (new pairType(val));
+			iterator it = keys.emplace(at.real(), ptrType(n));
+			data.emplace_hint(data.end(), dataType(val.first, n));
+			return it;
+		}
 	}
 
 	iterator insert(iterator start, iterator finnish)
 	{
 		iterator insIt = end();
-        reserve(std::distance(start, finnish));
-        auto e = finnish.real();
+		reserve(std::distance(start, finnish));
+		auto e = finnish.real();
 		for (keyIterator keyIt = start.real(); keyIt != e;) {
 			insIt = insert(end(), *(*keyIt++));
 		}
@@ -527,8 +545,8 @@ public:
 	iterator insert(iterator at, iterator start, iterator finnish)
 	{
 		iterator insIt = at;
-        reserve(std::distance(start, finnish));
-        auto e = finnish.real();
+		reserve(std::distance(start, finnish));
+		auto e = finnish.real();
 		for (keyIterator keyIt = start.real(); keyIt != e;) {
 			insIt = insert(insIt, *(*keyIt++));
 			++insIt;
