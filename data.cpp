@@ -670,7 +670,9 @@ bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPrett
 	if (fd) {
 		std::string w = writeXML(rootElem, bPretty, bTabs, preWriter);
 		if (fwrite(w.data(), 1, w.size(), fd) != w.size()) {
-			debug("Failed Writing to %s.", inStr.c_str());
+            if (debug) {
+                debug("Failed Writing to %s.", inStr.c_str());
+            }
 			fclose(fd);
 			return false;
 		} else {
@@ -682,20 +684,24 @@ bool document::writeXMLFile(std::string inStr, std::string rootElem, bool bPrett
 			}
 			if (json::fileExists(inStr.c_str())) {
 				if (rename(inStr.c_str(), sInstrPlusBak.c_str()) != 0) {
-					debug("Failed to backup %s.", inStr.c_str());
+                    if (debug) {
+                        debug("Failed to backup %s.", inStr.c_str());
+                    }
 					return false;
 				}
 			}
 			if (rename(sTempFile.c_str(), inStr.c_str()) != 0) {
-				debug("Failed rename temp file to %s.", inStr.c_str());
-				if (rename(sInstrPlusBak.c_str(), inStr.c_str()) != 0) {
+                if (debug) {
+                    debug("Failed rename temp file to %s.", inStr.c_str());
+                }
+				if (rename(sInstrPlusBak.c_str(), inStr.c_str()) != 0 && debug) {
 					debug("Failed restore backup of %s.", inStr.c_str());
 				}
 				return false;
 			}
 
 			if (json::fileExists(sInstrPlusBak.c_str())) {
-				if (remove(sInstrPlusBak.c_str()) != 0) {
+				if (remove(sInstrPlusBak.c_str()) != 0 && debug) {
 					debug("Failed remove backup of %s.", inStr.c_str());
 				}
 			}

@@ -926,7 +926,9 @@ namespace JSON_NAMESPACE
 	{
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json find: index %lu out of bounds", index);
+            if (debug) {
+                debug("json find: index %lu out of bounds", index);
+            }
 			return iterator();
 		}
 		if (arr) {
@@ -947,7 +949,9 @@ namespace JSON_NAMESPACE
 	reverse_iterator value::rfind(size_t index) const {
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json rfind: index %lu out of bounds", index);
+            if (debug) {
+                debug("json rfind: index %lu out of bounds", index);
+            }
 			return reverse_iterator();
 		}
 		return reverse_iterator(find(index));
@@ -1266,7 +1270,9 @@ namespace JSON_NAMESPACE
 	void value::erase(size_t index) {
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json erase: index %lu out of bounds", index);
+            if (debug) {
+                debug("json erase: index %lu out of bounds", index);
+            }
 			return;
 		}
 		if (arr) {
@@ -1315,7 +1321,9 @@ namespace JSON_NAMESPACE
 	bool value::exists(size_t index) {
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json exists: index %lu out of bounds", index);
+            if (debug) {
+                debug("json exists: index %lu out of bounds", index);
+            }
 			return false;
 		}
 		if (isA(JSON_ARRAY) && arr != NULL) {
@@ -1358,7 +1366,9 @@ namespace JSON_NAMESPACE
 	{
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json insert: index %lu out of bounds", index);
+            if (debug) {
+                debug("json insert: index %lu out of bounds", index);
+            }
 			return iterator();
 		}
 		if (myType != JSON_ARRAY) {
@@ -2098,7 +2108,9 @@ namespace JSON_NAMESPACE
 	{
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json at: index %lu out of bounds", index);
+            if (debug) {
+                debug("json at: index %lu out of bounds", index);
+            }
 			return *this;
 		}
 		if (myType == JSON_OBJECT) {
@@ -2429,7 +2441,9 @@ namespace JSON_NAMESPACE
 	value& value::operator[](size_t index) {
 		assert(i64(index) >= 0);
 		if (index > size_t(-1) / size_t(2) - 1) {
-			debug("json find: index %lu out of bounds", index);
+            if (debug) {
+                debug("json find: index %lu out of bounds", index);
+            }
 			return *this;
 		}
 		if (arr) {
@@ -4088,13 +4102,13 @@ namespace JSON_NAMESPACE
 		if (fd == NULL) {
 			if (fileExists(sInstrPlusBak.c_str())) {
 				fd = fopen(sInstrPlusBak.c_str(), "rb");
-				if (fd) {
+				if (debug && fd) {
 					debug("File opened from backup %s.", sInstrPlusBak.c_str());
 				}
 			}
 		} else {
 			if (fd && fileExists(sInstrPlusBak.c_str())) {
-				if (remove(sInstrPlusBak.c_str()) != 0) {
+				if (remove(sInstrPlusBak.c_str()) != 0 && debug) {
 					debug("Failed remove backup of %s.", inStr.c_str());
 				}
 			}
@@ -4197,7 +4211,9 @@ namespace JSON_NAMESPACE
 			std::string w = write(bPretty, preWriter);
 
 			if (fwrite(w.data(), 1, w.size(), fd) != w.size()) {
-				debug("Failed Writing to %s.", inStr.c_str());
+                if (debug) {
+                    debug("Failed Writing to %s.", inStr.c_str());
+                }
 				fclose(fd);
 				return false;
 			} else {
@@ -4209,20 +4225,24 @@ namespace JSON_NAMESPACE
 				}
 				if (fileExists(inStr.c_str())) {
 					if (rename(inStr.c_str(), sInstrPlusBak.c_str()) != 0) {
-						debug("Failed to backup %s.", inStr.c_str());
+						if (debug) {
+                            debug("Failed to backup %s.", inStr.c_str());
+                        }
 						return false;
 					}
 				}
 				if (rename(sTempFile.c_str(), inStr.c_str()) != 0) {
-					debug("Failed rename temp file to %s.", inStr.c_str());
-					if (rename(sInstrPlusBak.c_str(), inStr.c_str()) != 0) {
+                    if (debug) {
+                        debug("Failed rename temp file to %s.", inStr.c_str());
+                    }
+					if (rename(sInstrPlusBak.c_str(), inStr.c_str()) != 0 && debug) {
 						debug("Failed restore backup of %s.", inStr.c_str());
 					}
 					return false;
 				}
 
 				if (fileExists(sInstrPlusBak.c_str())) {
-					if (remove(sInstrPlusBak.c_str()) != 0) {
+					if (remove(sInstrPlusBak.c_str()) != 0 && debug) {
 						debug("Failed remove backup of %s.", inStr.c_str());
 					}
 				}
