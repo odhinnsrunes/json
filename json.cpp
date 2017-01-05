@@ -1594,6 +1594,33 @@ namespace JSON_NAMESPACE
 		// m_key = V.m_key;
 	}
 
+    value::value(value&& V)
+    {
+        m_number = V.m_number;
+        m_places = V.m_places;
+        m_boolean = V.m_boolean;
+        
+        str = std::move(V.str);
+        
+        myType = V.myType;
+        
+        obj = V.obj;
+        
+        arr = V.arr;
+
+        pParentObject = V.pParentObject;
+        pParentArray = V.pParentArray;
+        
+        V.m_number = 0;
+        V.m_places = -1;
+        V.m_boolean = false;
+        V.myType = JSON_VOID;
+        V.obj = NULL;
+        V.arr = NULL;
+        V.pParentObject = NULL;
+        V.pParentArray = NULL;
+    }
+    
 	value::value(const document& V) {
 		m_number = V.m_number;
 		m_places = V.m_places;
@@ -1789,97 +1816,174 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	value& value::operator=(const value& V) {
-		if (this == &V)
-			return *this;
-
-		if (debug) {
-			if (myType != V.myType) {
-				switch(myType) {
-					// case JSON_NULL:
-					// 	debug("json operator= changed type from NULL to %s", typeName(V.myType).c_str());
-					// 	break;
-
-					case JSON_BOOLEAN:
-						if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
-							debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(V.myType).c_str());
-						}
-						break;
-
-					case JSON_NUMBER:
-						if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
-							debug("json operator= changed type from Number %f to %s", m_number, typeName(V.myType).c_str());
-						}
-						break;
-
-					case JSON_STRING:
-						if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
-							debug("json operator= changed type from String '%s' to %s", str.c_str(), typeName(V.myType).c_str());
-						}
-						break;
-
-					case JSON_ARRAY:
-						debug("json operator= changed type from Array to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
-						break;
-
-					case JSON_OBJECT:
-						debug("json operator= changed type from Object to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
-						break;
-
-					default:
-						break;
-				}
-			}
-		}
-
-		m_number = V.m_number;
-		m_places = V.m_places;
-		m_boolean = V.m_boolean;
-
-		str.assign(V.str);
-
-		myType = V.myType;
-		
-		if (obj && V.obj == NULL) {
-			delete obj;
-			obj = NULL;
-		}
-		if (V.obj && obj == NULL) {
-			obj = new object(V.obj);
-		} else if (V.obj) {
-			*obj = *V.obj;
-		}
-		
-		if (arr && V.arr == NULL) {
-			delete arr;
-			arr = NULL;
-		}
-		if (V.arr && arr == NULL) {
-			arr = new array(V.arr);
-		} else if (V.arr) {
-			*arr = *V.arr;
-		}
-		if (myType != JSON_VOID) {
-			if (pParentObject) {
-				pParentObject->setNotEmpty();
-				if (arr) {
-					arr->setParentObject(pParentObject);
-				} else if (obj) {
-					obj->setParentObject(pParentObject);
-				}
-			} else if (pParentArray) {
-				pParentArray->setNotEmpty();
-				if (arr) {
-					arr->setParentArray(pParentArray);
-				} else if (obj) {
-					obj->setParentArray(pParentArray);
-				}
-			}
-		}
-		// m_key = V.m_key;
-		return *this;
-	}
-		
+    value& value::operator=(const value& V) {
+        if (this == &V)
+            return *this;
+        
+        if (debug) {
+            if (myType != V.myType) {
+                switch(myType) {
+                        // case JSON_NULL:
+                        // 	debug("json operator= changed type from NULL to %s", typeName(V.myType).c_str());
+                        // 	break;
+                        
+                    case JSON_BOOLEAN:
+                        if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+                            debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(V.myType).c_str());
+                        }
+                        break;
+                        
+                    case JSON_NUMBER:
+                        if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+                            debug("json operator= changed type from Number %f to %s", m_number, typeName(V.myType).c_str());
+                        }
+                        break;
+                        
+                    case JSON_STRING:
+                        if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+                            debug("json operator= changed type from String '%s' to %s", str.c_str(), typeName(V.myType).c_str());
+                        }
+                        break;
+                        
+                    case JSON_ARRAY:
+                        debug("json operator= changed type from Array to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
+                        break;
+                        
+                    case JSON_OBJECT:
+                        debug("json operator= changed type from Object to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+        }
+        
+        m_number = V.m_number;
+        m_places = V.m_places;
+        m_boolean = V.m_boolean;
+        
+        str.assign(V.str);
+        
+        myType = V.myType;
+        
+        if (obj && V.obj == NULL) {
+            delete obj;
+            obj = NULL;
+        }
+        if (V.obj && obj == NULL) {
+            obj = new object(V.obj);
+        } else if (V.obj) {
+            *obj = *V.obj;
+        }
+        
+        if (arr && V.arr == NULL) {
+            delete arr;
+            arr = NULL;
+        }
+        if (V.arr && arr == NULL) {
+            arr = new array(V.arr);
+        } else if (V.arr) {
+            *arr = *V.arr;
+        }
+        if (myType != JSON_VOID) {
+            if (pParentObject) {
+                pParentObject->setNotEmpty();
+                if (arr) {
+                    arr->setParentObject(pParentObject);
+                } else if (obj) {
+                    obj->setParentObject(pParentObject);
+                }
+            } else if (pParentArray) {
+                pParentArray->setNotEmpty();
+                if (arr) {
+                    arr->setParentArray(pParentArray);
+                } else if (obj) {
+                    obj->setParentArray(pParentArray);
+                }
+            }
+        }
+        // m_key = V.m_key;
+        return *this;
+    }
+	
+    value& value::operator=(value&& V) {
+        if (this == &V)
+            return *this;
+        
+        if (debug) {
+            if (myType != V.myType) {
+                switch(myType) {
+                        // case JSON_NULL:
+                        // 	debug("json operator= changed type from NULL to %s", typeName(V.myType).c_str());
+                        // 	break;
+                        
+                    case JSON_BOOLEAN:
+                        if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+                            debug("json operator= changed type from Boolean %i to %s", m_boolean, typeName(V.myType).c_str());
+                        }
+                        break;
+                        
+                    case JSON_NUMBER:
+                        if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+                            debug("json operator= changed type from Number %f to %s", m_number, typeName(V.myType).c_str());
+                        }
+                        break;
+                        
+                    case JSON_STRING:
+                        if (V.myType == JSON_OBJECT || V.myType == JSON_ARRAY) {
+                            debug("json operator= changed type from String '%s' to %s", str.c_str(), typeName(V.myType).c_str());
+                        }
+                        break;
+                        
+                    case JSON_ARRAY:
+                        debug("json operator= changed type from Array to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
+                        break;
+                        
+                    case JSON_OBJECT:
+                        debug("json operator= changed type from Object to %s, orphanning:\n%s\n", typeName(V.myType).c_str(), this->print(0, true).c_str());
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+        }
+        
+        m_number = V.m_number;
+        m_places = V.m_places;
+        m_boolean = V.m_boolean;
+        
+        str = std::move(V.str);
+        
+        myType = V.myType;
+        
+        if (obj) {
+            delete obj;
+        }
+        obj = V.obj;
+        
+        if (arr) {
+            delete arr;
+        }
+        arr = V.arr;
+        
+        pParentObject = V.pParentObject;
+        pParentArray = V.pParentArray;
+        
+        V.m_number = 0;
+        V.m_places = -1;
+        V.myType = JSON_VOID;
+        
+        V.obj = NULL;
+        V.arr = NULL;
+        
+        V.pParentObject = NULL;
+        V.pParentArray = NULL;
+        
+        return *this;
+    }
+    
 	value::value(bool V) {
 		m_number = (double)V;
 		m_places = -1;
@@ -2605,107 +2709,182 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	bool value::pruneEmptyValues()
-	{
-		switch(myType) {
-			default:
-			case JSON_VOID:
-				return false;
-
-			case JSON_NULL:
-				m_number = 0;
-				m_places = -1;
-				m_boolean = false;
-				myType = JSON_VOID;
-				str.clear();
-				return false;
-
-			case JSON_BOOLEAN:
-				if (m_boolean == false) {
-					m_number = 0;
-					m_places = -1;
-					myType = JSON_VOID;
-					str.clear();
-					return false;
-				}
-				return true;
-
-			case JSON_NUMBER:
-				if (m_number == 0.0 && m_places < 0) {
-					m_places = -1;
-					m_boolean = false;
-					myType = JSON_VOID;
-					str.clear();
-					return false;
-				}
-				return true;
-
-			case JSON_STRING:
-				if (str.empty()) {
-					m_number = 0;
-					m_places = -1;
-					m_boolean = false;
-					myType = JSON_VOID;
-					return false;
-				}
-				return true;
-
-			case JSON_ARRAY:
-			{
-				bool bNotEmpty = false;
-				for (reverse_iterator rit = (*this).rbegin(); rit != (*this).rend(); ++rit) {
-					if ((*rit).isA(JSON_NULL) && bNotEmpty == true) {
-						continue;  // NULLs are placeholders in arrays and only ones after the last non null value are pruned.
-					}
-					if ((*rit).pruneEmptyValues()) {
-						bNotEmpty = true;
-					}
-				}
-				if (bNotEmpty == false) {
-					m_number = 0.0;
-					m_places = -1;
-					m_boolean = false;
-					str.clear();
-					myType = JSON_VOID;
-					if (obj) {
-						delete obj;
-						obj = NULL;
-					}
-					if (arr) {
-						delete arr;
-						arr = NULL;
-					}
-				}
-				return bNotEmpty;
-			}
-			case JSON_OBJECT:
-			{
-				bool bNotEmpty = false;
-				for (value &val : *this) {
-					if (val.pruneEmptyValues()) {
-						bNotEmpty = true;
-					}
-				}
-				if (bNotEmpty == false) {
-					m_number = 0.0;
-					m_places = -1;
-					m_boolean = false;
-					str.clear();
-					myType = JSON_VOID;
-					if (obj) {
-						delete obj;
-						obj = NULL;
-					}
-					if (arr) {
-						delete arr;
-						arr = NULL;
-					}
-				}
-				return bNotEmpty;
-			}
-		}
-	}
-		
+    bool value::pruneEmptyValues()
+    {
+        switch(myType) {
+            default:
+            case JSON_VOID:
+                return false;
+                
+            case JSON_NULL:
+                m_number = 0;
+                m_places = -1;
+                m_boolean = false;
+                myType = JSON_VOID;
+                str.clear();
+                return false;
+                
+            case JSON_BOOLEAN:
+                if (m_boolean == false) {
+                    m_number = 0;
+                    m_places = -1;
+                    myType = JSON_VOID;
+                    str.clear();
+                    return false;
+                }
+                return true;
+                
+            case JSON_NUMBER:
+                if (m_number == 0.0 && m_places < 0) {
+                    m_places = -1;
+                    m_boolean = false;
+                    myType = JSON_VOID;
+                    str.clear();
+                    return false;
+                }
+                return true;
+                
+            case JSON_STRING:
+                if (str.empty()) {
+                    m_number = 0;
+                    m_places = -1;
+                    m_boolean = false;
+                    myType = JSON_VOID;
+                    return false;
+                }
+                return true;
+                
+            case JSON_ARRAY:
+            {
+                bool bNotEmpty = false;
+                for (reverse_iterator rit = (*this).rbegin(); rit != (*this).rend(); ++rit) {
+                    if ((*rit).isA(JSON_NULL) && bNotEmpty == true) {
+                        continue;  // NULLs are placeholders in arrays and only ones after the last non null value are pruned.
+                    }
+                    if ((*rit).pruneEmptyValues()) {
+                        bNotEmpty = true;
+                    }
+                }
+                if (bNotEmpty == false) {
+                    m_number = 0.0;
+                    m_places = -1;
+                    m_boolean = false;
+                    str.clear();
+                    myType = JSON_VOID;
+                    if (obj) {
+                        delete obj;
+                        obj = NULL;
+                    }
+                    if (arr) {
+                        delete arr;
+                        arr = NULL;
+                    }
+                }
+                return bNotEmpty;
+            }
+            case JSON_OBJECT:
+            {
+                bool bNotEmpty = false;
+                for (value &val : *this) {
+                    if (val.pruneEmptyValues()) {
+                        bNotEmpty = true;
+                    }
+                }
+                if (bNotEmpty == false) {
+                    m_number = 0.0;
+                    m_places = -1;
+                    m_boolean = false;
+                    str.clear();
+                    myType = JSON_VOID;
+                    if (obj) {
+                        delete obj;
+                        obj = NULL;
+                    }
+                    if (arr) {
+                        delete arr;
+                        arr = NULL;
+                    }
+                }
+                return bNotEmpty;
+            }
+        }
+    }
+    
+    bool value::compact()
+    {
+        switch(myType) {
+            default:
+                return true;
+                
+            case JSON_VOID:
+                return false;
+                
+            case JSON_ARRAY:
+            {
+                bool bNotEmpty = false;
+                size_t s = arr->size();
+                for (auto rit = arr->rbegin(); rit != arr->rend() && s > 0; ++rit) {
+                    if ((*rit).compact()) {
+                        bNotEmpty = true;
+                        break;
+                    } else {
+                        s--;
+                    }
+                }
+                
+                if (bNotEmpty == false) {
+                    m_number = 0.0;
+                    m_places = -1;
+                    m_boolean = false;
+                    str.clear();
+                    myType = JSON_VOID;
+                    if (obj) {
+                        delete obj;
+                        obj = NULL;
+                    }
+                    if (arr) {
+                        delete arr;
+                        arr = NULL;
+                    }
+                } else {
+                    resize(s);
+                }
+                return bNotEmpty;
+            }
+            case JSON_OBJECT:
+            {
+                bool bNotEmpty = false;
+                for (auto it = obj->begin(); it != obj->end();) {
+                    if ((*it).second.compact()) {
+                        bNotEmpty = true;
+                        ++it;
+                    } else {
+                        auto it2 = it;
+                        ++it2;
+                        obj->erase(it);
+                        it = it2;
+                    }
+                }
+                if (bNotEmpty == false) {
+                    m_number = 0.0;
+                    m_places = -1;
+                    m_boolean = false;
+                    str.clear();
+                    myType = JSON_VOID;
+                    if (obj) {
+                        delete obj;
+                        obj = NULL;
+                    }
+                    if (arr) {
+                        delete arr;
+                        arr = NULL;
+                    }
+                }
+                return bNotEmpty;
+            }
+        }
+    }
+    
 	bool value::empty() const
 	{
 		switch (isA()) {

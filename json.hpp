@@ -206,6 +206,7 @@ namespace JSON_NAMESPACE
 		
 		value();
 		value(const value& V);
+        value(value&& V);
 		value(const document& V);
 
 #if defined SUPPORT_ORDERED_JSON && !defined _USE_ADDED_ORDER_
@@ -240,7 +241,8 @@ namespace JSON_NAMESPACE
 
 		void setParentArray(array* pSetTo);
 
-		value& operator=(const value& V);
+        value& operator=(const value& V);
+        value& operator=(value&& V);
 		// value& operator=(const bool &V);
 		// value& operator=(const std::string& V);
 		// value& operator=(const char* V);
@@ -314,8 +316,10 @@ namespace JSON_NAMESPACE
 		void resize(size_t iCount);
 		void resize(size_t iCount, value val);
 
-		bool pruneEmptyValues();
-		
+        bool pruneEmptyValues();
+
+        bool compact();
+
 		bool empty() const; // Is array empty or object empty or string empty.  Number and booleans return false, NULL and VOID return true.
 		
 		std::string getKey(size_t index); // VERY slow for objects.  Don't use inside a for loop.  Use iterators instead.
