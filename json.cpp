@@ -1610,14 +1610,14 @@ namespace JSON_NAMESPACE
 		myType = V.myType;
 
 		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+        arr = NULL;
 
-		arr = NULL;
-		if (V.arr) {
+        if (V.myType == JSON_OBJECT) {
+			obj = new object(V.obj);
+		} else if (V.myType == JSON_ARRAY) {
 			arr = new array(V.arr);
 		}
+        
 		pParentObject = NULL;
 		pParentArray = NULL;
 		// m_key = V.m_key;
@@ -1662,15 +1662,15 @@ namespace JSON_NAMESPACE
 		myType = V.myType;
 
 		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+        arr = NULL;
+        
+        if (V.myType == JSON_OBJECT) {
+            obj = new object(V.obj);
+        } else if (V.myType == JSON_ARRAY) {
+            arr = new array(V.arr);
+        }
 
-		arr = NULL;
-		if (V.arr) {
-			arr = new array(V.arr);
-		}
-		pParentObject = NULL;
+        pParentObject = NULL;
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
@@ -1688,16 +1688,16 @@ namespace JSON_NAMESPACE
 
 		myType = JSONTypes((int)V.myType);
 
-		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+        obj = NULL;
+        arr = NULL;
+        
+        if (V.myType == JSON_OBJECT) {
+            obj = new object(V.obj);
+        } else if (V.myType == JSON_ARRAY) {
+            arr = new array(V.arr);
+        }
 
-		arr = NULL;
-		if (V.arr) {
-			arr = new array(V.arr);
-		}
-		pParentObject = NULL;
+        pParentObject = NULL;
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
@@ -1713,16 +1713,16 @@ namespace JSON_NAMESPACE
 
 		myType = JSONTypes((int)V.myType);
 
-		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+        obj = NULL;
+        arr = NULL;
+        
+        if (V.myType == JSON_OBJECT) {
+            obj = new object(V.obj);
+        } else if (V.myType == JSON_ARRAY) {
+            arr = new array(V.arr);
+        }
 
-		arr = NULL;
-		if (V.arr) {
-			arr = new array(V.arr);
-		}
-		pParentObject = NULL;
+        pParentObject = NULL;
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
@@ -1739,16 +1739,16 @@ namespace JSON_NAMESPACE
 
 		myType = JSONTypes((int)V.myType);
 
-		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+        obj = NULL;
+        arr = NULL;
+        
+        if (V.myType == JSON_OBJECT) {
+            obj = new object(V.obj);
+        } else if (V.myType == JSON_ARRAY) {
+            arr = new array(V.arr);
+        }
 
-		arr = NULL;
-		if (V.arr) {
-			arr = new array(V.arr);
-		}
-		pParentObject = NULL;
+        pParentObject = NULL;
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
@@ -1764,16 +1764,16 @@ namespace JSON_NAMESPACE
 
 		myType = JSONTypes((int)V.myType);
 
-		obj = NULL;
-		if (V.obj) {
-			obj = new object(V.obj);
-		}
+        obj = NULL;
+        arr = NULL;
+        
+        if (V.myType == JSON_OBJECT) {
+            obj = new object(V.obj);
+        } else if (V.myType == JSON_ARRAY) {
+            arr = new array(V.arr);
+        }
 
-		arr = NULL;
-		if (V.arr) {
-			arr = new array(V.arr);
-		}
-		pParentObject = NULL;
+        pParentObject = NULL;
 		pParentArray = NULL;
 		// m_key = V.m_key;
 	}
