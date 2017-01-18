@@ -205,11 +205,11 @@ namespace JSON_NAMESPACE
 			generateError(inputString, "Error Parsing null.");
 			*bFailed = true;
 		}
-		ret.myType = JSON_NULL;
-		if (ret.obj)
+		if (ret.myType == JSON_OBJECT)
 			delete ret.obj;
-		if (ret.arr)
+		else if (ret.myType == JSON_ARRAY)
 			delete ret.arr;
+        ret.myType = JSON_NULL;
 
 		ret.str.clear();
 
@@ -589,12 +589,12 @@ namespace JSON_NAMESPACE
 			falseParse(a, inputString, bFailed);
 			return;
 		case '"': {
-			a.myType = JSON_STRING;
-			if (a.obj)
+			if (a.myType == JSON_OBJECT)
 				delete a.obj;
-			if (a.arr)
+			if (a.myType == JSON_ARRAY)
 				delete a.arr;
-			a.m_boolean = false;
+            a.myType = JSON_STRING;
+            a.m_boolean = false;
 			a.m_number = 0.0;
 			a.m_places = -1;
 			if (!a.str.empty())
@@ -2004,7 +2004,7 @@ namespace JSON_NAMESPACE
         }
         myType = V.myType;
 		
- 		obj = V.obj;
+        obj = V.obj;
 		
 		if (myType != JSON_VOID) {
 			if (pParentObject) {
