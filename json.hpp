@@ -401,13 +401,16 @@ namespace JSON_NAMESPACE
 		bool m_boolean;
 		std::string str;
 		JSONTypes myType;
-		object* obj;
-		array* arr;
-		
+        union {
+            object* obj;
+            array* arr;
+        };
 		std::string m_key;
-
-		object* pParentObject;
-		array* pParentArray;
+        
+//        union {
+            object* pParentObject;
+            array* pParentArray;
+//        };
 		static DEBUGPTR debug;
 
 	private:
