@@ -3,11 +3,35 @@
 
 using namespace std;
 
+enum myKeys{
+	one = 1,
+	two,
+	three
+};
+
+enum myOtherKeys{
+	four = 4,
+	five,
+	six,
+	seven
+};
+
+#define MYKEY(z) JSONENUMKEY(myKeys, z)
+#define MYOTHERKEY(z) JSONENUMKEY(myOtherKeys, z)
+
 template <class T>
 void test(const char * type)
 {
 	// bStarted = true;
 	cout << "Testing: " << type << endl;
+	T jEnum;
+
+	jEnum[MYKEY(one)] = one;
+	jEnum[MYKEY(two)] = two;
+	jEnum[MYKEY(three)] = three;
+	jEnum[MYOTHERKEY(four)] = four; // works
+
+
 	T j1;
 	cout << "Parse File 1:               ";
 	if (j1.parseFile("test1.json")) {

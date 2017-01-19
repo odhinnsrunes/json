@@ -1046,8 +1046,19 @@ namespace JSON_NAMESPACE
 		
 	std::ostream& operator<<(std::ostream& S, document& doc);
 	std::ostream& operator<<(std::ostream& S, value& doc);
-	
+
+#ifndef _USE_ADDED_ORDER_
+	template <typename T>
+	const char * enumKey(T e, const char * keyString)
+	{
+		(void) e;
+		return keyString;
+	}
+	#define JSONENUMKEY(x, y) json::enumKey<x>(y, #y)
+#endif
 }
+
+
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
 #pragma warn + 8026
 #pragma warn + 8027
