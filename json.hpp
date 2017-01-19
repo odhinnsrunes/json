@@ -267,23 +267,23 @@ namespace JSON_NAMESPACE
 		value& toNull();
 		value& fixedDecimal(int iPlaces);
 		
-		double number();
-		float _float();
-		i64 integer();
-		ui64 _uint64();
-		int _int();
-		i64 _integer64();
-		double _double();
-        size_t _size_t();
-		long _long();
-		short _short();
-		char _char();
-		unsigned int _uint();
-		unsigned long _ulong();
-		unsigned short _ushort();
-		unsigned char _uchar();
+		double number() const;
+		float _float() const;
+		i64 integer() const;
+		ui64 _uint64() const;
+		int _int() const;
+		i64 _integer64() const;
+		double _double() const;
+        size_t _size_t() const;
+		long _long() const;
+		short _short() const;
+		char _char() const;
+		unsigned int _uint() const;
+		unsigned long _ulong() const;
+		unsigned short _ushort() const;
+		unsigned char _uchar() const;
 
-		bool boolean();
+		bool boolean() const;
 		std::string& string();
 		DEPRECATED (const char* safeCString());
 		const char* c_str();
@@ -326,31 +326,31 @@ namespace JSON_NAMESPACE
 		
 		value& at(size_t index);
 		
-		bool operator==(value V) const;
-		bool operator!=(value V) const;
-		bool operator>(value V) const;
-		bool operator<(value V) const;
-		bool operator>=(value V) const;
-		bool operator<=(value V) const;
+		bool operator==(const value& V) const;
+		bool operator!=(const value& V) const;
+		bool operator>(const value& V) const;
+		bool operator<(const value& V) const;
+		bool operator>=(const value& V) const;
+		bool operator<=(const value& V) const;
 		
-		value operator+(value V) const;
-		value operator-(value V) const;
-		value operator*(value V) const;
-		value operator/(value V) const;
-		value operator%(value V) const;
+		value operator+(const value& V) const;
+		value operator-(const value& V) const;
+		value operator*(const value& V) const;
+		value operator/(const value& V) const;
+		value operator%(const value& V) const;
 		
-		value &operator+=(value V);
-		value &operator-=(value V);
-		value &operator*=(value V);
-		value &operator/=(value V);
-		value &operator%=(value V);
+		value &operator+=(const value& V);
+		value &operator-=(const value& V);
+		value &operator*=(const value& V);
+		value &operator/=(const value& V);
+		value &operator%=(const value& V);
 		
 		value operator++(int);
 		value &operator++();
 		value operator--(int);
 		value &operator--();
 		
-		value operator-();
+		value operator-() const;
 		
 		size_t size() const;
 		size_t arraySize();
@@ -390,6 +390,8 @@ namespace JSON_NAMESPACE
         // static void threadDelete(array *);
         // static void threadDeleteObjectWorker(object *);
         // static void threadDeleteArrayWorker(array *);
+		
+		std::string &stringC(std::string &dest)const;
 
 		void cprint(MovingCharPointer& ptr, int depth = 1, bool bPretty = false) const;
 		std::string print(int depth = 0, bool bPretty = false) const;

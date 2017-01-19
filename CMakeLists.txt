@@ -60,6 +60,12 @@ set_property(TARGET json PROPERTY CXX_STANDARD 11)
 
 if(DATA_DOCUMENT)
 if(ORDERED_JSON)
+
+add_executable(test test.cpp)
+target_compile_definitions(test PRIVATE SUPPORT_ORDERED_JSON _CRT_SECURE_NO_WARNINGS)
+set_property(TARGET test PROPERTY CXX_STANDARD 11)
+target_link_libraries(test PRIVATE json)
+
 if(SAMPLES)
 
 add_executable(json2xml json2xml.cpp)

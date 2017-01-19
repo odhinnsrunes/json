@@ -953,7 +953,7 @@ namespace JSON_NAMESPACE
 		return reverse_iterator(++it);
 	}
 	
-	bool value::boolean() {
+	bool value::boolean() const {
 		switch (myType) {
 		case JSON_VOID:
 		case JSON_NULL:
@@ -3423,7 +3423,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 #endif
-	double value::number() {
+	double value::number() const {
 		switch (myType) {
 		case JSON_NUMBER:
 			return m_number;
@@ -3443,9 +3443,9 @@ namespace JSON_NAMESPACE
 			iterator it = (*this).find("#value");
 			if (it != (*this).end()) {
 				return (*it).m_number;
-			} else {
+			}/* else {
 				str.erase();
-			}
+			}*/
 			return 0;
 		}	
 		default:
@@ -3453,59 +3453,59 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	i64 value::integer() {
+	i64 value::integer() const {
 		return (i64)number();
 	}
 
-	ui64 value::_uint64() {
+	ui64 value::_uint64() const {
 		return (ui64)number();
 	}
 
-	float value::_float() {
+	float value::_float() const {
 		return (float)number();
 	}
 
-	long value::_long() {
+	long value::_long() const {
 		return (long)number();
 	}
 
-	double value::_double() {
+	double value::_double() const {
 		return number();
 	}
 
-	int value::_int() {
+	int value::_int() const {
 		return (int)number();
 	}
 
-	i64 value::_integer64() {
+	i64 value::_integer64() const {
 		return (i64)number();
 	}
 
-	size_t value::_size_t() {
+	size_t value::_size_t() const {
 		return (size_t)number();
 	}
 
-	short value::_short() {
+	short value::_short() const {
 		return (short)number();
 	}
 
-	char value::_char() {
+	char value::_char() const {
 		return (char)number();
 	}
 
-	unsigned long value::_ulong() {
+	unsigned long value::_ulong() const {
 		return (long)number();
 	}
 
-	unsigned int value::_uint() {
+	unsigned int value::_uint() const {
 		return (int)number();
 	}
 
-	unsigned short value::_ushort() {
+	unsigned short value::_ushort() const {
 		return (short)number();
 	}
 
-	unsigned char value::_uchar() {
+	unsigned char value::_uchar() const {
 		return (char)number();
 	}
 
@@ -3546,6 +3546,44 @@ namespace JSON_NAMESPACE
 		return str;
 	}
 
+	std::string& value::stringC(std::string & dest) const {
+		switch (myType) {
+		case JSON_STRING:
+			dest.assign(str);
+			break;
+
+		case JSON_NUMBER: {
+			// if (str.empty()) {
+				makeStringFromNumber(dest, m_places, m_number);
+			// }
+			break;
+		}
+
+		case JSON_BOOLEAN:
+			if (m_boolean)
+				dest = "true";
+			else
+				dest = "false";
+			break;
+
+		case JSON_OBJECT:
+		{
+			iterator it = (*this).find("#value");
+			if (it != (*this).end()) {
+				dest.assign((*it).str);
+			} else {
+				dest.erase();
+			}
+			break;
+		}	
+
+		default:
+			dest.erase();
+			break;
+		}
+		return dest;
+	}
+
 	const char* value::safeCString() {
 		return string().c_str();
 	}
@@ -3575,7 +3613,7 @@ namespace JSON_NAMESPACE
 		return std::string(ptr.orig());
 	}
 	
-	bool value::operator==(value V) const
+	bool value::operator==(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3590,7 +3628,10 @@ namespace JSON_NAMESPACE
 				return m_number == V.number();
 				
 			case JSON_STRING:
-				return str == V.string();
+			{
+				std::string temp;
+				return str == V.stringC(temp);
+			}
 				
 			case JSON_ARRAY:
 			{
@@ -3607,12 +3648,12 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	bool value::operator!=(value V) const
+	bool value::operator!=(const value& V) const
 	{
 		return !(*this == V);
 	}
 	
-	bool value::operator>(value V) const
+	bool value::operator>(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3627,7 +3668,10 @@ namespace JSON_NAMESPACE
 				return m_number > V.number();
 				
 			case JSON_STRING:
-				return str > V.string();
+			{
+				std::string temp;
+				return str > V.stringC(temp);
+			}
 				
 			case JSON_ARRAY:
 				if (V.myType == JSON_ARRAY)
@@ -3643,7 +3687,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	bool value::operator<(value V) const
+	bool value::operator<(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3662,7 +3706,10 @@ namespace JSON_NAMESPACE
 				return m_number < V.number();
 				
 			case JSON_STRING:
-				return str < V.string();
+			{
+				std::string temp;
+				return str < V.stringC(temp);
+			}
 				
 			case JSON_ARRAY:
 				if (V.myType == JSON_ARRAY)
@@ -3678,7 +3725,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	bool value::operator<=(value V) const
+	bool value::operator<=(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3693,7 +3740,10 @@ namespace JSON_NAMESPACE
 				return m_number <= V.number();
 				
 			case JSON_STRING:
-				return str <= V.string();
+			{
+				std::string temp;
+				return str <= V.stringC(temp);
+			}
 				
 			case JSON_ARRAY:
 				if (V.myType == JSON_ARRAY)
@@ -3709,7 +3759,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	bool value::operator>=(value V) const
+	bool value::operator>=(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3728,7 +3778,10 @@ namespace JSON_NAMESPACE
 				return m_number >= V.number();
 				
 			case JSON_STRING:
-				return str >= V.string();
+			{
+				std::string temp;
+				return str >= V.stringC(temp);
+			}
 				
 			case JSON_ARRAY:
 				if (V.myType == JSON_ARRAY)
@@ -3744,7 +3797,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	value value::operator+(value V) const
+	value value::operator+(const value& V) const
 	{
 		switch (myType) {
 			default:
@@ -3761,7 +3814,10 @@ namespace JSON_NAMESPACE
 				return value(m_number + V.number());
 				
 			case JSON_STRING:
-				return value(str + V.string());
+			{
+				std::string temp;
+				return value(str + V.stringC(temp));
+			}
 				
 			case JSON_ARRAY:
 			case JSON_OBJECT:
@@ -3778,7 +3834,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	value value::operator-(value V) const
+	value value::operator-(const value& V) const
 	{
 		switch (myType) {
 			default:
@@ -3805,7 +3861,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	value value::operator*(value V) const
+	value value::operator*(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3821,7 +3877,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	value value::operator/(value V) const
+	value value::operator/(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3834,7 +3890,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	value value::operator%(value V) const
+	value value::operator%(const value& V) const
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3847,7 +3903,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 	
-	value& value::operator+=(value V)
+	value& value::operator+=(const value& V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3861,9 +3917,12 @@ namespace JSON_NAMESPACE
 				break;
 				
 			case JSON_STRING:
-				str += V.string();
+			{
+				std::string temp;
+				str += V.stringC(temp);
 				break;
-				
+			}
+
 			case JSON_ARRAY:
                 insert(end(), V.begin(), V.end());
                 arr->setNotEmpty();
@@ -3880,7 +3939,7 @@ namespace JSON_NAMESPACE
 		return *this;
 	}
 	
-	value& value::operator-=(value V)
+	value& value::operator-=(const value& V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3906,7 +3965,7 @@ namespace JSON_NAMESPACE
 	}
 	
 	
-	value &value::operator*=(value V)
+	value &value::operator*=(const value& V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3925,7 +3984,7 @@ namespace JSON_NAMESPACE
 		return *this;
 	}
 	
-	value &value::operator/=(value V)
+	value &value::operator/=(const value& V)
 	{
 		switch (myType) {
 			case JSON_VOID:
@@ -3944,7 +4003,7 @@ namespace JSON_NAMESPACE
 		return *this;
 	}
 	
-	value &value::operator%=(value V)
+	value &value::operator%=(const value& V)
 	{
 		switch (myType) {
 			case JSON_NUMBER:
@@ -4054,10 +4113,10 @@ namespace JSON_NAMESPACE
 		return ret;
 	}
 	
-	value value::operator-()
+	value value::operator-() const
 	{
 		if (myType == JSON_NUMBER) {
-			return value(-m_number);
+			return value(-number());
 		}
 		return *this;
 	}

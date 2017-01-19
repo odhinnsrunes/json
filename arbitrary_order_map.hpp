@@ -488,34 +488,88 @@ public:
 		return keys.erase(start.real(), finnish.real());
 	}
 
-	bool operator==(const arbitrary_order_map& rhs) const
+	bool operator==(const arbitrary_order_map &rhs) const
 	{
-		return data == rhs.data;
-	}
-
-	bool operator!=(const arbitrary_order_map& rhs) const
-	{
-		return data != rhs.data;
-	}
-
-	bool operator<=(const arbitrary_order_map& rhs) const
-	{
-		return keys <= rhs.keys;
-	}
-
-	bool operator>=(const arbitrary_order_map& rhs) const
-	{
-		return keys >= rhs.keys;
+		if (keys.size() != rhs.keys.size()) {
+			return false;
+		}
+		auto leftIt = data.begin();
+		auto rightIt = rhs.data.begin();
+		for (; leftIt != data.end(); ++leftIt, ++rightIt) {
+			if ((*leftIt).first != (*rightIt).first) {
+				return false;
+			}
+			if (!((*leftIt).second->second == (*rightIt).second->second)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	bool operator>(const arbitrary_order_map& rhs) const
 	{
-		return keys > rhs.keys;
+		auto leftIt = data.begin();
+		auto rightIt = rhs.data.begin();
+		for (; leftIt != data.end(); ++leftIt, ++rightIt) {
+			if ((*leftIt).first > (*rightIt).first) {
+				return true;
+			}
+			if ((*rightIt).first > (*leftIt).first) {
+				return true;
+			}
+		}
+		return (leftIt != data.end()) && (rightIt == rhs.data.end());
 	}
 
 	bool operator<(const arbitrary_order_map& rhs) const
 	{
-		return keys < rhs.keys;
+		auto leftIt = data.begin();
+		auto rightIt = rhs.data.begin();
+		for (; leftIt != data.end(); ++leftIt, ++rightIt) {
+			if ((*leftIt).first < (*rightIt).first) {
+				return true;
+			}
+			if ((*rightIt).first < (*leftIt).first) {
+				return true;
+			}
+		}
+		return (leftIt == data.end()) && (rightIt != rhs.data.end());
+	}
+
+
+	bool operator!=(const arbitrary_order_map& rhs) const
+	{
+		return !(*this == rhs);
+	}
+
+	bool operator<=(const arbitrary_order_map& rhs) const
+	{
+		auto leftIt = data.begin();
+		auto rightIt = rhs.data.begin();
+		for (; leftIt != data.end(); ++leftIt, ++rightIt) {
+			if ((*leftIt).first < (*rightIt).first) {
+				return true;
+			}
+			if ((*rightIt).first < (*leftIt).first) {
+				return true;
+			}
+		}
+		return (leftIt == data.end()) && (rightIt == rhs.data.end());
+	}
+
+	bool operator>=(const arbitrary_order_map& rhs) const
+	{
+		auto leftIt = data.begin();
+		auto rightIt = rhs.data.begin();
+		for (; leftIt != data.end(); ++leftIt, ++rightIt) {
+			if ((*leftIt).first > (*rightIt).first) {
+				return true;
+			}
+			if ((*rightIt).first > (*leftIt).first) {
+				return true;
+			}
+		}
+		return (leftIt == data.end()) && (rightIt == rhs.data.end());
 	}
 
 	iterator insert(iterator at, pairType  val)
