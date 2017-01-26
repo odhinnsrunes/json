@@ -170,6 +170,13 @@ namespace DATA_NAMESPACE
 		bool bNoXMLHeader;
 		bool bStandAlone;
 	};
+
+#ifndef _USE_ADDED_ORDER_
+	#define DATA_ATT(x) std::string("@") + x
+	#define DATA_VAL "#value"
+	#define DATAENUMKEY(x, y) json::enumKey<x>(y, #y)
+	#define DATAATTENUMKEY(x, y) json::enumKey<x>(y, "@" #y)
+#endif
 }
 
 #undef JSON_NAMESPACE

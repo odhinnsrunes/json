@@ -113,7 +113,7 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 							JSON_NAMESPACE::instring in(sValue);
 							bool bFailed = false;
 							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
-								JSON_NAMESPACE::numberParse(ret[childName]["#value"], in, &bFailed);
+								JSON_NAMESPACE::numberParse(ret[childName][DATA_VAL], in, &bFailed);
 							} else {
 								JSON_NAMESPACE::numberParse(ret[childName], in, &bFailed);
 							}
@@ -121,11 +121,11 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 							std::string val = att->Value();
 							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
 								if (val == "true" || val == "YES") {
-									ret[childName]["#value"] = true;
+									ret[childName][DATA_VAL] = true;
 								} else if (val == "false" || val == "NO") {
-									ret[childName]["#value"] = false;
+									ret[childName][DATA_VAL] = false;
 								} else {
-									ret[childName]["#value"] = elem->Value();
+									ret[childName][DATA_VAL] = elem->Value();
 								}
 							} else {
 								if (val == "true" || val == "YES") {
@@ -184,7 +184,7 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 							JSON_NAMESPACE::instring in(sValue);
 							bool bFailed = false;
 							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
-								JSON_NAMESPACE::numberParse(ret[childName]["#value"], in, &bFailed);
+								JSON_NAMESPACE::numberParse(ret[childName][DATA_VAL], in, &bFailed);
 							} else {
 								JSON_NAMESPACE::numberParse(ret[childName], in, &bFailed);
 							}
@@ -192,11 +192,11 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 							std::string val = att->Value();
 							if (ret[childName].isA(JSON_NAMESPACE::JSON_OBJECT)) {
 								if (val == "true" || val == "YES") {
-									ret[childName]["#value"] = true;
+									ret[childName][DATA_VAL] = true;
 								} else if (val == "false" || val == "NO") {
-									ret[childName]["#value"] = false;
+									ret[childName][DATA_VAL] = false;
 								} else {
-									ret[childName]["#value"] = elem->Value();
+									ret[childName][DATA_VAL] = elem->Value();
 								}
 							} else {
 								if (val == "true" || val == "YES") {
@@ -261,7 +261,7 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 						JSON_NAMESPACE::instring in(sValue);
 						bool bFailed = false;
 						if (ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
-							JSON_NAMESPACE::numberParse(ret["#value"], in, &bFailed);
+							JSON_NAMESPACE::numberParse(ret[DATA_VAL], in, &bFailed);
 						} else {
 							JSON_NAMESPACE::numberParse(ret, in, &bFailed);
 						}
@@ -269,11 +269,11 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 						std::string val = elem->Value();
 						if (ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
 							if (val == "true" || val == "YES") {
-								ret["#value"] = true;
+								ret[DATA_VAL] = true;
 							} else if (val == "false" || val == "NO") {
-								ret["#value"] = false;
+								ret[DATA_VAL] = false;
 							} else {
-								ret["#value"] = elem->Value();
+								ret[DATA_VAL] = elem->Value();
 							}
 						} else {
 							if (val == "true" || val == "YES") {
@@ -293,12 +293,13 @@ void document::parseXMLElement(JSON_NAMESPACE::value & ret, const TiXmlNode * el
 
 bool document::parseXML(std::string inStr, PREPARSEPTR preParser, std::string preParseFileName)
 {
-	if (arr)
+	if (myType == JSON_NAMESPACE::JSON_ARRAY) {
 		delete arr;
-	arr = NULL;
-	if (obj)
+		arr = NULL;
+	} else if (myType == JSON_NAMESPACE::JSON_OBJECT) {
 		delete obj;
-	obj = NULL;
+		obj = NULL;
+	}
 	myType = JSON_NAMESPACE::JSON_VOID;
 	m_number = 0;
 	m_boolean = false;
@@ -456,7 +457,7 @@ void document::writeXML(std::string & str, JSON_NAMESPACE::value & ret, int dept
 						continue;
 					}
 				}
-				if (key == "#value") {
+				if (key == DATA_VAL) {
 					str.append(XMLEscape(val.string()));
 					continue;
 				}

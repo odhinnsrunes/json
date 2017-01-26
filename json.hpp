@@ -721,6 +721,37 @@ namespace JSON_NAMESPACE
 			bIsArray = it.bIsArray;
 			bSetKey = false;
 		}
+		iterator(iterator&& it) : arr_it(it.arr_it), obj_it(it.obj_it), dumbRet() {
+			bNone = it.bNone;
+			// arr_it = it.arr_it;
+			// obj_it = it.obj_it;
+			bIsArray = it.bIsArray;
+			bSetKey = false;
+			it.bSetKey = false;
+		}
+		iterator& operator=(const iterator& it) {
+			if (this == &it) {
+				return *this;
+			}
+			bNone = it.bNone;
+			arr_it = it.arr_it;
+			obj_it = it.obj_it;
+			bIsArray = it.bIsArray;
+			bSetKey = false;
+			return *this;
+		}
+		iterator& operator=(iterator&& it) {
+			if (this == &it) {
+				return *this;
+			}
+			bNone = it.bNone;
+			arr_it = it.arr_it;
+			obj_it = it.obj_it;
+			bIsArray = it.bIsArray;
+			bSetKey = false;
+			it.bSetKey = false;
+			return *this;
+		}
 		~iterator() {
 			if (bSetKey) {
 				obj_it->second.m_key.clear();
@@ -869,6 +900,41 @@ namespace JSON_NAMESPACE
 			// obj_it = it.obj_it;
 			bIsArray = it.bIsArray;
 			bSetKey = false;
+		}
+		
+		reverse_iterator(reverse_iterator&& it) : arr_it(it.arr_it), obj_it(it.obj_it), dumbRet() {
+			bNone = it.bNone;
+			// arr_it = it.arr_it;
+			// obj_it = it.obj_it;
+			bIsArray = it.bIsArray;
+			bSetKey = false;
+			it.bSetKey = false;
+		}
+		
+		reverse_iterator & operator=(const reverse_iterator& it) {
+			if (this == &it) {
+				return *this;
+			}
+			bNone = it.bNone;
+			arr_it = it.arr_it;
+			obj_it = it.obj_it;
+			bIsArray = it.bIsArray;
+			bSetKey = false;
+			// it.bSetKey = false;
+			return *this;
+		}
+		
+		reverse_iterator & operator=(reverse_iterator&& it) {
+			if (this == &it) {
+				return *this;
+			}
+			bNone = it.bNone;
+			arr_it = it.arr_it;
+			obj_it = it.obj_it;
+			bIsArray = it.bIsArray;
+			bSetKey = false;
+			it.bSetKey = false;
+			return *this;
 		}
 		
 		reverse_iterator(const JSON_NAMESPACE::iterator& it) : arr_it(myVec::reverse_iterator(it.arr_it)), obj_it(myMap::reverse_iterator(it.obj_it)) {
@@ -1057,7 +1123,6 @@ namespace JSON_NAMESPACE
 	#define JSONENUMKEY(x, y) json::enumKey<x>(y, #y)
 #endif
 }
-
 
 #if defined __BORLANDC__ && __BORLANDC__ < 0x0600
 #pragma warn + 8026
