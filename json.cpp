@@ -1691,9 +1691,9 @@ namespace JSON_NAMESPACE
         obj = NULL;
         arr = NULL;
         
-        if (V.myType == JSON_OBJECT) {
+        if ((json::JSONTypes)V.myType == JSON_OBJECT) {
             obj = new object(V.obj);
-        } else if (V.myType == JSON_ARRAY) {
+        } else if ((json::JSONTypes)V.myType == JSON_ARRAY) {
             arr = new array(V.arr);
         }
 
@@ -1716,9 +1716,9 @@ namespace JSON_NAMESPACE
         obj = NULL;
         arr = NULL;
         
-        if (V.myType == JSON_OBJECT) {
+        if ((json::JSONTypes)V.myType == JSON_OBJECT) {
             obj = new object(V.obj);
-        } else if (V.myType == JSON_ARRAY) {
+        } else if ((json::JSONTypes)V.myType == JSON_ARRAY) {
             arr = new array(V.arr);
         }
 
@@ -1742,9 +1742,9 @@ namespace JSON_NAMESPACE
         obj = NULL;
         arr = NULL;
         
-        if (V.myType == JSON_OBJECT) {
+        if ((ojson::JSONTypes)V.myType == JSON_OBJECT) {
             obj = new object(V.obj);
-        } else if (V.myType == JSON_ARRAY) {
+        } else if ((ojson::JSONTypes)V.myType == JSON_ARRAY) {
             arr = new array(V.arr);
         }
 
@@ -1767,9 +1767,9 @@ namespace JSON_NAMESPACE
         obj = NULL;
         arr = NULL;
         
-        if (V.myType == JSON_OBJECT) {
+        if ((ojson::JSONTypes)V.myType == JSON_OBJECT) {
             obj = new object(V.obj);
-        } else if (V.myType == JSON_ARRAY) {
+        } else if ((ojson::JSONTypes)V.myType == JSON_ARRAY) {
             arr = new array(V.arr);
         }
 
