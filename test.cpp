@@ -86,10 +86,10 @@ void test(const char * type)
 	T j2;
 	for (size_t i = 0; i < 10; i++) {
 		string k1 = to_string(i);
-		lpad(k1, '0', 3);
+		// lpad(k1, '0', 3);
 		for (size_t j = 0; j < 10; j++) {
 			string k2 = to_string(j);
-			lpad(k2, '0', 3);
+			// lpad(k2, '0', 3);
 			for (size_t k = 0; k < 10; k++) {
 				j2[k1][k2]["a"].push_back(k);
 				j2[k1][k2]["b"][k] = k;

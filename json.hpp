@@ -201,7 +201,7 @@ namespace JSON_NAMESPACE
 			swap(lhs.str, rhs.str);
 			swap(lhs.myType, rhs.myType);
 			swap(lhs.obj, rhs.obj);
-			swap(lhs.arr, rhs.arr);
+			// swap(lhs.arr, rhs.arr);
 		}
 		
 		value();
