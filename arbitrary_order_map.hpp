@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2016 James Baker
+Copyright (c) 2012-2018 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ public:
 
 	arbitrary_order_map& operator=(const arbitrary_order_map& V)
 	{
-		if(this == &V) {
+		if (this == &V) {
 			return *this;
 		}
 		this->clear();
@@ -97,7 +97,7 @@ public:
 
 	arbitrary_order_map& operator=(arbitrary_order_map&& V)
 	{
-		if(this == &V) {
+		if (this == &V) {
 			return *this;
 		}
 		
@@ -179,12 +179,12 @@ public:
 
 		}
 
-		iterator(const keyIterator & in) : it(in)
+		iterator(const keyIterator & rhs) : it(rhs)
 		{
 
 		}
 
-		iterator(const iterator& in) : it(in.it)
+		iterator(const iterator& rhs) : it(rhs.it)
 		{
 
 		}
@@ -252,7 +252,7 @@ public:
 	typedef iterator fIterator; // Kludge for Microsoft's compiler casting
 								// const iterator & it to it's parent class
 								// instead of iterator in
-								// reverse_iterator(const fIterator& in)...
+								// reverse_iterator(const fIterator& rhs)...
 
 	class const_iterator : public std::iterator<std::input_iterator_tag, data2Type>
 	{
@@ -263,22 +263,22 @@ public:
 
 		}
 
-		const_iterator(const typename std::vector<ptrType>::const_iterator & in) : it(in)
+		const_iterator(const typename std::vector<ptrType>::const_iterator & rhs) : it(rhs)
 		{
 
 		}
 
-		const_iterator(keyIterator & in) : it(in)
+		const_iterator(keyIterator & rhs) : it(rhs)
 		{
 
 		}
 
-		const_iterator(const const_iterator& in) : it(in.it)
+		const_iterator(const const_iterator& rhs) : it(rhs.it)
 		{
 
 		}
 
-		const_iterator(const fIterator& in) : it(in.it)
+		const_iterator(const fIterator& rhs) : it(rhs.it)
 		{
 
 		}
@@ -351,17 +351,17 @@ public:
 
 		}
 
-		reverse_iterator(const typename std::vector<ptrType>::reverse_iterator & in) : it(in)
+		reverse_iterator(const typename std::vector<ptrType>::reverse_iterator & rhs) : it(rhs)
 		{
 
 		}
 
-		reverse_iterator(const reverse_iterator& in) : it(in.it)
+		reverse_iterator(const reverse_iterator& rhs) : it(rhs.it)
 		{
 
 		}
 
-		reverse_iterator(const fIterator& in) : it(typename std::vector<ptrType>::reverse_iterator(in.it))
+		reverse_iterator(const fIterator& rhs) : it(typename std::vector<ptrType>::reverse_iterator(rhs.it))
 		{
 
 		}

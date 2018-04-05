@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2016 James Baker
+Copyright (c) 2012-2018 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ class TiXmlNode;
 #include "odata.hpp"
 #endif
 
-#ifdef _USE_ADDED_ORDER_
+#if defined _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
 #ifndef SUPPORT_ORDERED_JSON
 #define SUPPORT_ORDERED_JSON
@@ -157,9 +157,15 @@ namespace DATA_NAMESPACE
 		std::string rootTag() { return sRootTag; }
 		void rootTag(std::string rootElem) { sRootTag = rootElem; }
 
+		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc);
 		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc, JSON_NAMESPACE::document jNameSpaces, bool begin = true);
 		static void stripNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
 		static void addNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
+
+		void stripMyNameSpaces();
+		void stripMyNameSpaces(JSON_NAMESPACE::document jNameSpaces);
+		void stripMyNameSpace(std::string sNameSpace);
+		void addMyNameSpace(std::string sNameSpace);
 
 	private:
 		void parseXMLElement(JSON_NAMESPACE::value& ret, const TiXmlNode * elem);

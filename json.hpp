@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2016 James Baker
+Copyright (c) 2012-2018 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
  }
  \endcode
  */
-#ifdef __GNUC__
+#if defined __GNUC__
 #define DEPRECATED(func) func __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
 #define DEPRECATED(func) __declspec(deprecated) func
@@ -109,7 +109,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 #include <set>
 
-#ifdef _USE_ADDED_ORDER_
+#if defined _USE_ADDED_ORDER_
 #include "arbitrary_order_map.hpp"
 #define JSON_NAMESPACE ojson
 #ifndef SUPPORT_ORDERED_JSON
@@ -136,28 +136,15 @@ namespace JSON_NAMESPACE
 		JSON_OBJECT,
 	};
 	
-#if defined __clang__ || defined __GNUC__
-#define MAKE_EXPLICIT explicit
-#else
-#define MAKE_EXPLICIT
-#endif
-	
-#if defined _WIN32
-#define i64 __int64
-#define ui64 unsigned __int64
-#define i32 __int32
-#define ui32 unsigned __int32
-#define i16 __int16
-#define ui16 unsigned __int16
-#else
+#if !defined int64_t
 #include <stdint.h>
+#endif
 #define i64 int64_t
 #define ui64 uint64_t
 #define i32 int32_t
 #define ui32 uint32_t
 #define i16 int16_t
 #define ui16 uint16_t
-#endif
 	
 	class instring;
 	class MovingCharPointer;
@@ -360,7 +347,7 @@ namespace JSON_NAMESPACE
 		void destroy();
 		// void threadedDestroy();
 
-#ifdef __GNUC__
+#if defined __GNUC__
         void sort(bool (*compareFunc)(const value&, const value&));
 #else
         void sort(bool (*compareFunc)(value&, value&));
@@ -462,7 +449,7 @@ namespace JSON_NAMESPACE
 		size_t pos;
 		size_t m_size;
 	};
-#ifdef _USE_ADDED_ORDER_
+#if defined _USE_ADDED_ORDER_
 	typedef arbitrary_order_map<std::string, value> myMap;
 #else
 	typedef std::map<std::string, value> myMap;
@@ -847,7 +834,7 @@ namespace JSON_NAMESPACE
 			}
 		}
 		
-		bool None() { return bNone; }
+		bool Neither() { return bNone; } // changed to Neither because X.h defines None as 0L in the global namespace for some stupid reason.
 		bool IsArray() { return bIsArray; }
 		
 		myVec::iterator & arr() { return arr_it; }
@@ -1040,7 +1027,7 @@ namespace JSON_NAMESPACE
 			}
 		}
 		
-		bool None() { return bNone; }
+		bool Neither() { return bNone; }
 		bool IsArray() { return bIsArray; }
 		
 		myVec::reverse_iterator & arr() { return arr_it; }

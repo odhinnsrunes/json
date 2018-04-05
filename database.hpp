@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2016 James Baker
+Copyright (c) 2012-2018 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #ifndef _JSON_DATABASE_HPP_
 #define _JSON_DATABASE_HPP_
 
-#ifdef _USE_ADDED_ORDER_
+#if defined _USE_ADDED_ORDER_
 #define _CANCELLED_ORDER
 #undef _USE_ADDED_ORDER_
 #endif
@@ -67,7 +67,7 @@ namespace json
 			document cleanUpViews();
 
 		private:
-#ifdef __GNUC__
+#if defined __GNUC__
             static bool viewSort(const value &a, const value &b);
 #else
             static bool viewSort(value &a, value &b);
@@ -90,7 +90,7 @@ namespace json
 
 }
 
-#ifdef _CANCELLED_ORDER
+#if defined _CANCELLED_ORDER
 #define _USE_ADDED_ORDER_
 #undef _CANCELLED_ORDER
 #endif

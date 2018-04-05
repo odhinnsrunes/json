@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2016 James Baker
+Copyright (c) 2012-2018 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <sys/types.h> 
 #include <sys/stat.h> 
 
-#ifdef _USE_ADDED_ORDER_
+#if defined _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
 #ifndef SUPPORT_ORDERED_JSON
 #define SUPPORT_ORDERED_JSON
@@ -63,7 +63,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #define SIGNEDMAX 0x7FFFFFFFFFFFFFFF
 #endif
 
-#ifdef _WIN32
+#if defined _WIN32
 #define _CRT_SECURE_NO_DEPRICATE 1
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
@@ -281,10 +281,10 @@ namespace JSON_NAMESPACE
 			char c = s.take();
 			switch (c) {
 			case '\\': {
-				char e = s.take();
-				if (escape[(unsigned char)e])
-					*ptr++ = escape[(unsigned char)e];
-				else if (e == 'u') { // Unicode
+				char cE = s.take();
+				if (escape[(unsigned char)cE])
+					*ptr++ = escape[(unsigned char)cE];
+				else if (cE == 'u') { // Unicode
 					unsigned h = hex4Parse(s, bFailed);
 					if (h >= 0xD800 && h <= 0xDBFF) { // Handle UTF-16 surrogate pair
 						if (s.take() != '\\' || s.take() != 'u') {
@@ -1285,7 +1285,7 @@ namespace JSON_NAMESPACE
 	iterator value::erase(iterator it) {
 		if (it.IsArray() && arr) {
 			return arr->erase(it.arr());
-		} else if (!it.IsArray() && !it.None() && obj) {
+		} else if (!it.IsArray() && !it.Neither() && obj) {
 			return obj->erase(it.obj());
 		}
 		if (arr != NULL) {
@@ -1300,7 +1300,7 @@ namespace JSON_NAMESPACE
 	{
 		if (first.IsArray() && last.IsArray() && arr) {
 			arr->erase(first.arr(), last.arr());
-		} else if (!first.IsArray() && !last.IsArray() && !first.None() && !last.None() && obj) {
+		} else if (!first.IsArray() && !last.IsArray() && !first.Neither() && !last.Neither() && obj) {
 			obj->erase(first.obj(), last.obj());
 		}
 		return iterator();
@@ -1417,8 +1417,8 @@ namespace JSON_NAMESPACE
 	iterator value::insert(iterator position, value V) {
 		if (position.IsArray() && myType == JSON_ARRAY) {
 			return iterator(arr->insert(position.arr(), V));
-#ifdef _USE_ADDED_ORDER_
-		} else if (!position.IsArray() && !position.None() && myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
+#if defined _USE_ADDED_ORDER_
+		} else if (!position.IsArray() && !position.Neither() && myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
 			return iterator(obj->insert(position.obj(), V.begin().obj(), V.end().obj()));
 #else
 		} else if (myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
@@ -1431,7 +1431,7 @@ namespace JSON_NAMESPACE
 	}
 	
 	iterator value::insert(iterator position, std::string key, value V) {
-		if (!position.IsArray() && !position.None() && myType == JSON_OBJECT) {
+		if (!position.IsArray() && !position.Neither() && myType == JSON_OBJECT) {
 			return iterator(obj->insert(position.obj(), std::pair<std::string, value>(key, V)));
 		} else {
 			return iterator();
@@ -1470,16 +1470,20 @@ namespace JSON_NAMESPACE
 				}
 			}
 			arr->insert(position.arr(), first.arr(), last.arr());
-#ifdef _USE_ADDED_ORDER_
-		} else if (!position.IsArray() && !position.None() && !first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
+#if defined _USE_ADDED_ORDER_
+		} else if (!position.IsArray() && !position.Neither() && !first.IsArray() && !first.Neither() && !last.IsArray() && !last.Neither()) {
 #else
-		} else if (!first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
+		} else if (!first.IsArray() && !first.Neither() && !last.IsArray() && !last.Neither()) {
 #endif
 			if (myType != JSON_OBJECT || obj == NULL) {
 				m_number = 0;
 				m_places = -1;
 				m_boolean = false;
 				myType = JSON_OBJECT;
+                		if (arr) {
+                    			delete arr;
+                   			 arr = NULL;
+                		}
 				if (!str.empty())
 					str.clear();
 				obj = new object();
@@ -1488,10 +1492,8 @@ namespace JSON_NAMESPACE
 				} else if (pParentArray) {
 					obj->setParentArray(pParentArray);
 				}
-				delete arr;
-				arr = NULL;
 			}
-#ifdef _USE_ADDED_ORDER_
+#if defined _USE_ADDED_ORDER_
 			obj->insert(position.obj(), first.obj(), last.obj());
 #else
 			obj->insert(first.obj(), last.obj());
@@ -1531,7 +1533,7 @@ namespace JSON_NAMESPACE
 				}
 			}
 			arr->insert(arr->end(), first.arr(), last.arr());
-		} else if (!first.IsArray() && !first.None() && !last.IsArray() && !last.None()) {
+		} else if (!first.IsArray() && !first.Neither() && !last.IsArray() && !last.Neither()) {
 			if (myType != JSON_OBJECT) {
 				m_number = 0;
 				m_places = -1;
@@ -2371,7 +2373,7 @@ namespace JSON_NAMESPACE
 		m_places = iDecimalPlaces;
 		if (myType == JSON_STRING) {
 			return *this;
-		} else if(myType == JSON_NUMBER) {
+		} else if (myType == JSON_NUMBER) {
 			str.clear();
 		}
 		value temp = *this;
@@ -3404,7 +3406,7 @@ namespace JSON_NAMESPACE
 		myType = JSON_VOID;
 	}
     
-#ifdef __GNUC__
+#if defined __GNUC__
 	void value::sort(bool (*compareFunc)(const value&, const value&)) {
 		if (myType == JSON_ARRAY) {
 			DEBUGPTR oldDebug = debug;
@@ -3824,9 +3826,9 @@ namespace JSON_NAMESPACE
 			{
 				value ret = *this;
 				ret.insert(ret.end(), V.begin(), V.end());
-				if (ret.myType == JSON_OBJECT) {
+				if (ret.myType == JSON_OBJECT && ret.obj) {
 					ret.obj->setNotEmpty();
-				} else if (ret.myType == JSON_ARRAY) {
+				} else if (ret.myType == JSON_ARRAY && ret.arr) {
 					ret.arr->setNotEmpty();
 				}
 				return ret;
@@ -4347,7 +4349,7 @@ namespace JSON_NAMESPACE
 
 	bool document::writeFile(std::string inStr, bool bPretty, PREWRITEPTR preWriter) const
 	{
-#ifdef _JSON_TEMP_FILES_
+#if defined _JSON_TEMP_FILES_
 		std::string sTempFile(inStr);
 		sTempFile.append(".tmp");
 		

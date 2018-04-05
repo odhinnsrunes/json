@@ -100,7 +100,7 @@ std::string & json2csv(std::string & sOut, ojson::value & data, bool bDoKeys)
 	return sOut;
 }
 
-#ifdef __STANDALONE_CSV__
+#if defined __STANDALONE_CSV__
 #include <iostream>
 
 int main(int argc, char** argv)
