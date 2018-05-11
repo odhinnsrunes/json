@@ -926,7 +926,15 @@ namespace JSON_NAMESPACE
 		return iterator();
 	}
 	
-	iterator value::find(std::string index) const 
+	iterator value::find(const std::string& index) const 
+	{
+		if (myType == JSON_OBJECT) {
+			return obj->find(index);
+		}
+		return iterator();
+	}
+	
+	iterator value::find(const char* index) const 
 	{
 		if (myType == JSON_OBJECT) {
 			return obj->find(index);
@@ -945,7 +953,15 @@ namespace JSON_NAMESPACE
 		return reverse_iterator(find(index));
 	}
 	
-	reverse_iterator value::rfind(std::string index) const {
+	reverse_iterator value::rfind(const std::string& index) const {
+		iterator it = find(index);
+		if (it == end()) {
+			return reverse_iterator();
+		}
+		return reverse_iterator(++it);
+	}
+	
+	reverse_iterator value::rfind(const char* index) const {
 		iterator it = find(index);
 		if (it == end()) {
 			return reverse_iterator();
@@ -1270,7 +1286,11 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	size_t value::erase(std::string index) {
+	// size_t value::erase(const std::string &index) {
+	// 	return erase(index.c_str());
+	// }
+	
+	size_t value::erase(const std::string index) {
 		if (myType == JSON_OBJECT) {
 			myMap::iterator it;
 			it = obj->find(index);
@@ -1325,7 +1345,11 @@ namespace JSON_NAMESPACE
 		return false;
 	}
 	
-	bool value::exists(std::string index) {
+	// bool value::exists(const std::string &index) {
+	// 	return exists(index.c_str());
+	// }
+
+	bool value::exists(const std::string index) {
 		if (isA(JSON_OBJECT) && obj != NULL) {
 			if (obj->empty()) {
 				return false;
@@ -1393,7 +1417,7 @@ namespace JSON_NAMESPACE
 		return iterator();
 	}
 	
-	iterator value::insert(std::string index, value V)
+	iterator value::insert(const std::string index, value V)
 	{
 		if (myType != JSON_OBJECT) {
 			m_number = 0;
@@ -1413,6 +1437,27 @@ namespace JSON_NAMESPACE
 		}
 		return iterator(obj->insert(obj->end(), std::pair<std::string, value>(index, V)));
 	}
+	
+	// iterator value::insert(const char* index, value V)
+	// {
+	// 	if (myType != JSON_OBJECT) {
+	// 		m_number = 0;
+	// 		m_places = -1;
+	// 		m_boolean = false;
+	// 		myType = JSON_OBJECT;
+	// 		if (!str.empty())
+	// 			str.clear();
+	// 		obj = new object();
+	// 		if (pParentObject) {
+	// 			obj->setParentObject(pParentObject);
+	// 		} else if (pParentArray) {
+	// 			obj->setParentArray(pParentArray);
+	// 		}
+	// 		delete arr;
+	// 		arr = NULL;
+	// 	}
+	// 	return iterator(obj->insert(obj->end(), std::pair<std::string, value>(index, V)));
+	// }
 	
 	iterator value::insert(iterator position, value V) {
 		if (position.IsArray() && myType == JSON_ARRAY) {
@@ -2086,6 +2131,17 @@ namespace JSON_NAMESPACE
 		pParentObject = NULL;
 		pParentArray = NULL;
 	}
+	// value::value(const std::string& V) {
+	// 	m_number = 0;
+	// 	m_places = -1;
+	// 	m_boolean = false;
+	// 	str.assign(V);
+	// 	myType = JSON_STRING;
+	// 	obj = NULL;
+	// 	arr = NULL;
+	// 	pParentObject = NULL;
+	// 	pParentArray = NULL;
+	// }
 	value::value(std::string V) {
 		m_number = 0;
 		m_places = -1;
@@ -2340,7 +2396,12 @@ namespace JSON_NAMESPACE
 		return *this;
 	}
 
-	value & value::toObject(std::string key)
+	value & value::toObject(const std::string& key)
+	{
+		return toObject(key.c_str());
+	}
+
+	value & value::toObject(const char * key)
 	{
 		if (myType == JSON_OBJECT) {
 			return *this;
@@ -2628,7 +2689,11 @@ namespace JSON_NAMESPACE
 		return ret;
 	}
 
-	value& value::operator[](std::string index) {
+	// value& value::operator[](const std::string& index) {
+	// 	return operator[](index.c_str());
+	// }
+
+	value& value::operator[](const std::string index) {
 		if (myType == JSON_OBJECT) {
 			value& ret = obj->operator[](index);
 			ret.setParentObject(obj);
@@ -2643,19 +2708,19 @@ namespace JSON_NAMESPACE
 					// 	break;
 
 					case JSON_BOOLEAN:
-						debug("json operator[](std::string index = '%s') changed type from Boolean to Object.", index.c_str(), m_boolean);
+						debug("json operator[](std::string index = '%s') changed type from Boolean to Object.", index, m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json operator[](std::string index = '%s') changed type from Number %f to Object.", index.c_str(), m_number);
+						debug("json operator[](std::string index = '%s') changed type from Number %f to Object.", index, m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json operator[](std::string index = '%s') changed type from String '%s' to Object.", index.c_str(), str.c_str());
+						debug("json operator[](std::string index = '%s') changed type from String '%s' to Object.", index, str);
 						break;
 
 					case JSON_ARRAY:
-						debug("json operator[](std::string index = '%s') changed type from Array to Object(%s), orphanning:\n%s\n", index.c_str(), index.c_str(), this->print(0, true).c_str());
+						debug("json operator[](std::string index = '%s') changed type from Array to Object(%s), orphanning:\n%s\n", index, index, this->print(0, true).c_str());
 						break;
 
 					default:

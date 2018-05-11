@@ -53,27 +53,19 @@ void test(const char * type)
 {
 	// bStarted = true;
 	cout << "Testing: " << type << endl;
-	data::document dData;
-	cout << "Parse XML File 1:           ";
-	if (dData.parseXMLFile("PushKeyData.SETX")) {
-		cout << "Success!" << endl;
-	} else {
-		cout << "Failed!" << endl;
-	}
-	cout << "Parse XML File 2:           ";
-	if (dData.parseXMLFile("PushKeyData.SETX")) {
-		cout << "Success!" << endl;
-	} else {
-		cout << "Failed!" << endl;
-	}
 	T jEnum;
+
+	jEnum["Array"][0] = "Value";
+	std::string mstring("String");
+	jEnum[mstring] = "Value";
+	jEnum["Array"][0] = "Value";
 
 	jEnum[MYKEY(one)] = one;
 	jEnum[MYKEY(two)] = two;
 	jEnum[DATA_ATT(MYKEY(three))] = three;
 	jEnum[MYOTHERKEY(four)] = four; // works
 
-	jEnum.writeFile("testEnum.json", true);
+	jEnum.writeFile("test1.json", true);
 	T j1;
 	cout << "Parse File 1:               ";
 	if (j1.parseFile("test1.json")) {

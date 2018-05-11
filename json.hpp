@@ -206,6 +206,7 @@ namespace JSON_NAMESPACE
 		value(bool V);
 		value(const char* V);
 		value(char* V);
+		// value(const std::string& V);
 		value(std::string V);
 		value(object& V);
 		value(array& V);
@@ -246,7 +247,8 @@ namespace JSON_NAMESPACE
 		value& emptyObject();
 
 		value& toArray();
-		value& toObject(std::string key);
+		value& toObject(const std::string& key);
+		value& toObject(const char * key);
 		value& toString();
 		value& toString(int iDecimalPlaces);
 		value& toNumber();
@@ -276,8 +278,11 @@ namespace JSON_NAMESPACE
 		const char* c_str();
 		const char* cString();
 		
+		// template<typename T>
+		// value& operator[](T index){ return operator[]((size_t)index); }
 		value& operator[](size_t index);
-		value& operator[](std::string index);
+		value& operator[](const std::string index);
+		// value& operator[](const char* index);
 		
 		void push_back(const value& val);									   // Array
 		void push_front(const value& val);									  // Array
@@ -285,16 +290,23 @@ namespace JSON_NAMESPACE
 		value pop_back();												// Array
 		value pop_front();											   // Array
 		
+		// template<typename T>
+		// void erase(T index) { erase((size_t)index); }									   // Array
 		void erase(size_t index);									   // Array
-		size_t erase(std::string index);								  // Object
+		size_t erase(const std::string index);								  // Object
+		// size_t erase(const char *index);								  // Object
 		iterator erase(iterator it);										// Array / Object
 		iterator erase(iterator first, iterator last);					  // Array / Object
 
+		// template<typename T>
+		// bool exists(T index) { return exists((size_t)index); }									   // Array
 		bool exists(size_t index);
-		bool exists(std::string index);
+		bool exists(const std::string index);
+		// bool exists(const char *index);
 		
 		iterator insert(size_t index, value V);							  // Array
-		iterator insert(std::string index, value V);						 // Object
+		iterator insert(const std::string index, value V);						 // Object
+		// iterator insert(const char * index, value V);						 // Object
 		iterator insert(iterator position, std::string key, value V);						 // Object
 		iterator insert(iterator position, value V);						 // Array 
 		void insert(iterator position, iterator first, iterator last);  // Array / Object (position ignored unless ojson)
@@ -361,9 +373,11 @@ namespace JSON_NAMESPACE
 		reverse_iterator rbegin() const;
 		reverse_iterator rend() const;
 		iterator find(size_t index) const;
-		iterator find(std::string index) const;
+		iterator find(const std::string& index) const;
+		iterator find(const char* index) const;
 		reverse_iterator rfind(size_t index) const;
-		reverse_iterator rfind(std::string index) const;
+		reverse_iterator rfind(const std::string& index) const;
+		reverse_iterator rfind(const char* index) const;
 		
 		typedef void (*DEBUGPTR)(const char *, ...);
 		void debugPrint() const { if (debug) { debug("%s\n", print(0, true).c_str()); } }
@@ -720,6 +734,7 @@ namespace JSON_NAMESPACE
 			if (this == &it) {
 				return *this;
 			}
+			dumbRet = it.dumbRet;
 			bNone = it.bNone;
 			arr_it = it.arr_it;
 			obj_it = it.obj_it;
@@ -731,6 +746,7 @@ namespace JSON_NAMESPACE
 			if (this == &it) {
 				return *this;
 			}
+			dumbRet = it.dumbRet;
 			bNone = it.bNone;
 			arr_it = it.arr_it;
 			obj_it = it.obj_it;
@@ -902,6 +918,7 @@ namespace JSON_NAMESPACE
 			if (this == &it) {
 				return *this;
 			}
+			dumbRet = it.dumbRet;
 			bNone = it.bNone;
 			arr_it = it.arr_it;
 			obj_it = it.obj_it;
@@ -915,6 +932,7 @@ namespace JSON_NAMESPACE
 			if (this == &it) {
 				return *this;
 			}
+			dumbRet = it.dumbRet;
 			bNone = it.bNone;
 			arr_it = it.arr_it;
 			obj_it = it.obj_it;

@@ -314,7 +314,7 @@ namespace json
 		}
 	}
 
-	document &database::getView(document & ret, const std::string sName, document keys, bool bReduce, size_t limit, size_t offset)
+	document &database::getView(document & ret, const std::string &sName, document keys, bool bReduce, size_t limit, size_t offset)
 	{
 		mtx.lock();
 		std::string mmName = sName;
