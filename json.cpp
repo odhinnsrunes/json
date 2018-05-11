@@ -1680,21 +1680,30 @@ namespace JSON_NAMESPACE
 		
 		myType = V.myType;
 		
-		obj = V.obj;
-		
-		arr = V.arr;
+		switch (myType) {
+			default:
+				break;
+
+			case JSON_OBJECT:
+				obj = std::move(V.obj);
+				break;
+
+			case JSON_ARRAY:
+				arr = std::move(V.arr);
+				break;
+		}	
 
 		pParentObject = NULL;
 		pParentArray = NULL;
 		
-		V.m_number = 0;
-		V.m_places = -1;
-		V.m_boolean = false;
+		// V.m_number = 0;
+		// V.m_places = -1;
+		// V.m_boolean = false;
 		V.myType = JSON_VOID;
-		V.obj = NULL;
-		V.arr = NULL;
-		V.pParentObject = NULL;
-		V.pParentArray = NULL;
+		// V.obj = NULL;
+		// V.arr = NULL;
+		// V.pParentObject = NULL;
+		// V.pParentArray = NULL;
 	}
 	
 	value::value(const document& V) {
@@ -2030,9 +2039,9 @@ namespace JSON_NAMESPACE
 			}
 		}
 		
-		m_number = V.m_number;
-		m_places = V.m_places;
-		m_boolean = V.m_boolean;
+		m_number = std::move(V.m_number);
+		m_places = std::move(V.m_places);
+		m_boolean = std::move(V.m_boolean);
 		
 		str = std::move(V.str);
 		
@@ -2049,9 +2058,9 @@ namespace JSON_NAMESPACE
             default:
                 break;
         }
-        myType = V.myType;
+        myType = std::move(V.myType);
 		
-        obj = V.obj;
+        obj = std::move(V.obj);
 		
 		if (myType != JSON_VOID) {
 			if (pParentObject) {
@@ -2071,13 +2080,13 @@ namespace JSON_NAMESPACE
 			}
 		}
 		
-		V.m_number = 0;
-		V.m_places = -1;
-		V.m_boolean = false;
+		// V.m_number = 0;
+		// V.m_places = -1;
+		// V.m_boolean = false;
 		V.myType = JSON_VOID;
 		
-		V.obj = NULL;
-		V.arr = NULL;
+		// V.obj = NULL;
+		// V.arr = NULL;
 		
 		V.pParentObject = NULL;
 		V.pParentArray = NULL;
@@ -2279,12 +2288,12 @@ namespace JSON_NAMESPACE
             switch (myType) {
                 case JSON_OBJECT:
                     delete obj;
-                    obj = NULL;
+                    // obj = NULL;
                     break;
                     
                 case JSON_ARRAY:
                     delete arr;
-                    arr = NULL;
+                    // arr = NULL;
                     break;
                     
                 default:
@@ -2344,12 +2353,12 @@ namespace JSON_NAMESPACE
             switch (myType) {
                 case JSON_OBJECT:
                     delete obj;
-                    obj = NULL;
+                    // obj = NULL;
                     break;
                     
                 case JSON_ARRAY:
                     delete arr;
-                    arr = NULL;
+                    // arr = NULL;
                     break;
                     
                 default:
@@ -2379,7 +2388,7 @@ namespace JSON_NAMESPACE
 		str.clear();
         if (myType == JSON_OBJECT) {
             delete obj;
-            obj = NULL;
+            // obj = NULL;
         }
         myType = JSON_ARRAY;
 		arr = new array();
@@ -2411,9 +2420,11 @@ namespace JSON_NAMESPACE
 		m_places = -1;
 		m_boolean = false;
 		str.clear();
+		if (myType == JSON_ARRAY) {
+			delete arr;
+			arr = NULL;
+		}
 		myType = JSON_OBJECT;
-		delete arr;
-		arr = NULL;
 		obj = new object();
 		if (pParentObject) {
 			obj->setParentObject(pParentObject);
@@ -2634,9 +2645,7 @@ namespace JSON_NAMESPACE
 				ret.setParentArray(arr);
 				return ret;
 			}
-		}
-
-		if (myType != JSON_VOID) {
+		} else if (myType != JSON_VOID) {
 			if (index == 0) {
 				return *this;
 			}
@@ -2672,7 +2681,7 @@ namespace JSON_NAMESPACE
 			str.clear();
             if (myType == JSON_OBJECT) {
                 delete obj;
-                obj = NULL;
+                // obj = NULL;
             }
 		}
 
@@ -2699,8 +2708,7 @@ namespace JSON_NAMESPACE
 			ret.setParentObject(obj);
 			// ret.m_key.assign(index);
 			return ret;
-		}
-		if (myType != JSON_VOID) {
+		} else if (myType != JSON_VOID) {
 			if (debug) {
 				switch(myType) {
 					// case JSON_NULL:
@@ -2731,8 +2739,10 @@ namespace JSON_NAMESPACE
 			m_places = -1;
 			m_boolean = false;
 			str.clear();
-			delete arr;
-			arr = NULL;
+			if (myType == JSON_ARRAY) {
+				delete arr;
+				// arr = NULL;
+			}
 		}
 		myType = JSON_OBJECT;
 		obj = new object();
@@ -2781,7 +2791,7 @@ namespace JSON_NAMESPACE
             str.clear();
             if (myType == JSON_OBJECT) {
                 delete obj;
-                obj = NULL;
+                // obj = NULL;
             }
             myType = JSON_ARRAY;
 			arr = new array();
@@ -2833,7 +2843,7 @@ namespace JSON_NAMESPACE
 			str.clear();
             if (myType == JSON_OBJECT) {
                 delete obj;
-                obj = NULL;
+                // obj = NULL;
             }
 			arr = new array();
             myType = JSON_ARRAY;
