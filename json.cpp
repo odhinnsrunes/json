@@ -2716,19 +2716,19 @@ namespace JSON_NAMESPACE
 					// 	break;
 
 					case JSON_BOOLEAN:
-						debug("json operator[](std::string index = '%s') changed type from Boolean to Object.", index, m_boolean);
+						debug("json operator[](std::string index = '%s') changed type from Boolean to Object.", index.c_str(), m_boolean);
 						break;
 
 					case JSON_NUMBER:
-						debug("json operator[](std::string index = '%s') changed type from Number %f to Object.", index, m_number);
+						debug("json operator[](std::string index = '%s') changed type from Number %f to Object.", index.c_str(), m_number);
 						break;
 
 					case JSON_STRING:
-						debug("json operator[](std::string index = '%s') changed type from String '%s' to Object.", index, str);
+						debug("json operator[](std::string index = '%s') changed type from String '%s' to Object.", index.c_str(), str.c_str());
 						break;
 
 					case JSON_ARRAY:
-						debug("json operator[](std::string index = '%s') changed type from Array to Object(%s), orphanning:\n%s\n", index, index, this->print(0, true).c_str());
+						debug("json operator[](std::string index = '%s') changed type from Array to Object(%s), orphanning:\n%s\n", index.c_str(), index.c_str(), this->print(0, true).c_str());
 						break;
 
 					default:
