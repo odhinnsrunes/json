@@ -783,29 +783,6 @@ namespace JSON_NAMESPACE
 		free(str);
 	}
 
-	inline char &instring::take() {
-		return *(wpos++);
-	}
-
-	inline void instring::skip() {
-		++wpos;
-	}
-
-	inline char &instring::peek() const
-	{
-		return *(wpos);
-	}
-
-	inline size_t instring::tell() const
-	{
-		return wpos - str;
-	}
-
-	inline size_t instring::size() const
-	{
-		return m_size;
-	}
-
 	void instring::seek(size_t newPos) {
 		if (newPos < m_size) {
 			wpos = str + newPos;

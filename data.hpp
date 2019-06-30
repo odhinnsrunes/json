@@ -38,8 +38,8 @@ class TiXmlNode;
 #if !defined SUPPORT_ORDERED_JSON
 #define SUPPORT_ORDERED_JSON
 #endif
-#include "json.hpp"
 #include "ojson.hpp"
+#include "json.hpp"
 #define _USE_ADDED_ORDER_
 // #undef JSON_HPP_
 // #include "json.hpp"
@@ -125,8 +125,10 @@ namespace DATA_NAMESPACE
 			return bNoXMLHeader;
 		}
 		bool parseXML(const sdstring &inStr, PREPARSEPTR = NULL, const sdstring &preParseFileName = "");
+		bool parseXML2(const sdstring &inStr, PREPARSEPTR = NULL, const sdstring &preParseFileName = "");
 
 		bool parseXMLFile(const sdstring &inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
+		bool parseXMLFile2(const sdstring &inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
 
 		sdstring writeXML(const char * in, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
 		{ 
@@ -158,6 +160,7 @@ namespace DATA_NAMESPACE
 		void addMyNameSpace(sdstring sNameSpace);
 
 	private:
+		bool fastParse(JSON_NAMESPACE::instring& in, JSON_NAMESPACE::value& out, sdstring& parseResult);
 		void parseXMLElement(JSON_NAMESPACE::value& ret, const TiXmlNode * elem);
 		void writeXML(sdstring & str, JSON_NAMESPACE::value & ret, size_t depth, bool bPretty = true, bool bTabs = true);
 

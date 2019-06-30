@@ -480,6 +480,7 @@ namespace JSON_NAMESPACE
 	};
 
 	void numberParse(value& ret, instring& s, bool* bFailed);
+	void SkipWhitespace(instring& in);
 
 	class instring
 	{
@@ -1023,6 +1024,29 @@ namespace JSON_NAMESPACE
 		sdstring strParseResult;
 		bool bParseSuccessful;
 	};
+
+	inline char &instring::take() {
+		return *(wpos++);
+	}
+
+	inline void instring::skip() {
+		++wpos;
+	}
+
+	inline char &instring::peek() const
+	{
+		return *(wpos);
+	}
+
+	inline size_t instring::tell() const
+	{
+		return wpos - str;
+	}
+
+	inline size_t instring::size() const
+	{
+		return m_size;
+	}
 
 	std::ostream& operator<<(std::ostream& S, document& doc);
 	std::ostream& operator<<(std::ostream& S, value& doc);

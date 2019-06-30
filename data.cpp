@@ -411,6 +411,506 @@ namespace DATA_NAMESPACE
 		}
 	}
 
+	sdstring generateError(JSON_NAMESPACE::instring& inputString, const sdstring& szError) {
+		sdstring in = inputString.SoFar();
+		size_t l = in.size();
+		size_t pos = 1;
+		size_t line = 1;
+		for (size_t i = 0; i < l; i++) {
+			if (in[i] == '\n') {
+				line++;
+				pos = 1;
+			} else {
+				if (in[i] != '\r')
+					pos++;
+			}
+		}
+
+		std::ostringstream s;
+		s << szError << "  Line: " << line <<  " Column: " << pos;
+		return s.str().c_str();
+	}
+
+	bool document::fastParse(JSON_NAMESPACE::instring& in, JSON_NAMESPACE::value& out, sdstring& parseResult)
+	{
+		enum eState {
+			eRoot,
+			eTag,
+			eEndTag,
+			eAttribute,
+			eValue,
+			eComment,
+			eEscape,
+			eInfo,
+		};
+		eState state = eRoot;
+		eState lastState = eRoot;
+		char* ptr = in.getPos();
+		char* retVal = ptr;
+		sdstring sTag;
+		sdstring sAttribute;
+		JSON_NAMESPACE::value * pTag = nullptr;
+		bool bHadChars = false;
+		bool bHaveAtts = false;
+		for (;;) {
+//			std::cout << sz << ", " << tl << std::endl;
+			char &c = in.take();
+			switch (state) {
+				case eRoot:
+				{
+					switch (c) {
+						default: {
+							*ptr = c;
+							++ptr;
+							if (c != ' ' && c != '\r' && c != '\n' && c != '\t') {
+								bHadChars = true;
+							}
+							break;
+						}
+						case '<':
+						{
+							JSON_NAMESPACE::SkipWhitespace(in);
+							if (bHadChars && in.peek() != '/') {
+								char sMessage[256];
+								sprintf (sMessage, "tags inline with text not permitted. '%c'", in.peek());
+								parseResult = generateError(in, sMessage);
+								return false;
+							}
+							if (bHadChars) {
+								JSON_NAMESPACE::value temp = std::string(retVal, (size_t)(ptr - retVal));
+								std::swap(out, temp);
+//								out = std::string(retVal, (size_t)(ptr - retVal));
+							}
+							state = eTag;
+							ptr = in.getPos();
+							retVal = ptr;
+							break;
+						}
+//						case '&':
+//						{
+//							lastState = state;
+//							state = eEscape;
+//							break;
+//						}
+						case '>':
+						{
+							parseResult = generateError(in, "Unexpected >");
+							return false;
+						}
+					}		
+					break;
+				}
+
+				case eTag:
+				{
+					switch (c) {
+						default:
+						{
+							*ptr = c;
+							++ptr;
+							bHadChars = true;
+							break;
+						}
+
+						case '\r':
+							break;
+
+						case '\n':
+						case ' ':
+						{
+							sTag.assign(retVal, (size_t)(ptr - retVal));
+							if (out.exists(sTag)) {
+								JSON_NAMESPACE::value& jChild = out[sTag];
+								if (!jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+									JSON_NAMESPACE::value a;
+
+									std::swap(jChild, a);
+									std::swap(jChild[0], a);
+								} else {
+									jChild.resize(jChild.size() + 1);
+								}
+								pTag = &(jChild[jChild.size()]);
+							} else {
+								pTag = &(out[sTag]);
+							}
+							if (sTag.empty()) {
+								std::cout << "Empty" << std::endl;
+							}
+							ptr = in.getPos();
+							retVal = ptr;
+							state = eAttribute;
+							break;
+						}
+
+						case '>':
+						{
+							sTag.assign(retVal, (size_t)(ptr - retVal));
+							if (out.exists(sTag)) {
+								JSON_NAMESPACE::value& jChild = out[sTag];
+								if (!jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+									JSON_NAMESPACE::value a;
+
+									std::swap(jChild, a);
+									std::swap(jChild[0], a);
+								} else {
+									jChild.resize(jChild.size() + 1);
+								}
+								pTag = &(jChild[jChild.size()]);
+							} else {
+								pTag = &(out[sTag]);
+							}
+							if (sTag.empty()) {
+								std::cout << "Empty" << std::endl;
+							}
+							if(fastParse(in, *pTag, parseResult) == false) {
+								return false;
+							} else {
+								pTag = nullptr;
+								bHadChars = false;
+								bHaveAtts = false;
+								state = eRoot;
+							}
+							ptr = in.getPos();
+							retVal = ptr;
+
+							break;
+						}
+
+						case '/':
+						{
+							state = eEndTag;
+							JSON_NAMESPACE::SkipWhitespace(in);
+							break;
+						}
+						case '?':
+						{
+							if (!bHadChars) {
+								lastState = state;
+								state = eInfo;
+								break;
+							} else {
+								parseResult = generateError(in, "Unexpected ?");
+								return false;
+							}
+						}
+						case '!':
+						{
+							if (!bHadChars) {
+								if (in.take() != '-') {
+									parseResult = generateError(in, "Improperly formed comment.");
+								}
+								if (in.take() != '-') {
+									parseResult = generateError(in, "Improperly formed comment.");
+								}
+								lastState = state;
+								state = eComment;
+								break;
+							} else {
+								parseResult = generateError(in, "Unexpected !");
+								return false;
+							}
+						}
+					}
+					break;
+				}
+
+				case eEndTag:
+				{
+					if (out.isA(JSON_NAMESPACE::JSON_VOID)) {
+						out = "";
+					}
+					switch (c) {
+						default:
+						{
+							*ptr = c;
+							++ptr;
+							bHadChars = true;
+							break;
+						}
+						case ' ':
+						{
+							JSON_NAMESPACE::SkipWhitespace(in);
+							if (in.take() != '>') {
+								parseResult = generateError(in, "Unexpected data in end tag.");
+								return false;
+							}
+							parseResult.assign(retVal, (size_t)(ptr - retVal));
+							JSON_NAMESPACE::SkipWhitespace(in);
+							return true;
+						}
+						case '>':
+						{
+							parseResult.assign(retVal, (size_t)(ptr - retVal));
+							JSON_NAMESPACE::SkipWhitespace(in);
+							return true;
+						}
+
+					}
+					break;
+				}
+
+				case eEscape:
+				{
+					switch (c) {
+						default:
+						{
+							*ptr = c;
+							++ptr;
+							bHadChars = true;
+							break;
+						}
+						case ';':
+						{
+							// do something with it.
+							ptr = in.getPos();
+							retVal = ptr;
+							state = lastState;
+							break;
+						}
+					}
+					break;
+				}
+
+				case eAttribute:
+				{
+					switch (c) {
+						default:
+						{
+							*ptr = c;
+							++ptr;
+							bHadChars = true;
+							break;
+						}
+
+						case ' ':
+						{
+							JSON_NAMESPACE::SkipWhitespace(in);
+							char & cNext = in.take();
+							if (cNext != '=' && cNext != '>' && cNext != '/') {
+								parseResult = generateError(in, "Unexpected data.");
+								return false;
+							} else if (cNext == '>') {
+								if (out.exists(sTag)) {
+									JSON_NAMESPACE::value& jChild = out[sTag];
+									if (jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+										pTag = &(jChild[jChild.size()]);
+									} else  {
+										pTag = &jChild;
+									}
+								} else {
+									pTag = &(out[sTag]);
+								}
+								if (fastParse(in, *pTag, parseResult) == false) {
+									return false;
+								} else {
+									pTag = nullptr;
+									ptr = in.getPos();
+									retVal = ptr;
+									bHadChars = false;
+									state = eRoot;
+								}
+							} else if (cNext == '/') {
+								JSON_NAMESPACE::SkipWhitespace(in);
+								if (in.take() != '>') {
+									parseResult = generateError(in, "Unexpected data.");
+									return false;
+								}
+								return true;
+							}
+							JSON_NAMESPACE::SkipWhitespace(in);
+							break;
+						}
+
+						case '>':
+						{
+							ptr = in.getPos();
+							retVal = ptr;
+							if (out.exists(sTag)) {
+								JSON_NAMESPACE::value& jChild = out[sTag];
+								if (jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+									pTag = &(jChild[jChild.size() - 1]);
+								} else {
+									pTag = &(jChild);
+								}
+							} else {
+								pTag = &(out[sTag]);
+							}
+							if(fastParse(in, *pTag, parseResult) == false) {
+								return false;
+							} else {
+								pTag = nullptr;
+								ptr = in.getPos();
+								retVal = ptr;
+								bHadChars = false;
+								state = eRoot;
+							}
+							break;
+						}
+
+						case '=':
+						{
+							// do something with it.
+							JSON_NAMESPACE::SkipWhitespace(in);
+							if (in.take() == '"') {
+								sAttribute.assign(retVal, (size_t)(ptr - retVal));
+								ptr = in.getPos();
+								retVal = ptr;
+								sAttribute.insert(0, "@");
+								state = eValue;
+								break;
+							} else {
+								parseResult = generateError(in, "Attributes must be in quotes.");
+								return false;
+							}
+						}
+					}
+					break;
+				}
+
+				case eValue:
+				{
+					switch (c) {
+						default:
+						{
+							*ptr = c;
+							++ptr;
+							bHadChars = true;
+							break;
+						}
+//						case '&':
+//						{
+//							lastState = state;
+//							state = eEscape;
+//							break;
+//						}
+						case '"':
+						{
+//							if (out.exists(sTag)) {
+//								JSON_NAMESPACE::value& jChild = out[sTag];
+//								if (jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+//									jChild[jChild.size()][sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
+//								} else {
+//									out[sTag][sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
+//								}
+//							} else {
+//								out[sTag][sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
+//							}
+							(*pTag)[sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
+
+							ptr = in.getPos();
+							retVal = ptr;
+							state = eAttribute;
+							JSON_NAMESPACE::SkipWhitespace(in);
+							bHaveAtts = true;
+							break;
+						}
+						case '>':
+						{
+							parseResult = generateError(in, "Unexpected >.");
+							return false;
+						}
+					}
+					break;
+				}
+
+				case eComment:
+				{
+					switch (c) 
+					{
+						default:
+							*ptr = c;
+							++ptr;
+							break;
+						case '-':
+							if (in.take() != '-') {
+								*ptr = c;
+								++ptr;
+								break;
+							}
+							if (in.take() != '>') {
+								*ptr = c;
+								++ptr;
+								break;
+							}
+							ptr = in.getPos();
+							retVal = ptr;
+							state = eRoot;
+							break;
+					}
+					break;
+				}
+
+				case eInfo:
+				{
+					switch (c) 
+					{
+						default:
+							*ptr = c;
+							++ptr;
+							break;
+						case '>':
+							ptr = in.getPos();
+							retVal = ptr;
+							state = eRoot;
+							JSON_NAMESPACE::SkipWhitespace(in);
+							break;
+					}
+					break;
+				}
+			}
+			if (in.tell() >= in.size()) {
+				break;
+			}
+		}
+		return true;
+	}
+
+	bool document::parseXML2(const sdstring &inStr, PREPARSEPTR preParser, const sdstring &preParseFileName)
+	{
+		if (myType == JSON_NAMESPACE::JSON_ARRAY) {
+			delete arr;
+			arr = NULL;
+		} else if (myType == JSON_NAMESPACE::JSON_OBJECT) {
+			delete obj;
+			obj = NULL;
+		}
+		myType = JSON_NAMESPACE::JSON_VOID;
+		m_number = 0;
+		m_boolean = false;
+		str.clear();
+		if (preParser == NULL) {
+			JSON_NAMESPACE::instring in(inStr);
+			JSON_NAMESPACE::SkipWhitespace(in);
+			bParseSuccessful = fastParse(in, *this, strParseResult);
+		} else {
+			sdstring sOut;
+			preParser(inStr, sOut, preParseFileName);
+			if (sOut.size() == 0) {
+				bParseSuccessful = false;
+				strParseResult = "XML Document failed to pre-parse.";
+				if (debug) {
+					debug("%s", strParseResult.c_str());
+					debug("%s", inStr.c_str());
+				}
+				return false;
+			}
+			JSON_NAMESPACE::instring in(inStr);
+			JSON_NAMESPACE::SkipWhitespace(in);
+			bParseSuccessful = fastParse(in, *this, strParseResult);
+		}
+		if (isA(JSON_NAMESPACE::JSON_OBJECT) && size() == 1) {
+			JSON_NAMESPACE::value a;
+			auto beg = this->begin();
+			sRootTag = beg.key().string();
+			std::swap(*(beg), a);
+			std::swap(*(static_cast<JSON_NAMESPACE::value*>(this)), a);
+			return bParseSuccessful;
+		} else {
+			strParseResult = "XML Requires there be only one root tag.";
+			return false;
+		}
+	}
+
 	bool document::parseXML(const sdstring &inStr, PREPARSEPTR preParser, const sdstring &preParseFileName)
 	{
 		if (myType == JSON_NAMESPACE::JSON_ARRAY) {
@@ -477,6 +977,38 @@ namespace DATA_NAMESPACE
 				bRetVal = parseXML(sDat, preParser, inStr);
 			} else {
 				bRetVal = parseXML(sDat, preParser);
+			}
+			bParseSuccessful = bRetVal;
+			memset(buffer, 0, l + 1);
+			free(buffer);
+			return bRetVal;
+		}
+		strParseResult = "Couldn't open file " + inStr;
+		bParseSuccessful = false;
+		return false;
+	}
+
+	bool document::parseXMLFile2(const sdstring &inStr, PREPARSEPTR preParser, bool bReWriteFile)
+	{
+		FILE* fd = fopen(inStr.c_str(), "rb");
+		if (fd) {
+			fseek(fd, 0, SEEK_END);
+			size_t l = (size_t)ftell(fd);
+			fseek(fd, 0, SEEK_SET);
+			char* buffer = static_cast<char*>(malloc(l + 1));
+
+			buffer[l] = 0;
+			size_t br = fread(buffer, 1, l, fd);
+			if (debug && br != l) {
+				debug("File size mismatch in %s.", inStr.c_str());
+			}
+			fclose(fd);
+			bool bRetVal;
+			sdstring sDat(buffer, l);
+			if (bReWriteFile) {
+				bRetVal = parseXML2(sDat, preParser, inStr);
+			} else {
+				bRetVal = parseXML2(sDat, preParser);
 			}
 			bParseSuccessful = bRetVal;
 			memset(buffer, 0, l + 1);

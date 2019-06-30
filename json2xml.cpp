@@ -56,7 +56,7 @@ int main (int argc, char ** argv)
 		}
 	} else if (ends_with(argv[0], "xmlpretty")) {
 		odata::document in;
-		if (in.parseXMLFile(argv[1])) {
+		if (in.parseXMLFile2(argv[1])) {
 			if (!in.writeXMLFile(argv[2], true)) {
 				std::cout << "Couldn't open '" << argv[2] << "'' for writing." << std::endl;
 				return 2;
@@ -68,7 +68,7 @@ int main (int argc, char ** argv)
 		}
 	} else if (ends_with(argv[0], "xml2json")) {
 		odata::document in;
-		if (in.parseXMLFile(argv[1])) {
+		if (in.parseXMLFile2(argv[1])) {
 			if (!in.writeFile(argv[2], true)) {
 				std::cout << "Couldn't open '" << argv[2] << "'' for writing." << std::endl;
 				return 2;
