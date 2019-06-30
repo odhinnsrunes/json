@@ -25,6 +25,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 #include <iomanip>
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/tinystr.h"
+#include <chrono>
 
 #if defined _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
@@ -545,9 +546,10 @@ namespace DATA_NAMESPACE
 						case '>':
 						{
 							sTag.assign(retVal, (size_t)(ptr - retVal));
-							if (out.exists(sTag)) {
-								JSON_NAMESPACE::value& jChild = out[sTag];
-								if (!jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
+							JSON_NAMESPACE::value& jChild = out[sTag];
+							int iIs = jChild.isA();
+							if (iIs != JSON_NAMESPACE::JSON_VOID) {
+								if (iIs != JSON_NAMESPACE::JSON_ARRAY) {
 									JSON_NAMESPACE::value a;
 
 									std::swap(jChild, a);
@@ -557,7 +559,7 @@ namespace DATA_NAMESPACE
 								}
 								pTag = &(jChild[jChild.size()]);
 							} else {
-								pTag = &(out[sTag]);
+								pTag = &(jChild);
 							}
 							if (sTag.empty()) {
 								std::cout << "Empty" << std::endl;
@@ -958,29 +960,59 @@ namespace DATA_NAMESPACE
 
 	bool document::parseXMLFile(const sdstring &inStr, PREPARSEPTR preParser, bool bReWriteFile)
 	{
+		auto start = std::chrono::steady_clock::now();
 		FILE* fd = fopen(inStr.c_str(), "rb");
+		auto mainStart = start;
 		if (fd) {
+			auto end = std::chrono::steady_clock::now();
+			std::cout << "open: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
+
 			fseek(fd, 0, SEEK_END);
 			size_t l = (size_t)ftell(fd);
 			fseek(fd, 0, SEEK_SET);
+
+			end = std::chrono::steady_clock::now();
+			std::cout << "size: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
+
 			char* buffer = static_cast<char*>(malloc(l + 1));
+			end = std::chrono::steady_clock::now();
+			std::cout << "allocate: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 
 			buffer[l] = 0;
 			size_t br = fread(buffer, 1, l, fd);
+			end = std::chrono::steady_clock::now();
+			std::cout << "read: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			if (debug && br != l) {
 				debug("File size mismatch in %s.", inStr.c_str());
 			}
 			fclose(fd);
+			end = std::chrono::steady_clock::now();
+			std::cout << "close: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			bool bRetVal;
 			sdstring sDat(buffer, l);
+			end = std::chrono::steady_clock::now();
+			std::cout << "sdstring: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			if (bReWriteFile) {
 				bRetVal = parseXML(sDat, preParser, inStr);
 			} else {
 				bRetVal = parseXML(sDat, preParser);
 			}
+			end = std::chrono::steady_clock::now();
+			std::cout << "parsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			bParseSuccessful = bRetVal;
 			memset(buffer, 0, l + 1);
 			free(buffer);
+			end = std::chrono::steady_clock::now();
+			std::cout << "freed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			std::cout << "TOTAL: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - mainStart).count() << std::endl << std::endl;
+			start = end;
 			return bRetVal;
 		}
 		strParseResult = "Couldn't open file " + inStr;
@@ -990,29 +1022,55 @@ namespace DATA_NAMESPACE
 
 	bool document::parseXMLFile2(const sdstring &inStr, PREPARSEPTR preParser, bool bReWriteFile)
 	{
+		auto start = std::chrono::steady_clock::now();
+		auto mainStart = start;
 		FILE* fd = fopen(inStr.c_str(), "rb");
 		if (fd) {
+			auto end = std::chrono::steady_clock::now();
+			std::cout << "open: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			fseek(fd, 0, SEEK_END);
 			size_t l = (size_t)ftell(fd);
 			fseek(fd, 0, SEEK_SET);
+			end = std::chrono::steady_clock::now();
+			std::cout << "size: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			char* buffer = static_cast<char*>(malloc(l + 1));
-
+			end = std::chrono::steady_clock::now();
+			std::cout << "allocate: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			buffer[l] = 0;
 			size_t br = fread(buffer, 1, l, fd);
+			end = std::chrono::steady_clock::now();
+			std::cout << "read: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			if (debug && br != l) {
 				debug("File size mismatch in %s.", inStr.c_str());
 			}
 			fclose(fd);
+			end = std::chrono::steady_clock::now();
+			std::cout << "close: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			bool bRetVal;
 			sdstring sDat(buffer, l);
+			end = std::chrono::steady_clock::now();
+			std::cout << "sdstring: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			if (bReWriteFile) {
 				bRetVal = parseXML2(sDat, preParser, inStr);
 			} else {
 				bRetVal = parseXML2(sDat, preParser);
 			}
+			end = std::chrono::steady_clock::now();
+			std::cout << "parsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
 			bParseSuccessful = bRetVal;
 			memset(buffer, 0, l + 1);
 			free(buffer);
+			end = std::chrono::steady_clock::now();
+			std::cout << "freed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+			start = end;
+			std::cout << "TOTAL: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - mainStart).count() << std::endl << std::endl;
 			return bRetVal;
 		}
 		strParseResult = "Couldn't open file " + inStr;
