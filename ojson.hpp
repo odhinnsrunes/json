@@ -22,7 +22,7 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
-#ifndef OJSON_HPP_
+#if !defined OJSON_HPP_
 #define OJSON_HPP_
 
 #define _USE_ADDED_ORDER_

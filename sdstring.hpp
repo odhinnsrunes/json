@@ -75,6 +75,7 @@ class sdstring : public base_sdstring
 		using base_sdstring::base_sdstring;
 		using base_sdstring::operator[];
 		using base_sdstring::operator=;
+//		using base_sdstring::operator<;
 		using base_sdstring::operator+=;
 		using base_sdstring::append;
 		using base_sdstring::assign;
@@ -138,6 +139,11 @@ class sdstring : public base_sdstring
             return (rhs != this->c_str());
         }
 
+//		size_t operator<(const sdstring& rhs) const
+//		{
+//			return std::less<std::string>{}(static_cast<std::string&>(*this), static_cast<std::string&>(rhs));
+//		}
+
 //        sdstring& append(const std::string& rhs)
 //        {
 //            this->append(rhs.c_str());
@@ -151,6 +157,10 @@ sdstring operator+(const sdstring & lhs, const char* rhs);
 std::string operator+(const std::string & lhs, const sdstring & rhs);
 bool operator==(const std::string & lhs, const sdstring & rhs);
 bool operator!=(const std::string & lhs, const sdstring & rhs);
+//size_t operator<(sdstring const& s, sdstring const& s2)
+//{
+//	return std::less<std::string>{}(static_cast<std::string&>(s), static_cast<std::string&>(s2));
+//}
 
 // struct SDStringComparator
 // {
@@ -168,7 +178,7 @@ template<>
 	{
         typedef sdstring argument_type;
         typedef std::size_t result_type;
-        result_type operator()(argument_type const& s) const noexcept
+		result_type operator()(argument_type const& s) const
 		{
             return std::hash<std::string>{}(std::string(s.c_str()));
 		}
@@ -178,7 +188,7 @@ template<>
 	{
         typedef sdstring argument_type;
         typedef std::size_t result_type;
-        result_type operator()(argument_type const& s, argument_type const& s2) const noexcept
+		result_type operator()(argument_type const& s, argument_type const& s2) const
 /*        typedef bool result_type;
         result_type operator()(argument_type const& s, argument_type const& s2) const NOEXCEPT*/
 		{

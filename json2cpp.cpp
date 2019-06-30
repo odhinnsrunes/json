@@ -22,14 +22,14 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
-#include "json.hpp"
+#include "data.hpp"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 
 #define endStr "\n"
 
-void write(const std::string &sPrefix, json::value & val, std::string & dest)
+void write(const std::string &sPrefix, ojson::value & val, std::string & dest)
 {
 	switch (val.isA())
 	{
@@ -90,7 +90,7 @@ void write(const std::string &sPrefix, json::value & val, std::string & dest)
 		case json::JSON_ARRAY:
 		{
 			size_t iIndex = 0;
-			for (json::value & subVal : val) {
+			for (ojson::value & subVal : val) {
 				std::string sNewPrefix(sPrefix);
 				sNewPrefix.reserve(sPrefix.size() + 24);
 				sNewPrefix.append("[");
@@ -104,7 +104,7 @@ void write(const std::string &sPrefix, json::value & val, std::string & dest)
 
 		case json::JSON_OBJECT:
 		{
-			for (json::value & subVal : val) {
+			for (ojson::value & subVal : val) {
 				std::string sNewPrefix(sPrefix);
 				sNewPrefix.reserve(sPrefix.size() + subVal.key().size() + 2);
 				sNewPrefix.append("[\"");
@@ -126,7 +126,7 @@ int main(int argc, char const *argv[])
 		return 1;
 	}
 
-	json::document jDoc;
+	odata::document jDoc;
 
 	if (jDoc.parseFile(argv[1])) {
 		std::string output;
@@ -140,6 +140,25 @@ int main(int argc, char const *argv[])
 			std::ofstream ofs (argv[3], std::ofstream::out);
 
 			ofs << "json::document " << argv[2] << ";" << std::endl << std::endl;
+
+  			ofs << output;
+
+  			ofs.close();
+		}
+		return 0;		
+	} else if (jDoc.parseXMLFile(argv[1])) {
+		std::string output;
+		write(argv[2], jDoc, output);
+
+		if (argc < 4) {
+			std::cout << "odata::document " << argv[2] << ";" << std::endl << std::endl;
+			std::cout << argv[2] << ".rootTag(\"" << jDoc.rootTag() << "\");" << std::endl;
+			std::cout << output;
+		} else {
+			std::ofstream ofs (argv[3], std::ofstream::out);
+
+			ofs << "odata::document " << argv[2] << ";" << std::endl << std::endl;
+			ofs << argv[2] << ".rootTag(\"" << jDoc.rootTag() << "\");" << std::endl;
 
   			ofs << output;
 

@@ -22,7 +22,7 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
-#ifndef _JSON_DATABASE_HPP_
+#if !defined _JSON_DATABASE_HPP_
 #define _JSON_DATABASE_HPP_
 
 #if defined _USE_ADDED_ORDER_

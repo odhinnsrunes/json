@@ -23,7 +23,7 @@ The official repository for this library is at https://github.com/odhinnsrunes/j
 
 */
 #if !defined _DATA_HPP || defined _ODATA_HPP_START
-#ifndef _ODATA_HPP_START
+#if !defined _ODATA_HPP_START
 #define _DATA_HPP
 #endif
 
@@ -35,7 +35,7 @@ class TiXmlNode;
 
 #if defined _USE_ADDED_ORDER_
 #undef _USE_ADDED_ORDER_
-#ifndef SUPPORT_ORDERED_JSON
+#if !defined SUPPORT_ORDERED_JSON
 #define SUPPORT_ORDERED_JSON
 #endif
 #include "json.hpp"
@@ -45,7 +45,7 @@ class TiXmlNode;
 // #include "json.hpp"
 #define JSON_NAMESPACE ojson
 #define DATA_NAMESPACE odata
-#ifndef SUPPORT_ORDERED_JSON
+#if !defined SUPPORT_ORDERED_JSON
 #define SUPPORT_ORDERED_JSON
 #endif
 #else 
@@ -56,7 +56,7 @@ class TiXmlNode;
 
 namespace DATA_NAMESPACE
 {
-	std::string XMLEscape(const std::string& in, bool bAttribute = false);
+	sdstring XMLEscape(const sdstring& in, bool bAttribute = false);
 	
 	class document : public JSON_NAMESPACE::document
 	{
@@ -68,7 +68,7 @@ namespace DATA_NAMESPACE
 			bStandAlone = true;
 		}
 
-		document(std::string& in) 
+		document(sdstring& in) 
 		{
 			bForceXMLHeader = false;
 			bNoXMLHeader = false;
@@ -110,8 +110,8 @@ namespace DATA_NAMESPACE
 		bool standAlone() { 
 			return bStandAlone; 
 		}
-		typedef std::string& (*PREPARSEPTR)(const std::string& in, std::string& out, std::string fileName);
-		typedef std::string& (*PREWRITEPTR)(const std::string& in, std::string& out);
+		typedef sdstring& (*PREPARSEPTR)(const sdstring& in, sdstring& out, sdstring fileName);
+		typedef sdstring& (*PREWRITEPTR)(const sdstring& in, sdstring& out);
 		void forceXMLHeader(bool bSetTo) {
 			bForceXMLHeader = bSetTo;
 		}
@@ -124,61 +124,51 @@ namespace DATA_NAMESPACE
 		bool noXMLHeader() {
 			return bNoXMLHeader;
 		}
-		bool parseXML(std::string inStr, PREPARSEPTR = NULL, std::string preParseFileName = "");
+		bool parseXML(const sdstring &inStr, PREPARSEPTR = NULL, const sdstring &preParseFileName = "");
 
-		bool parseXMLFile(std::string inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
+		bool parseXMLFile(const sdstring &inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
 
-		std::string writeXML(const char * in, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
+		sdstring writeXML(const char * in, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
 		{ 
-			return writeXML(std::string(in), bPretty, bTabs, pre); 
+			return writeXML(std::string(in), bPretty, bTabs, pre);
 		}
 
-		std::string writeXML(std::string rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
-		std::string writeXML(bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+		sdstring writeXML(const sdstring &rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+		sdstring writeXML(bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
 
-		bool writeXMLFile(std::string inStr, std::string rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);		
-		bool writeXMLFile(const char * in, const char * root, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
+		bool writeXMLFile(const sdstring &inStr, const sdstring &rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+		bool writeXMLFile(const sdstring &inStr, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);
+
+		bool writeXMLFile(const sdstring &inStr, const char * rootElem, bool bPretty = true, bool bTabs = true, PREWRITEPTR pWriter = NULL)
 		{
-			return writeXMLFile(std::string(in), std::string(root), bPretty, bTabs, pre); 
+			return writeXMLFile(inStr, std::string(rootElem), bPretty, bTabs, pWriter);
 		}
-
-		bool writeXMLFile(std::string in, const char * root, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
-		{
-			return writeXMLFile(in, std::string(root), bPretty, bTabs, pre); 
-		}
-
-		bool writeXMLFile(const char * in, std::string root, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
-		{
-			return writeXMLFile(std::string(in), root, bPretty, bTabs, pre); 
-		}
-
-		bool writeXMLFile(std::string inStr, bool bPretty = true, bool bTabs = true, PREWRITEPTR = NULL);	
 	
-		std::string rootTag() { return sRootTag; }
-		void rootTag(std::string rootElem) { sRootTag = rootElem; }
+		sdstring rootTag() { return sRootTag; }
+		void rootTag(sdstring rootElem) { sRootTag = rootElem; }
 
 		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc);
-		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc, JSON_NAMESPACE::document jNameSpaces, bool begin = true);
-		static void stripNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
-		static void addNameSpace(JSON_NAMESPACE::value & jDoc, std::string sNameSpace, bool begin = true);
+		static void stripNameSpaces(JSON_NAMESPACE::value & jDoc, JSON_NAMESPACE::document & jNameSpaces, bool begin = true);
+		static void stripNameSpace(JSON_NAMESPACE::value & jDoc, sdstring sNameSpace, bool begin = true);
+		static void addNameSpace(JSON_NAMESPACE::value & jDoc, sdstring sNameSpace, bool begin = true);
 
 		void stripMyNameSpaces();
-		void stripMyNameSpaces(JSON_NAMESPACE::document jNameSpaces);
-		void stripMyNameSpace(std::string sNameSpace);
-		void addMyNameSpace(std::string sNameSpace);
+		void stripMyNameSpaces(JSON_NAMESPACE::document & jNameSpaces);
+		void stripMyNameSpace(sdstring sNameSpace);
+		void addMyNameSpace(sdstring sNameSpace);
 
 	private:
 		void parseXMLElement(JSON_NAMESPACE::value& ret, const TiXmlNode * elem);
-		void writeXML(std::string & str, JSON_NAMESPACE::value & ret, int depth, bool bPretty = true, bool bTabs = true);
+		void writeXML(sdstring & str, JSON_NAMESPACE::value & ret, size_t depth, bool bPretty = true, bool bTabs = true);
 
-		std::string sRootTag;
+		sdstring sRootTag;
 		bool bForceXMLHeader;
 		bool bNoXMLHeader;
 		bool bStandAlone;
 	};
 
-#ifndef _USE_ADDED_ORDER_
-	#define DATA_ATT(x) std::string("@") + x
+#if !defined _USE_ADDED_ORDER_
+	#define DATA_ATT(x) sdstring("@") + x
 	#define DATA_VAL "#value"
 	#define DATAENUMKEY(x, y) json::enumKey<x>(y, #y)
 	#define DATAATTENUMKEY(x, y) json::enumKey<x>(y, "@" #y)

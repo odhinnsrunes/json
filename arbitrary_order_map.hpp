@@ -22,35 +22,39 @@ THE SOFTWARE.
 The official repository for this library is at https://github.com/odhinnsrunes/json
 
 */
-#ifndef _ARBITRARY_ORDER_MAP_
+#if !defined _ARBITRARY_ORDER_MAP_
 #define _ARBITRARY_ORDER_MAP_
 
-#include <unordered_map>
+#define UNORDERED_TYPE map//unordered_map
+
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <memory>
 #include <iostream>
-template<class keyType, class valueType, class A = std::allocator<valueType> >
+#include "sdstring.hpp"
+
+template<class keyType, class valueType>
 class arbitrary_order_map
 {
 public:
 	typedef std::pair<keyType, valueType> pairType;
 	typedef std::unique_ptr<pairType> ptrType;
-	typedef typename std::unordered_map<keyType, pairType*>::iterator dataIterator;
+	typedef typename std::UNORDERED_TYPE<keyType, pairType*, std::hash<keyType>>::iterator dataIterator;
 	typedef typename std::vector<ptrType>::iterator keyIterator;
 	typedef std::pair<keyType, pairType*> dataType;
 	typedef std::pair<keyType, pairType> data2Type;
 	
 	arbitrary_order_map() {}
 
-	arbitrary_order_map(const std::unordered_map<keyType, valueType> &map)
-	{
-		reserve(map.size());
-		auto e = map.end();
-		for (auto it = map.begin(); it != e; ++it) {
-		   *this[it->first] = it->second;
-		}
-	}
+	// arbitrary_order_map(const std::map<keyType, valueType> &map)
+	// {
+	// 	reserve(map.size());
+	// 	auto e = map.end();
+	// 	for (auto it = map.begin(); it != e; ++it) {
+	// 	   *this[it->first] = it->second;
+	// 	}
+	// }
 	
 	arbitrary_order_map(const std::map<keyType, valueType> &map)
 	{
@@ -74,10 +78,10 @@ public:
 		}
 	}
 
-	arbitrary_order_map(arbitrary_order_map&& V)
+	arbitrary_order_map(arbitrary_order_map&& V) : data(std::move(V.data)), keys(std::move(V.keys))
 	{
-		keys = std::move(V.keys);
-		data = std::move(V.data);
+		// keys = std::move(V.keys);
+		// data = std::move(V.data);
 	}
 
 	arbitrary_order_map& operator=(const arbitrary_order_map& V)
@@ -109,25 +113,25 @@ public:
 
 	void reserve(size_t n)
 	{
-		data.reserve(n);
+//		data.reserve(n);
 		keys.reserve(n);
 	}
 	
 	valueType &operator[](const keyType &key)
 	{
-		dataIterator it = data.find(key);
-		if (it == data.end()) {
+		dataIterator it = data.lower_bound(key);
+		if (!(it != data.end() && it->first == key)) {
 			pairType* p = new pairType(key, valueType());
 			keys.emplace_back(ptrType(p));
-			data.emplace_hint(it, dataType(key, p));
-			return p->second;
+
+			return (*(data.emplace_hint(it, key, p))).second->second;
 		}
 		return ((*it).second)->second;
 	}
 
 	valueType &operator[](size_t index)
 	{
-		return *keys[index];
+		return keys[index].get()->second;
 	}
 
 	size_t size() const
@@ -189,9 +193,29 @@ public:
 
 		}
 
+		iterator(iterator&& rhs) : it(std::move(rhs.it))
+		{
+
+		}
+
 		~iterator()
 		{
 
+		}
+
+		iterator& operator=(const iterator& rhs)
+		{
+			if (this == &rhs) {
+				return *this;
+			}
+			it = rhs.it;
+			return *this;
+		}
+
+		iterator& operator=(iterator&& rhs)
+		{
+			std::swap(it, rhs.it);
+			return *this;
 		}
 
 		iterator& operator++() 
@@ -278,6 +302,11 @@ public:
 
 		}
 
+		const_iterator(const_iterator&& rhs) : it(std::move(rhs.it))
+		{
+
+		}
+
 		const_iterator(const fIterator& rhs) : it(rhs.it)
 		{
 
@@ -288,6 +317,21 @@ public:
 
 		}
 
+		const_iterator& operator=(const const_iterator& rhs)
+		{
+			if (this == &rhs) {
+				return *this;
+			}
+			it = rhs.it;
+			return *this;
+		}
+
+		const_iterator& operator=(const_iterator&& rhs)
+		{
+			std::swap(it, rhs.it);
+			return *this;
+		}
+
 		const_iterator& operator++() 
 		{
 			++it;
@@ -296,7 +340,7 @@ public:
 
 		const_iterator& operator++(int)
 		{
-			iterator tmp(*this);
+			const_iterator tmp(*this);
 			operator++();
 			return tmp;
 		}
@@ -308,7 +352,7 @@ public:
 
 		const_iterator& operator--(int)
 		{
-			iterator tmp(*this);
+			const_iterator tmp(*this);
 			operator--();
 			return tmp;
 		}
@@ -334,7 +378,7 @@ public:
 			return (*it).get();
 		}
 
-		const typename std::vector<ptrType>::const_iterator &real() 
+		const typename std::vector<ptrType>::const_iterator &real()
 		{
 			return it;
 		}
@@ -361,6 +405,11 @@ public:
 
 		}
 
+		reverse_iterator(reverse_iterator&& rhs) : it(std::move(rhs.it))
+		{
+
+		}
+
 		reverse_iterator(const fIterator& rhs) : it(typename std::vector<ptrType>::reverse_iterator(rhs.it))
 		{
 
@@ -369,6 +418,21 @@ public:
 		~reverse_iterator()
 		{
 
+		}
+
+		reverse_iterator& operator=(const reverse_iterator& rhs)
+		{
+			if (this == &rhs) {
+				return *this;
+			}
+			it = rhs.it;
+			return *this;
+		}
+
+		reverse_iterator& operator=(reverse_iterator&& rhs)
+		{
+			std::swap(it, rhs.it);
+			return *this;
 		}
 
 		reverse_iterator& operator++() 
@@ -417,7 +481,7 @@ public:
 			return (*it).get();
 		}
 
-		typename std::vector<ptrType>::reverse_iterator &real() 
+		typename std::vector<ptrType>::reverse_iterator &real()
 		{
 			return it;
 		}
@@ -588,7 +652,6 @@ public:
 	iterator insert(iterator start, iterator finnish)
 	{
 		iterator insIt = end();
-		reserve(std::distance(start, finnish));
 		auto e = finnish.real();
 		for (keyIterator keyIt = start.real(); keyIt != e;) {
 			insIt = insert(end(), *(*keyIt++));
@@ -599,7 +662,6 @@ public:
 	iterator insert(iterator at, iterator start, iterator finnish)
 	{
 		iterator insIt = at;
-		reserve(std::distance(start, finnish));
 		auto e = finnish.real();
 		for (keyIterator keyIt = start.real(); keyIt != e;) {
 			insIt = insert(insIt, *(*keyIt++));
@@ -608,7 +670,7 @@ public:
 		return insIt;
 	}
 protected:
-	std::unordered_map<keyType, pairType*>		data;
+	std::UNORDERED_TYPE<keyType, pairType*>		data;
 	std::vector<ptrType> 			keys;
 };
 
