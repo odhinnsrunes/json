@@ -452,7 +452,11 @@ namespace DATA_NAMESPACE
 		sdstring sAttribute;
 		JSON_NAMESPACE::value * pTag = nullptr;
 		bool bHadChars = false;
+		bool bHadNonNumber = false;
+		bool bHadDecimal = false;
+		bool bHadSign = false;
 		bool bHaveAtts = false;
+		size_t decimalPos = 0;
 		for (;;) {
 //			std::cout << sz << ", " << tl << std::endl;
 			char &c = in.take();
@@ -463,6 +467,26 @@ namespace DATA_NAMESPACE
 						default: {
 							*ptr = c;
 							++ptr;
+							if (c == '+' || c == '-') {
+								if(!bHadChars) {
+									bHadSign = true;
+								} else {
+									bHadNonNumber = true;
+								}
+							} else if (c == '.') {
+								if (!bHadNonNumber) {
+									if (bHadDecimal) {
+										bHadNonNumber = true;
+									} else {
+										decimalPos = size_t(ptr - retVal);
+										bHadDecimal = true;
+									}
+								} else {
+									bHadNonNumber = true;
+								}
+							} else if (c < '0' || c > '9')  {
+								bHadNonNumber = true;
+							}
 							if (c != ' ' && c != '\r' && c != '\n' && c != '\t') {
 								bHadChars = true;
 							}
@@ -478,8 +502,23 @@ namespace DATA_NAMESPACE
 								return false;
 							}
 							if (bHadChars) {
-								JSON_NAMESPACE::value temp = std::string(retVal, (size_t)(ptr - retVal));
-								std::swap(out, temp);
+								size_t len = (size_t)(ptr - retVal);
+								if (bHadNonNumber || (*retVal == '0' && *(retVal+1) != '.' && len > 1)) {
+									JSON_NAMESPACE::value temp = std::string(retVal, len);
+									std::swap(out, temp);
+								} else {
+									std::istringstream convert(std::string(retVal, len));
+									double d = 0.0;
+									if (!(convert >> d)) {
+										out = 0.0;
+										out.fixedDecimal(1);
+									} else {
+										out = d;
+										if (bHadDecimal) {
+											out.fixedDecimal(len - decimalPos);
+										}
+									}
+								}
 //								out = std::string(retVal, (size_t)(ptr - retVal));
 							}
 							state = eTag;
@@ -487,12 +526,12 @@ namespace DATA_NAMESPACE
 							retVal = ptr;
 							break;
 						}
-//						case '&':
-//						{
-//							lastState = state;
-//							state = eEscape;
-//							break;
-//						}
+						case '&':
+						{
+							lastState = state;
+							state = eEscape;
+							break;
+						}
 						case '>':
 						{
 							parseResult = generateError(in, "Unexpected >");
@@ -546,7 +585,7 @@ namespace DATA_NAMESPACE
 						case '>':
 						{
 							sTag.assign(retVal, (size_t)(ptr - retVal));
-							JSON_NAMESPACE::value& jChild = out[sTag];
+							JSON_NAMESPACE::value& jChild(out[sTag]);
 							int iIs = jChild.isA();
 							if (iIs != JSON_NAMESPACE::JSON_VOID) {
 								if (iIs != JSON_NAMESPACE::JSON_ARRAY) {
@@ -568,6 +607,10 @@ namespace DATA_NAMESPACE
 								return false;
 							} else {
 								pTag = nullptr;
+								bHadNonNumber = false;
+								bHadDecimal = false;
+								decimalPos = 0;
+								bHadSign = false;
 								bHadChars = false;
 								bHaveAtts = false;
 								state = eRoot;
@@ -656,19 +699,65 @@ namespace DATA_NAMESPACE
 					switch (c) {
 						default:
 						{
-							*ptr = c;
-							++ptr;
-							bHadChars = true;
-							break;
+							parseResult = generateError(in, "Invalid Escape.");
+							return false;
 						}
-						case ';':
+						case 'a':
 						{
-							// do something with it.
-							ptr = in.getPos();
-							retVal = ptr;
-							state = lastState;
-							break;
+							char & c2 = in.take();
+							if (c2 == 'm') {
+								if (in.take() == 'p' && in.take() == ';') {
+									*ptr = '&';
+									++ptr;
+									bHadChars = true;
+									state = lastState;
+									break;
+								}
+							} else if (c2 == 'p') {
+								if (in.take() == 'o' && in.take() == 's' && in.take() == ';') {
+									*ptr = '\'';
+									++ptr;
+									bHadChars = true;
+									state = lastState;
+									break;
+								}
+							}
+							parseResult = generateError(in, "Invalid Escape.");
+							return false;
 						}
+						case 'g':
+							if (in.take() == 't' && in.take() == ';') {
+								*ptr = '>';
+								++ptr;
+								bHadChars = true;
+								state = lastState;
+								break;
+							}
+							parseResult = generateError(in, "Invalid Escape.");
+							return false;
+
+						case 'l':
+							if (in.take() == 't' && in.take() == ';') {
+								*ptr = '<';
+								++ptr;
+								bHadChars = true;
+								state = lastState;
+								break;
+							}
+							parseResult = generateError(in, "Invalid Escape.");
+							return false;
+
+						case 'q':
+							if (in.take() == 'u' && in.take() == 'o' && in.take() == 't' && in.take() == ';') {
+								*ptr = '"';
+								++ptr;
+								bHadChars = true;
+								state = lastState;
+								break;
+							}
+							parseResult = generateError(in, "Invalid Escape.");
+							return false;
+
 					}
 					break;
 				}
@@ -708,6 +797,10 @@ namespace DATA_NAMESPACE
 									pTag = nullptr;
 									ptr = in.getPos();
 									retVal = ptr;
+									bHadNonNumber = false;
+									bHadDecimal = false;
+									decimalPos = 0;
+									bHadSign = false;
 									bHadChars = false;
 									state = eRoot;
 								}
@@ -718,6 +811,24 @@ namespace DATA_NAMESPACE
 									return false;
 								}
 								return true;
+							} else if (cNext == '=') {
+								JSON_NAMESPACE::SkipWhitespace(in);
+								if (in.take() == '"') {
+									sAttribute.assign(retVal, (size_t)(ptr - retVal));
+									ptr = in.getPos();
+									retVal = ptr;
+									sAttribute.insert(0, "@");
+									state = eValue;
+									bHadNonNumber = false;
+									bHadDecimal = false;
+									decimalPos = 0;
+									bHadSign = false;
+									bHadChars = false;
+									break;
+								} else {
+									parseResult = generateError(in, "Attributes must be in quotes.");
+									return false;
+								}
 							}
 							JSON_NAMESPACE::SkipWhitespace(in);
 							break;
@@ -743,6 +854,10 @@ namespace DATA_NAMESPACE
 								pTag = nullptr;
 								ptr = in.getPos();
 								retVal = ptr;
+								bHadNonNumber = false;
+								bHadDecimal = false;
+								decimalPos = 0;
+								bHadSign = false;
 								bHadChars = false;
 								state = eRoot;
 							}
@@ -758,6 +873,11 @@ namespace DATA_NAMESPACE
 								ptr = in.getPos();
 								retVal = ptr;
 								sAttribute.insert(0, "@");
+								bHadChars = false;
+								bHadNonNumber = false;
+								bHadSign = false;
+								bHadDecimal = false;
+								decimalPos = 0;
 								state = eValue;
 								break;
 							} else {
@@ -776,34 +896,62 @@ namespace DATA_NAMESPACE
 						{
 							*ptr = c;
 							++ptr;
+							if (c == '+' || c == '-') {
+								if(!bHadChars) {
+									bHadSign = true;
+								} else {
+									bHadNonNumber = true;
+								}
+							} else if (c == '.') {
+								if (!bHadNonNumber) {
+									if (bHadDecimal) {
+										bHadNonNumber = true;
+									} else {
+										bHadDecimal = true;
+									}
+								} else {
+									bHadNonNumber = true;
+								}
+							} else if (c < '0' || c > '9')  {
+								bHadNonNumber = true;
+							}
 							bHadChars = true;
 							break;
 						}
-//						case '&':
-//						{
-//							lastState = state;
-//							state = eEscape;
-//							break;
-//						}
+						case '&':
+						{
+							lastState = state;
+							state = eEscape;
+							break;
+						}
 						case '"':
 						{
-//							if (out.exists(sTag)) {
-//								JSON_NAMESPACE::value& jChild = out[sTag];
-//								if (jChild.isA(JSON_NAMESPACE::JSON_ARRAY)) {
-//									jChild[jChild.size()][sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
-//								} else {
-//									out[sTag][sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
-//								}
-//							} else {
-//								out[sTag][sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
-//							}
-							(*pTag)[sAttribute] = sdstring(retVal, (size_t)(ptr - retVal));
-
+							size_t len = (size_t)(ptr - retVal);
+							if (bHadNonNumber || !bHadChars || (*retVal == '0' && *(retVal+1) != '.' && len > 1)) {
+								(*pTag)[sAttribute] = sdstring(retVal, len);
+							} else {
+								std::istringstream convert(sdstring(retVal, len));
+								double d = 0.0;
+								if (!(convert >> d)) {
+									(*pTag)[sAttribute] = 0.0;
+									(*pTag)[sAttribute].fixedDecimal(1);
+								} else {
+									(*pTag)[sAttribute] = d;
+									if (bHadDecimal) {
+										(*pTag)[sAttribute].fixedDecimal(len - decimalPos);
+									}
+								}
+							}
 							ptr = in.getPos();
 							retVal = ptr;
 							state = eAttribute;
 							JSON_NAMESPACE::SkipWhitespace(in);
 							bHaveAtts = true;
+							bHadChars = false;
+							bHadSign = false;
+							bHadNonNumber = false;
+							bHadDecimal = false;
+							decimalPos = 0;
 							break;
 						}
 						case '>':
