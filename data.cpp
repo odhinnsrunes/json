@@ -504,8 +504,29 @@ namespace DATA_NAMESPACE
 							if (bHadChars) {
 								size_t len = (size_t)(ptr - retVal);
 								if (bHadNonNumber || (*retVal == '0' && *(retVal+1) != '.' && len > 1)) {
-									JSON_NAMESPACE::value temp = std::string(retVal, len);
-									std::swap(out, temp);
+									sdstring sTemp(std::string(retVal, len));
+									int iIsBool = IsBool(sTemp);
+									switch (iIsBool) {
+										default:
+										case 0:
+										{
+											JSON_NAMESPACE::value temp = sTemp;
+											std::swap(out, temp);
+											break;
+										}
+										case 1:
+										{
+											JSON_NAMESPACE::value temp = false;
+											std::swap(out, temp);
+											break;
+										}
+										case 2:
+										{
+											JSON_NAMESPACE::value temp = true;
+											std::swap(out, temp);
+											break;
+										}
+									}
 								} else {
 									std::istringstream convert(std::string(retVal, len));
 									double d = 0.0;
@@ -599,9 +620,6 @@ namespace DATA_NAMESPACE
 								pTag = &(jChild[jChild.size()]);
 							} else {
 								pTag = &(jChild);
-							}
-							if (sTag.empty()) {
-								std::cout << "Empty" << std::endl;
 							}
 							if(fastParse(in, *pTag, parseResult) == false) {
 								return false;
@@ -928,7 +946,26 @@ namespace DATA_NAMESPACE
 						{
 							size_t len = (size_t)(ptr - retVal);
 							if (bHadNonNumber || !bHadChars || (*retVal == '0' && *(retVal+1) != '.' && len > 1)) {
-								(*pTag)[sAttribute] = sdstring(retVal, len);
+								sdstring sTemp(std::string(retVal, len));
+								int iIsBool = IsBool(sTemp);
+								switch (iIsBool) {
+									default:
+									case 0:
+									{
+										(*pTag)[sAttribute] = sdstring(retVal, len);
+										break;
+									}
+									case 1:
+									{
+										(*pTag)[sAttribute] = false;
+										break;
+									}
+									case 2:
+									{
+										(*pTag)[sAttribute] = true;
+										break;
+									}
+								}
 							} else {
 								std::istringstream convert(sdstring(retVal, len));
 								double d = 0.0;

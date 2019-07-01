@@ -737,7 +737,8 @@ namespace JSON_NAMESPACE
 	}
 
 	inline void MovingCharPointer::set(char n) {
-		*m_current++ = n;
+		*m_current = n;
+		++m_current;
 	}
 
 	char* MovingCharPointer::orig() {
