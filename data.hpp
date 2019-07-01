@@ -124,11 +124,11 @@ namespace DATA_NAMESPACE
 		bool noXMLHeader() {
 			return bNoXMLHeader;
 		}
+		bool parseXML_old(const sdstring &inStr, PREPARSEPTR = NULL, const sdstring &preParseFileName = "");
 		bool parseXML(const sdstring &inStr, PREPARSEPTR = NULL, const sdstring &preParseFileName = "");
-		bool parseXML2(const sdstring &inStr, PREPARSEPTR = NULL, const sdstring &preParseFileName = "");
 
+		bool parseXMLFile_old(const sdstring &inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
 		bool parseXMLFile(const sdstring &inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
-		bool parseXMLFile2(const sdstring &inStr, PREPARSEPTR = NULL, bool bReWriteFile = false);
 
 		sdstring writeXML(const char * in, bool bPretty = true, bool bTabs = true, PREWRITEPTR pre = NULL) 
 		{ 
