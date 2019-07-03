@@ -542,6 +542,11 @@ namespace DATA_NAMESPACE
 								}
 //								out = std::string(retVal, (size_t)(ptr - retVal));
 							}
+							bHadChars = false;
+							bHadSign = false;
+							bHadDecimal = false;
+							bHadNonNumber = false;
+							decimalPos = 0;
 							state = eTag;
 							ptr = in.getPos();
 							retVal = ptr;
@@ -594,12 +599,11 @@ namespace DATA_NAMESPACE
 							} else {
 								pTag = &(out[sTag]);
 							}
-							if (sTag.empty()) {
-								std::cout << "Empty" << std::endl;
-							}
+
 							ptr = in.getPos();
 							retVal = ptr;
 							state = eAttribute;
+							JSON_NAMESPACE::SkipWhitespace(in);
 							break;
 						}
 
@@ -641,10 +645,30 @@ namespace DATA_NAMESPACE
 
 						case '/':
 						{
-							state = eEndTag;
-							JSON_NAMESPACE::SkipWhitespace(in);
+							if (bHadChars) {
+								JSON_NAMESPACE::SkipWhitespace(in);
+								if (in.take() != '>') {
+									parseResult = generateError(in, "Improper end tag");
+									return false;
+								}
+								JSON_NAMESPACE::value &jValue = out[sTag];
+								if (jValue.isA(JSON_NAMESPACE::JSON_VOID)) {
+									jValue = "";
+								}
+								state = eRoot;
+								pTag = nullptr;
+								bHadNonNumber = false;
+								bHadDecimal = false;
+								decimalPos = 0;
+								bHadSign = false;
+								bHadChars = false;
+								bHaveAtts = false;
+							} else {
+								state = eEndTag;
+							}
 							break;
 						}
+
 						case '?':
 						{
 							if (!bHadChars) {
@@ -656,6 +680,7 @@ namespace DATA_NAMESPACE
 								return false;
 							}
 						}
+
 						case '!':
 						{
 							if (!bHadChars) {
@@ -703,6 +728,10 @@ namespace DATA_NAMESPACE
 						}
 						case '>':
 						{
+//							JSON_NAMESPACE::value &jValue = out[sTag];
+//							if (jValue.isA(JSON_NAMESPACE::JSON_VOID)) {
+//								jValue = "";
+//							}
 							parseResult.assign(retVal, (size_t)(ptr - retVal));
 							JSON_NAMESPACE::SkipWhitespace(in);
 							return true;
@@ -903,6 +932,26 @@ namespace DATA_NAMESPACE
 								return false;
 							}
 						}
+
+						case '/':
+						{
+							JSON_NAMESPACE::SkipWhitespace(in);
+							if (in.take() != '>') {
+								parseResult = generateError(in, "invalid end tag.");
+								return false;
+							}
+							bHadChars = false;
+							bHadNonNumber = false;
+							bHadSign = false;
+							bHadDecimal = false;
+							decimalPos = 0;
+							JSON_NAMESPACE::value &jValue = out[sTag];
+							if (jValue.isA(JSON_NAMESPACE::JSON_VOID)) {
+								jValue = "";
+							}
+							state = eRoot;
+							break;
+						}
 					}
 					break;
 				}
@@ -993,6 +1042,10 @@ namespace DATA_NAMESPACE
 						}
 						case '>':
 						{
+							JSON_NAMESPACE::value &jValue = out[sTag];
+							if (jValue.isA(JSON_NAMESPACE::JSON_VOID)) {
+								jValue = "";
+							}
 							parseResult = generateError(in, "Unexpected >.");
 							return false;
 						}
