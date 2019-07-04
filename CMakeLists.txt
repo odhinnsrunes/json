@@ -100,11 +100,6 @@ target_compile_definitions(xmlpretty PRIVATE SUPPORT_ORDERED_JSON _CRT_SECURE_NO
 set_property(TARGET xmlpretty PROPERTY CXX_STANDARD 17)
 target_link_libraries(xmlpretty PRIVATE json)
 
-add_executable(memtest memtest.cpp)
-target_compile_definitions(memtest PRIVATE SUPPORT_ORDERED_JSON _CRT_SECURE_NO_WARNINGS)
-set_property(TARGET memtest PROPERTY CXX_STANDARD 14)
-target_link_libraries(memtest PRIVATE json)
-
 add_executable(json2csv json2csv.cpp)
 target_compile_definitions(json2csv PRIVATE __STANDALONE_CSV__ SUPPORT_ORDERED_JSON _CRT_SECURE_NO_WARNINGS)
 set_property(TARGET json2csv PROPERTY CXX_STANDARD 17)
