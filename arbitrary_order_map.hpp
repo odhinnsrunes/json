@@ -40,7 +40,7 @@ class arbitrary_order_map
 public:
 	typedef std::pair<keyType, valueType> pairType;
 	typedef std::unique_ptr<pairType> ptrType;
-	typedef typename std::UNORDERED_TYPE<keyType, pairType*, std::hash<keyType>>::iterator dataIterator;
+	typedef typename std::UNORDERED_TYPE<keyType, pairType*>::iterator dataIterator;
 	typedef typename std::vector<ptrType>::iterator keyIterator;
 	typedef std::pair<keyType, pairType*> dataType;
 	typedef std::pair<keyType, pairType> data2Type;
