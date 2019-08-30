@@ -156,7 +156,7 @@ namespace DATA_NAMESPACE
 						if (iValType != 0) {
 							sdstring sValue = att->Value();
 
-							JSON_NAMESPACE::instring in(sValue);
+							JSON_NAMESPACE::instring in(sValue.data());
 							bool bFailed = false;
 							if (childref.isA(JSON_NAMESPACE::JSON_OBJECT)) {
 								JSON_NAMESPACE::numberParse(childref[DATA_VAL], in, &bFailed);
@@ -260,7 +260,7 @@ namespace DATA_NAMESPACE
 							if (iValType != 0) {
 								sdstring sValue = att->Value();
 
-								JSON_NAMESPACE::instring in(sValue);
+								JSON_NAMESPACE::instring in(sValue.data());
 					
 								bool bFailed = false;
 					
@@ -355,7 +355,7 @@ namespace DATA_NAMESPACE
 					if (iValType != 0) {
 						sdstring sValue = elem->Value();
 
-						JSON_NAMESPACE::instring in(sValue);
+						JSON_NAMESPACE::instring in(sValue.data());
 						bool bFailed = false;
 						if (ret.isA(JSON_NAMESPACE::JSON_OBJECT)) {
 							JSON_NAMESPACE::numberParse(ret[DATA_VAL], in, &bFailed);
@@ -1119,7 +1119,7 @@ namespace DATA_NAMESPACE
 		m_boolean = false;
 		str.clear();
 		if (preParser == NULL) {
-			JSON_NAMESPACE::instring in(inStr);
+			JSON_NAMESPACE::instring in(inStr.data());
 			JSON_NAMESPACE::SkipWhitespace(in);
 			bParseSuccessful = fastParse(in, *this, strParseResult);
 		} else {
@@ -1134,7 +1134,7 @@ namespace DATA_NAMESPACE
 				}
 				return false;
 			}
-			JSON_NAMESPACE::instring in(inStr);
+			JSON_NAMESPACE::instring in(inStr.data());
 			JSON_NAMESPACE::SkipWhitespace(in);
 			bParseSuccessful = fastParse(in, *this, strParseResult);
 		}

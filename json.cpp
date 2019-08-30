@@ -755,33 +755,37 @@ namespace JSON_NAMESPACE
 		return temp;
 	}
 
-	instring::instring(const sdstring& in) {
-		m_size = in.size();
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str;
-		memcpy(str, in.c_str(), m_size);
-		str[m_size] = 0;
-	}
-
-	instring::instring(const instring& in) {
-		m_size = in.m_size;
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str + (in.wpos - in.str);
-		memcpy(str, in.str, m_size);
-		str[m_size] = 0;
-	}
-
-	instring::instring(char* in) {
+	instring::instring(const char* in) {
 		m_size = strlen(in);
-		str = static_cast<char*>(malloc(m_size + 1));
+		str = (char*)in;//static_cast<char*>(malloc(m_size + 1));
 		wpos = str;
-		memcpy(str, in, m_size);
-		str[m_size] = 0;
+	}
+
+	instring & instring::operator=(const instring& in)
+	{
+		if (&in != this) {
+			m_size = in.m_size;
+			str = static_cast<char*>(malloc(m_size));
+			memcpy(str, in.str, m_size);
+			wpos = str + (in.wpos - in.str);
+			bMine = true;
+		}
+		return *this;
+	}
+
+	instring & instring::operator=(instring && in)
+	{
+		std::swap(str, in.str);
+		std::swap(wpos, in.wpos);
+		std::swap(m_size, in.m_size);
+		std::swap(bMine, in.bMine);
+		return *this;
 	}
 
 	instring::~instring() {
-		memset(str, 0, m_size);
-		free(str);
+		if (bMine) {
+			free(str);
+		}
 	}
 
 	void instring::seek(size_t newPos) {
@@ -792,84 +796,6 @@ namespace JSON_NAMESPACE
 
 	char* instring::getPos() {
 		return wpos;
-	}
-
-	instring& instring::operator=(const sdstring& in) {
-		memset(str, 0, m_size);
-		m_size = in.size();
-		free(str);
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str;
-		memcpy(str, in.c_str(), m_size);
-		str[m_size] = 0;
-		return *this;
-	}
-
-	instring& instring::operator=(const char* in) {
-		memset(str, 0, m_size);
-		m_size = strlen(in);
-		free(str);
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str;
-		memcpy(str, in, m_size);
-		str[m_size] = 0;
-		return *this;
-	}
-
-	instring& instring::operator=(const instring& in) {
-		if (this == &in)
-			return *this;
-		memset(str, 0, m_size);
-		m_size = in.m_size;
-		free(str);
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str + (in.wpos - in.str);
-		memcpy(str, in.str, m_size);
-		str[m_size] = 0;
-		return *this;
-	}
-
-	void instring::set(const sdstring &in) {
-		memset(str, 0, m_size);
-		m_size = in.size();
-		free(str);
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str;
-		memcpy(str, in.c_str(), m_size);
-		str[m_size] = 0;
-	}
-
-	void instring::set(const char* in) {
-		memset(str, 0, m_size);
-		m_size = strlen(in);
-		free(str);
-		str = static_cast<char*>(malloc(m_size + 1));
-		wpos = str;
-		memcpy(str, in, m_size);
-		str[m_size] = 0;
-	}
-
-	instring instring::operator+(double V) const
-	{
-		sdstring temp = *this;
-		std::ostringstream o;
-		o << std::setprecision(JSON_NUMBER_PRECISION) << V;
-		temp.append(o.str().c_str());
-		return temp;
-	}
-
-	instring instring::operator+(sdstring& V) const
-	{
-		sdstring temp = *this;
-		temp.append(V);
-		return temp;
-	}
-
-	instring instring::operator+(const char* V) const
-	{
-		sdstring temp = *this;
-		temp.append(V);
-		return temp;
 	}
 
 	sdstring instring::Str() const

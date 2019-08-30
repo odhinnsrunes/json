@@ -28,6 +28,7 @@ option(ORDERED_JSON "Is the ordered json (ojson::document) class required" ON)
 option(DATA_DOCUMENT "Is the xml functionality (data/odata::document) class(es) required" ON)
 option(SAMPLES "Create sample programs" ON)
 option(STAND_ALONE "Stand Alone or part of another project." ON)
+option(TEST_EXAMPLE "Creates a sample used for testing features." OFF)
 
 if(STAND_ALONE)
 set(OBJECT_TYPE OBJECT)
