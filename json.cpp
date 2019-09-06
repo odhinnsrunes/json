@@ -2908,6 +2908,7 @@ namespace JSON_NAMESPACE
 			} else if (pParentArray) {
 				arr->setParentArray(pParentArray);
 			}
+			myType = JSON_ARRAY;
 		} else if (myType == JSON_ARRAY) {
 			arr->resize(iCount);
 		}
@@ -2921,6 +2922,7 @@ namespace JSON_NAMESPACE
 			} else if (pParentArray) {
 				arr->setParentArray(pParentArray);
 			}
+			myType = JSON_ARRAY;
 		} else if (myType == JSON_ARRAY) {
 			arr->resize(iCount, val);
 		}
