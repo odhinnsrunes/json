@@ -7,16 +7,6 @@
 
 std::vector< std::vector<std::string> > CSVData;
 
-std::string RTrim(const std::string &in) 
-{
-	std::string ret(in);
-	size_t l = ret.find_last_not_of(" \t\r\n");
-	if (l != std::string::npos && l < ret.size()) {
-		ret.resize(l + 1);
-	}
-	return ret;
-}
-
 std::string deQuote(std::string str)
 {
 	if (str[0] == '\"') {
@@ -112,17 +102,21 @@ int main(int argc, char ** argv)
 	}
 	size_t iLines = ParseCSV(argv[1]);
 
+	odata::document outDoc;
 	for (size_t i = 1; i < iLines; i++) {
-		odata::document outDoc;
 
-		for (size_t j = 1; j < CSVData[i].size(); j++) {
-			outDoc[CSVData[0][j]] = RTrim(CSVData[i][j]);
+		for (size_t j = 0; j < CSVData[i].size(); j++) {
+			if (CSVData[0][j].empty()) {
+				continue;
+			}
+			// printf("%s = %s\n", CSVData[0][j].c_str(), CSVData[i][j].c_str());
+			outDoc[i - 1][CSVData[0][j]] = CSVData[i][j];
 		}
-		if (std::string(argv[0]) == "csv2xml") {
-			outDoc.writeXMLFile(argv[2], argv[3], true);
-		} else {
-			outDoc.writeFile(argv[2], true);
-		}
+	}
+	if (std::string(argv[0]) == "csv2xml") {
+		outDoc.writeXMLFile(argv[2], argv[3], true);
+	} else {
+		outDoc.writeFile(argv[2], true);
 	}
 	return 0;
 
