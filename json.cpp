@@ -3509,7 +3509,7 @@ namespace JSON_NAMESPACE
 		myType = JSON_VOID;
 	}
 
-#if defined __GNUC__
+/*#if defined __GNUC__
 	void value::sort(bool (*compareFunc)(const value&, const value&)) {
 		if (myType == JSON_ARRAY) {
 			DEBUGPTR oldDebug = debug;
@@ -3518,7 +3518,7 @@ namespace JSON_NAMESPACE
 			debug = oldDebug;
 		}
 	}
-#else
+#else*/
 	void value::sort(bool (*compareFunc)(value&, value&)) {
 		if (myType == JSON_ARRAY) {
 			DEBUGPTR oldDebug = debug;
@@ -3527,7 +3527,7 @@ namespace JSON_NAMESPACE
 			debug = oldDebug;
 		}
 	}
-#endif
+//#endif
 	double value::number() const {
 		switch (myType) {
 		case JSON_NUMBER:
