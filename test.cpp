@@ -169,7 +169,25 @@ std::string & lpad(std::string & in, char with, size_t length)
 int main(int, char**)
 {
 	json::value::setDebug(Debug);
-	TEST(json::document);
-	TEST(ojson::document);
+	json::document jData;
+	jData["rows"][0]["key"][0] = "Hello";
+	jData["rows"][0]["key"][1] = "World";
+	jData["rows"][0]["value"] = 1;
+	jData["rows"][1]["key"] = "Hello Kitty";
+	jData["rows"][1]["value"] = 1;
+	jData["rows"][2]["key"][0] = "Hello Darkness";
+	jData["rows"][2]["key"][1] = "My Old Friend";
+	jData["rows"][2]["value"] = 1;
+
+	for (auto it = jData["rows"].begin(); it != jData["rows"].end(); ++it) {
+		if (!(*it)["key"].isA(json::JSON_ARRAY)) {
+			it = jData["rows"].erase(it);
+		}
+	}
+
+	std::cout << jData;
+
+//	TEST(json::document);
+//	TEST(ojson::document);
 	return 0;
 }

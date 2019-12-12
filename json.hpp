@@ -342,11 +342,8 @@ namespace JSON_NAMESPACE
 			void clear();
 			void destroy();
 
-#if defined __GNUC__
-			void sort(bool (*compareFunc)(const value&, const value&));
-#else
 			void sort(bool (*compareFunc)(value&, value&));
-#endif
+
 			value simpleSearch(value& searchFor, bool bSubStr = false);
 			size_t simpleCount(value& searchFor, bool bSubStr = false);
 			value merge(value& V);
