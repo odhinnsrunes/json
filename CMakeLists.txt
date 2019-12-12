@@ -106,7 +106,17 @@ target_compile_definitions(json2csv PRIVATE __STANDALONE_CSV__ SUPPORT_ORDERED_J
 set_property(TARGET json2csv PROPERTY CXX_STANDARD 17)
 target_link_libraries(json2csv PRIVATE json)
 
-install(TARGETS json2xml xml2json jsonpretty xmlpretty json2csv RUNTIME DESTINATION bin)
+add_executable(csv2json csv2json.cpp)
+target_compile_definitions(csv2json PRIVATE SUPPORT_ORDERED_JSON _CRT_SECURE_NO_WARNINGS)
+set_property(TARGET csv2json PROPERTY CXX_STANDARD 17)
+target_link_libraries(csv2json PRIVATE json)
+
+add_executable(csv2xml csv2json.cpp)
+target_compile_definitions(csv2xml PRIVATE SUPPORT_ORDERED_JSON _CRT_SECURE_NO_WARNINGS)
+set_property(TARGET csv2xml PROPERTY CXX_STANDARD 17)
+target_link_libraries(csv2xml PRIVATE json)
+
+install(TARGETS json2xml xml2json jsonpretty xmlpretty json2csv csv2json csv2xml RUNTIME DESTINATION bin)
 
 endif(SAMPLES)
 install(FILES odata.hpp DESTINATION include)
