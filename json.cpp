@@ -1134,7 +1134,7 @@ namespace JSON_NAMESPACE
 			ret++;
 		const_iterator it;
 		for (it = begin(); it != end(); ++it) {
-			if (it->second.myType != JSON_VOID) {
+			if (it->second.isA() != JSON_VOID) {
 				if (it != begin()) {
 					if (bPretty)
 						ret += 2;
