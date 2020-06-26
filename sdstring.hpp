@@ -145,22 +145,34 @@ class sdstring : public base_sdstring
     
 		bool operator==(const sdstring& rhs) const noexcept
         {
-            return (rhs == this->c_str());
+			if (rhs.size() != this->size()) {
+				return false;
+			}
+            return memcmp(rhs.data(), this->data(), this->size()) == 0;
         }
 
 		bool operator!=(const sdstring& rhs) const noexcept
         {
-            return (rhs != this->c_str());
-        }
+			if (rhs.size() != this->size()) {
+				return true;
+			}
+            return memcmp(rhs.data(), this->data(), this->size()) != 0;
+         }
 
 		bool operator==(const char* rhs) const noexcept
         {
-            return (reinterpret_cast<const std::string&>(*this) == rhs);
+			if (sdstring(rhs).size() != this->size()) {
+				return false;
+			}
+            return memcmp(rhs, this->data(), this->size()) == 0;
         }
 
 		bool operator!=(const char* rhs) const noexcept
         {
-            return (rhs != this->c_str());
+			if (sdstring(rhs).size() != this->size()) {
+				return true;
+			}
+            return memcmp(rhs, this->data(), this->size()) != 0;
         }
 
 //		size_t operator<(const sdstring& rhs) const

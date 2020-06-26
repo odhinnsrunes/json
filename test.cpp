@@ -98,6 +98,15 @@ void test(const char * type)
 		cout << "Failed!" << endl;
 	}
 
+	cout << "Compare ==:                 ";
+	if (jEnum == j1) {
+		cout << "Success!" << endl;
+	} else {
+		cout << "Failed!" << endl;
+		jEnum.writeFile("jenum.json", true);
+		j1.writeFile("j1.json", true);
+	}
+
 	cout << "Build                       ";
 	T j2;
 	for (size_t i = 0; i < 10; i++) {
@@ -113,14 +122,6 @@ void test(const char * type)
 		}
 	}
 	cout << "Done!" << endl;;
-
-
-	cout << "Compare ==:                 ";
-	if (j1 == j2) {
-		cout << "Success!" << endl;
-	} else {
-		cout << "Failed!" << endl;
-	}
 
 	cout << "Write File 2:               ";
 	if (j2.writeFile("test2.json", true)) {
