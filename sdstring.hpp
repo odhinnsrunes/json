@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2019 James Baker
+Copyright (c) 2012-2020 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -143,22 +143,22 @@ class sdstring : public base_sdstring
 //        return std::string(this->c_str());
 //    }
     
-        bool operator==(const sdstring& rhs) const
+		bool operator==(const sdstring& rhs) const noexcept
         {
             return (rhs == this->c_str());
         }
 
-        bool operator!=(const sdstring& rhs) const
+		bool operator!=(const sdstring& rhs) const noexcept
         {
             return (rhs != this->c_str());
         }
 
-        bool operator==(const char* rhs) const
+		bool operator==(const char* rhs) const noexcept
         {
             return (reinterpret_cast<const std::string&>(*this) == rhs);
         }
 
-        bool operator!=(const char* rhs) const
+		bool operator!=(const char* rhs) const noexcept
         {
             return (rhs != this->c_str());
         }
@@ -181,10 +181,10 @@ sdstring operator+(const sdstring & lhs, const char* rhs);
 std::string operator+(const std::string & lhs, const sdstring & rhs);
 bool operator==(const std::string & lhs, const sdstring & rhs);
 bool operator!=(const std::string & lhs, const sdstring & rhs);
-//size_t operator<(sdstring const& s, sdstring const& s2)
-//{
-//	return std::less<std::string>{}(static_cast<std::string&>(s), static_cast<std::string&>(s2));
-//}
+inline size_t operator<(sdstring const& s, sdstring const& s2)
+{
+	return std::less<std::string>{}(static_cast<std::string&>(s), static_cast<std::string&>(s2));
+}
 
 // struct SDStringComparator
 // {
@@ -202,7 +202,7 @@ template<>
 	{
         typedef sdstring argument_type;
         typedef std::size_t result_type;
-		result_type operator()(argument_type const& s) const
+		result_type operator()(const argument_type& s) const noexcept
 		{
             return std::hash<std::string>{}(std::string(s.c_str()));
 		}
@@ -212,7 +212,7 @@ template<>
 	{
         typedef sdstring argument_type;
         typedef std::size_t result_type;
-		result_type operator()(argument_type const& s, argument_type const& s2) const
+		result_type operator()(const argument_type& s, const argument_type& s2) const noexcept
 /*        typedef bool result_type;
         result_type operator()(argument_type const& s, argument_type const& s2) const NOEXCEPT*/
 		{

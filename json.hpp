@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2019 James Baker
+Copyright (c) 2012-2020 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -399,7 +399,9 @@ namespace JSON_NAMESPACE
 	class instring
 	{
 		public:
-			instring(const char* in);
+			instring(const sdstring& in);
+			instring(const instring& in);
+			instring(char* in);
 
 			~instring();
 
@@ -411,6 +413,8 @@ namespace JSON_NAMESPACE
 			void seek(size_t newPos);
 			char* getPos();
 
+			instring& operator=(const sdstring& in);
+			instring& operator=(const char* in);
 			instring& operator=(const instring& in);
 			instring& operator=(instring&& in);
 
@@ -423,13 +427,16 @@ namespace JSON_NAMESPACE
 				return sdstring(str);
 			}
 
+			instring operator+(sdstring& V) const;
+			instring operator+(const char* V) const;
+			instring operator+(double V) const;
+
 			sdstring Str() const;
 			sdstring SoFar() const;
 		private:
 			char* str;
 			char* wpos;
 			size_t m_size;
-			bool bMine = false;
 	};
 #if defined _USE_ADDED_ORDER_
 	typedef arbitrary_order_map<sdstring, value> myMap;
@@ -645,9 +652,11 @@ namespace JSON_NAMESPACE
 			object* pParentObject;
 	};
 
-	class iterator : public std::iterator<std::input_iterator_tag, value>{
+class iterator : public std::iterator<std::input_iterator_tag, value>
+	{
 		public:
 			friend class reverse_iterator;
+		
 			iterator() : bNone(true), bIsArray(false), bSetKey(false) {}
 			iterator(const myMap::iterator & it) : obj_it(it), bNone(false), bIsArray(false), bSetKey(false) {}
 			iterator(const myVec::iterator & it) : arr_it(it), bNone(false), bIsArray(true), bSetKey(false) {}
@@ -661,8 +670,13 @@ namespace JSON_NAMESPACE
 			iterator operator++(int);
 			iterator& operator--();
 			iterator operator--(int);
+#if defined _WIN32
+		bool operator==(const iterator& rhs) const;
+		bool operator!=(const iterator& rhs) const;
+#else
 			bool operator==(const iterator& rhs);
 			bool operator!=(const iterator& rhs);
+#endif
 			value& operator*();
 			value key();
 
@@ -701,8 +715,8 @@ namespace JSON_NAMESPACE
 			reverse_iterator operator++(int);
 			reverse_iterator& operator--();
 			reverse_iterator operator--(int);
-			bool operator==(const reverse_iterator& rhs);
-			bool operator!=(const reverse_iterator& rhs);
+		bool operator==(const reverse_iterator& rhs) const;
+		bool operator!=(const reverse_iterator& rhs) const;
 			value& operator*();
 			value key();
 

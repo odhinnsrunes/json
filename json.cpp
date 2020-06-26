@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2019 James Baker
+Copyright (c) 2012-2020 James Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -755,37 +755,33 @@ namespace JSON_NAMESPACE
 		return temp;
 	}
 
-	instring::instring(const char* in) {
-		m_size = strlen(in);
-		str = (char*)in;//static_cast<char*>(malloc(m_size + 1));
+	instring::instring(const sdstring& in) {
+		m_size = in.size();
+		str = static_cast<char*>(malloc(m_size + 1));
 		wpos = str;
+		memcpy(str, in.c_str(), m_size);
+		str[m_size] = 0;
 	}
 
-	instring & instring::operator=(const instring& in)
-	{
-		if (&in != this) {
+	instring::instring(const instring& in) {
 			m_size = in.m_size;
-			str = static_cast<char*>(malloc(m_size));
-			memcpy(str, in.str, m_size);
+		str = static_cast<char*>(malloc(m_size + 1));
 			wpos = str + (in.wpos - in.str);
-			bMine = true;
-		}
-		return *this;
+		memcpy(str, in.str, m_size);
+		str[m_size] = 0;
 	}
 
-	instring & instring::operator=(instring && in)
-	{
-		std::swap(str, in.str);
-		std::swap(wpos, in.wpos);
-		std::swap(m_size, in.m_size);
-		std::swap(bMine, in.bMine);
-		return *this;
+	instring::instring(char* in) {
+		m_size = strlen(in);
+		str = static_cast<char*>(malloc(m_size + 1));
+		wpos = str;
+		memcpy(str, in, m_size);
+		str[m_size] = 0;
 	}
 
 	instring::~instring() {
-		if (bMine) {
-			free(str);
-		}
+		memset(str, 0, m_size);
+		free(str);
 	}
 
 	void instring::seek(size_t newPos) {
@@ -796,6 +792,84 @@ namespace JSON_NAMESPACE
 
 	char* instring::getPos() {
 		return wpos;
+	}
+
+	instring& instring::operator=(const sdstring& in) {
+		memset(str, 0, m_size);
+		m_size = in.size();
+		free(str);
+		str = static_cast<char*>(malloc(m_size + 1));
+		wpos = str;
+		memcpy(str, in.c_str(), m_size);
+		str[m_size] = 0;
+		return *this;
+	}
+
+	instring& instring::operator=(const char* in) {
+		memset(str, 0, m_size);
+		m_size = strlen(in);
+		free(str);
+		str = static_cast<char*>(malloc(m_size + 1));
+		wpos = str;
+		memcpy(str, in, m_size);
+		str[m_size] = 0;
+		return *this;
+	}
+
+	instring& instring::operator=(const instring& in) {
+		if (this == &in)
+			return *this;
+		memset(str, 0, m_size);
+		m_size = in.m_size;
+		free(str);
+		str = static_cast<char*>(malloc(m_size + 1));
+		wpos = str + (in.wpos - in.str);
+		memcpy(str, in.str, m_size);
+		str[m_size] = 0;
+		return *this;
+	}
+
+	void instring::set(const sdstring &in) {
+		memset(str, 0, m_size);
+		m_size = in.size();
+		free(str);
+		str = static_cast<char*>(malloc(m_size + 1));
+		wpos = str;
+		memcpy(str, in.c_str(), m_size);
+		str[m_size] = 0;
+	}
+
+	void instring::set(const char* in) {
+		memset(str, 0, m_size);
+		m_size = strlen(in);
+		free(str);
+		str = static_cast<char*>(malloc(m_size + 1));
+		wpos = str;
+		memcpy(str, in, m_size);
+		str[m_size] = 0;
+	}
+
+	instring instring::operator+(double V) const
+	{
+		sdstring temp = *this;
+		std::ostringstream o;
+		o << std::setprecision(JSON_NUMBER_PRECISION) << V;
+		temp.append(o.str().c_str());
+		return temp;
+	}
+
+	instring instring::operator+(sdstring& V) const
+	{
+		sdstring temp = *this;
+		temp.append(V);
+		return temp;
+	}
+
+	instring instring::operator+(const char* V) const
+	{
+		sdstring temp = *this;
+		temp.append(V);
+		return temp;
 	}
 
 	sdstring instring::Str() const
@@ -4906,8 +4980,8 @@ namespace JSON_NAMESPACE
 		operator--();
 		return tmp;
 	}
-
-	bool iterator::operator==(const iterator& rhs) 
+#if defined _WIN32
+	bool iterator::operator==(iterator const& rhs) const
 	{
 		if (bNone && rhs.bNone)
 			return true;
@@ -4918,7 +4992,7 @@ namespace JSON_NAMESPACE
 		}
 	}
 
-	bool iterator::operator!=(const iterator& rhs) 
+	bool iterator::operator!=(iterator const& rhs) const
 	{
 		if (bNone && rhs.bNone)
 			return false;
@@ -4928,7 +5002,29 @@ namespace JSON_NAMESPACE
 			return obj_it != rhs.obj_it;
 		}
 	}
+#else
+	bool iterator::operator==(iterator const& rhs)
+	{
+		if (bNone && rhs.bNone)
+			return true;
+		if (bIsArray) {
+			return arr_it == rhs.arr_it;
+		} else {
+			return obj_it == rhs.obj_it;
+		}
+	}
 
+	bool iterator::operator!=(iterator const& rhs)
+	{
+		if (bNone && rhs.bNone)
+			return false;
+		if (bIsArray) {
+			return arr_it != rhs.arr_it;
+		} else {
+			return obj_it != rhs.obj_it;
+		}
+	}
+#endif
 	value& iterator::operator*() 
 	{
 		if (!bNone) {
@@ -5049,7 +5145,7 @@ namespace JSON_NAMESPACE
 			return tmp;
 		}
 
-		bool reverse_iterator::operator==(const reverse_iterator& rhs)
+		bool reverse_iterator::operator==(const reverse_iterator& rhs) const
 		{
 			if (bNone && rhs.bNone)
 				return true;
@@ -5060,7 +5156,7 @@ namespace JSON_NAMESPACE
 			}
 		}
 
-		bool reverse_iterator::operator!=(const reverse_iterator& rhs)
+		bool reverse_iterator::operator!=(const reverse_iterator& rhs) const
 		{
 			if (bNone && rhs.bNone)
 				return false;

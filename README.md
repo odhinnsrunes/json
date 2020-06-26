@@ -248,3 +248,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 The official repository for this library is at https://github.com/odhinnsrunes/json
+
+Copyright (c) 2012-2020 James Baker
