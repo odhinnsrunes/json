@@ -1436,6 +1436,7 @@ namespace JSON_NAMESPACE
 				arr->setParentArray(pParentArray);
 			}
 		}
+		arr->setNotEmpty();
 		if (index <= arr->size()) {
 			return iterator(arr->insert(arr->begin() + (long)index, V));
 		}
@@ -1460,6 +1461,7 @@ namespace JSON_NAMESPACE
 			delete arr;
 			arr = NULL;
 		}
+		obj->setNotEmpty();
 		return iterator(obj->insert(obj->end(), std::pair<sdstring, value>(index, V)));
 	}
 
@@ -1486,13 +1488,16 @@ namespace JSON_NAMESPACE
 
 	iterator value::insert(iterator position, value& V) {
 		if (position.IsArray() && myType == JSON_ARRAY) {
+			arr->setNotEmpty();
 			return iterator(arr->insert(position.arr(), V));
 #if defined _USE_ADDED_ORDER_
 		} else if (!position.IsArray() && !position.Neither() && myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
+			obj->setNotEmpty();
 			return iterator(obj->insert(position.obj(), V.begin().obj(), V.end().obj()));
 #else
 		} else if (myType == JSON_OBJECT && V.myType == JSON_OBJECT) {
 			obj->insert(V.begin().obj(), V.end().obj());
+			obj->setNotEmpty();
 			return obj->find(V.begin().key().string());
 #endif
 		} else {
@@ -1502,6 +1507,7 @@ namespace JSON_NAMESPACE
 
 	iterator value::insert(iterator position, const sdstring &key, value &V) {
 		if (!position.IsArray() && !position.Neither() && myType == JSON_OBJECT) {
+			obj->setNotEmpty();
 			return iterator(obj->insert(position.obj(), std::pair<sdstring, value>(key, V)));
 		} else {
 			return iterator();
@@ -1539,6 +1545,7 @@ namespace JSON_NAMESPACE
 					arr->setParentArray(pParentArray);
 				}
 			}
+			arr->setNotEmpty();
 			arr->insert(position.arr(), first.arr(), last.arr());
 #if defined _USE_ADDED_ORDER_
 		} else if (!position.IsArray() && !position.Neither() && !first.IsArray() && !first.Neither() && !last.IsArray() && !last.Neither()) {
@@ -1568,6 +1575,7 @@ namespace JSON_NAMESPACE
 #else
 			obj->insert(first.obj(), last.obj());
 #endif
+			obj->setNotEmpty();
 		}
 	}
 
@@ -1602,6 +1610,7 @@ namespace JSON_NAMESPACE
 					arr->setParentArray(pParentArray);
 				}
 			}
+			arr->setNotEmpty();
 			arr->insert(arr->end(), first.arr(), last.arr());
 		} else if (!first.IsArray() && !first.Neither() && !last.IsArray() && !last.Neither()) {
 			if (myType != JSON_OBJECT) {
@@ -1620,6 +1629,7 @@ namespace JSON_NAMESPACE
 				delete arr;
 				arr = NULL;
 			}
+			obj->setNotEmpty();
 			obj->insert(first.obj(), last.obj());
 		}
 	}
