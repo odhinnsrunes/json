@@ -81,7 +81,7 @@ namespace json
 				REDUCEPTR reduce;
 			};
 
-			std::recursive_mutex mtx;
+			std::recursive_timed_mutex mtx;
 			std::string sPath;
 			std::map <std::string, view> views;
 			document data;

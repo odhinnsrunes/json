@@ -87,6 +87,10 @@ class sdstring : public base_sdstring
 
 		sdstring(sdstring && rhs) : base_sdstring(std::move(rhs)) { }
 
+		sdstring(const base_sdstring & rhs) : base_sdstring(rhs.data(), rhs.size()) { }
+
+		sdstring(base_sdstring && rhs) : base_sdstring(std::move(rhs)) { }
+
 		sdstring(const std::string & rhs) : base_sdstring(rhs.data(), rhs.size()) { }
 
 		sdstring(std::string && rhs) : base_sdstring(std::move(rhs.data()), rhs.size()) { }
