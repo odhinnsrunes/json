@@ -1738,7 +1738,7 @@ namespace DATA_NAMESPACE
 					if (sKey[0] == '@') {
 						if (sKey.size() > (*nit).string().size()) {
 							if (sKey.substr(1, (*nit).string().size()) == (*nit)._sdstring()) {
-								sKey = sdstring("@") + sKey.substr((*nit).string().size() + 1);
+								sKey = sdstring("@") + (sdstring)sKey.substr((*nit).string().size() + 1);
 							}
 						}
 					} else {
@@ -1780,7 +1780,7 @@ namespace DATA_NAMESPACE
 				if (sKey.size() > sNameSpace.size()) {
 					if (sKey[0] == '@') {
 						if (sKey.substr(1, sNameSpace.size()) == sNameSpace) {
-							sKey = sdstring("@") + sKey.substr(sNameSpace.size() + 1);
+							sKey = sdstring("@") + (sdstring)sKey.substr(sNameSpace.size() + 1);
 						}
 					} else {
 						if (sKey.substr(0, sNameSpace.size()) == sNameSpace) {
