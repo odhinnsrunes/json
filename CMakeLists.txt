@@ -20,7 +20,7 @@
 # 
 # The official repository for this library is at https://github.com/odhinnsrunes/json
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 project(json_document)
 
