@@ -275,17 +275,20 @@ namespace JSON_NAMESPACE
 			value& operator[](size_t index);
 			value& operator[](const sdstring& index);
 
-			void push_back(const value& val);					   // Array
-			void push_back(value&& val);					   // Array
-			void push_front(const value& val);					  // Array
+			void push_back(const value& val);				// Array
+			void push_back(value&& val);					// Array
+			void push_front(const value& val);				// Array
 
 			value pop_back();								// Array
-			value pop_front();							   // Array
+			value pop_front();							   	// Array
 
-			void erase(size_t index);					   // Array
-			size_t erase(const sdstring &index);				  // Object
-			iterator erase(iterator it);						// Array / Object
-			iterator erase(iterator first, iterator last);	  // Array / Object
+			value & front();								// Array / Object
+			value & back();									// Array / Object
+
+			void erase(size_t index);					   	// Array
+			size_t erase(const sdstring &index);			// Object
+			iterator erase(iterator it);					// Array / Object
+			iterator erase(iterator first, iterator last);	// Array / Object
 
 			bool exists(size_t index);
 			bool exists(const sdstring& index);

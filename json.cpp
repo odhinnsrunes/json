@@ -2984,6 +2984,38 @@ namespace JSON_NAMESPACE
 		return ret;
 	}
 
+	value & value::back()
+	{
+		if (myType == JSON_ARRAY) {
+			if (!arr->empty()) {
+				return *(arr->rbegin());
+			}
+		} else if (myType == JSON_OBJECT) {
+			if (!obj->empty()) {
+				return (obj->rbegin())->second;
+			}
+		}
+		static value dummy;
+		dummy.destroy();
+		return dummy;
+	}
+
+	value & value::front()
+	{
+		if (myType == JSON_ARRAY) {
+			if (!arr->empty()) {
+				return *(arr->begin());
+			}
+		} else if (myType == JSON_OBJECT) {
+			if (!obj->empty()) {
+				return (obj->begin())->second;
+			}
+		}
+		static value dummy;
+		dummy.destroy();
+		return dummy;
+	}
+	
 	void value::resize(size_t iCount) {
 		if (myType == JSON_VOID) {
 			arr = new array();
